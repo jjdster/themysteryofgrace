@@ -49,7 +49,6 @@ export default function Home() {
               className="px-8 py-4 bg-accent text-white rounded-full font-medium hover:bg-accent-light transition-all flex items-center justify-center group"
             >
               First Things First — Are You Saved?
-              <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               to="/mystery"
@@ -62,7 +61,7 @@ export default function Home() {
               className="px-8 py-4 bg-white/10 text-secondary rounded-full font-medium hover:bg-white/20 transition-all flex items-center justify-center"
             >
               <Book className="mr-2 h-4 w-4" />
-              Theological Library
+              The Mystery of Grace Library
             </Link>
           </motion.div>
         </div>
