@@ -104,12 +104,16 @@ export default function BibleStudies() {
             <h2 className="text-3xl font-serif text-primary">Study Resources</h2>
             <div className="w-16 h-1 bg-accent mx-auto mt-4"></div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {['Online Bible', 'Greek Lexicon', 'Pauline Timeline'].map((tool) => (
-              <div key={tool} className="p-6 bg-primary text-secondary rounded-2xl flex items-center justify-between cursor-pointer hover:bg-accent transition-colors">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {['Online Bible', 'Greek Lexicon', 'Pauline Timeline', 'Theological Library'].map((tool) => (
+              <a 
+                key={tool} 
+                href={tool === 'Theological Library' ? '/library' : '#'}
+                className="p-6 bg-primary text-secondary rounded-2xl flex items-center justify-between cursor-pointer hover:bg-accent transition-colors"
+              >
                 <span className="font-medium tracking-wide">{tool}</span>
                 <ChevronRight className="h-5 w-5" />
-              </div>
+              </a>
             ))}
           </div>
         </section>

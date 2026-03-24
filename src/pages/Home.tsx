@@ -57,6 +57,13 @@ export default function Home() {
             >
               Discover the Mystery
             </Link>
+            <Link
+              to="/library"
+              className="px-8 py-4 bg-white/10 text-secondary rounded-full font-medium hover:bg-white/20 transition-all flex items-center justify-center"
+            >
+              <Book className="mr-2 h-4 w-4" />
+              Theological Library
+            </Link>
           </motion.div>
         </div>
       </section>

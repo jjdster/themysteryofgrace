@@ -7,6 +7,7 @@ import Videos from './pages/Videos';
 import Salvation from './pages/Salvation';
 import Testimony from './pages/Testimony';
 import BibleStudies from './pages/BibleStudies';
+import Library from './pages/Library';
 import Contact from './pages/Contact';
 import LiveStudy from './pages/LiveStudy';
 import { motion, AnimatePresence } from 'motion/react';
@@ -27,6 +28,7 @@ export default function App() {
                 <Route path="/mystery" element={<Mystery />} />
                 <Route path="/videos" element={<Videos />} />
                 <Route path="/studies" element={<BibleStudies />} />
+                <Route path="/library" element={<Library />} />
                 <Route path="/live-study" element={<LiveStudy />} />
                 <Route path="/contact" element={<Contact />} />
               </Routes>

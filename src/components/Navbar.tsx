@@ -14,6 +14,7 @@ export default function Navbar() {
     { name: 'The Mystery', path: '/mystery', icon: Info },
     { name: 'Videos', path: '/videos', icon: Youtube },
     { name: 'Bible Studies', path: '/studies', icon: BookOpen },
+    { name: 'Library', path: '/library', icon: BookOpen },
     { name: 'Live Study', path: '/live-study', icon: Video },
     { name: 'Contact', path: '/contact', icon: Mail },
   ];
