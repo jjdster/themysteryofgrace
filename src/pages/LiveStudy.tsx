@@ -78,7 +78,7 @@ export default function LiveStudy() {
           speechConfig: {
             voiceConfig: { prebuiltVoiceConfig: { voiceName: "Zephyr" } },
           },
-          systemInstruction: "You are a scholarly guide specializing in 'The Mystery of Grace' and the Pauline revelation. Your goal is to help the user understand the preaching of Jesus Christ according to the revelation of the mystery (Romans 16:25). Be respectful, insightful, and use scripture (KJV preferred) to support your points. You can see the user and hear them in real-time. If they show you a Bible verse or a book, try to read it and comment on it.",
+          systemInstruction: "You are a scholarly guide specializing in 'Grace Library' and the Pauline revelation. Your goal is to help the user understand the preaching of Jesus Christ according to the revelation of the mystery (Romans 16:25). Be respectful, insightful, and use scripture (KJV preferred) to support your points. You can see the user and hear them in real-time. If they show you a Bible verse or a book, try to read it and comment on it.",
           inputAudioTranscription: {},
           outputAudioTranscription: {},
         },
@@ -293,7 +293,7 @@ export default function LiveStudy() {
               </div>
               <p className="text-secondary/60 text-sm leading-relaxed mb-6">
                 Experience a real-time, face-to-face conversation with our AI scholarly guide. 
-                Discuss the "Mystery of Grace," ask questions about the Pauline revelation, or even show your Bible to the camera for joint study.
+                Discuss the "Grace Library," ask questions about the Pauline revelation, or even show your Bible to the camera for joint study.
               </p>
               <ul className="space-y-4 text-xs text-secondary/40 font-medium uppercase tracking-wider">
                 <li className="flex items-center gap-3">

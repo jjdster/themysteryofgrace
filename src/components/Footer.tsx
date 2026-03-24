@@ -9,7 +9,7 @@ export default function Footer() {
           <div className="col-span-2">
             <div className="flex items-center space-x-2 mb-6">
               <span className="text-2xl font-serif font-bold tracking-wider text-accent-light">
-                The Mystery of Grace
+                Grace Library
               </span>
             </div>
             <p className="text-secondary/60 max-w-md leading-relaxed">
@@ -44,7 +44,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-xs text-secondary/40 tracking-widest uppercase font-medium">
-          <p>© {new Date().getFullYear()} The Mystery of Grace. All Rights Reserved.</p>
+          <p>© {new Date().getFullYear()} Grace Library. All Rights Reserved.</p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <a href="#" className="hover:text-secondary transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-secondary transition-colors">Terms of Service</a>

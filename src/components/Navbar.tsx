@@ -30,7 +30,7 @@ export default function Navbar() {
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
               <span className="text-2xl font-serif font-bold tracking-wider text-accent-light">
-                The Mystery of Grace
+                Grace Library
               </span>
             </Link>
           </div>
