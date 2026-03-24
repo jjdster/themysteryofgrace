@@ -61,7 +61,7 @@ export default function Home() {
               className="px-8 py-4 bg-white/10 text-secondary rounded-full font-medium hover:bg-white/20 transition-all flex items-center justify-center"
             >
               <Book className="mr-2 h-4 w-4" />
-              Grace Library
+              The Mystery of Grace Library
             </Link>
           </motion.div>
         </div>

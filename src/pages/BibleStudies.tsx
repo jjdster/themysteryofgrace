@@ -105,10 +105,10 @@ export default function BibleStudies() {
             <div className="w-16 h-1 bg-accent mx-auto mt-4"></div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {['Online Bible', 'Greek Lexicon', 'Pauline Timeline', 'Grace Library'].map((tool) => (
+            {['Online Bible', 'Greek Lexicon', 'Pauline Timeline', 'The Mystery of Grace Library'].map((tool) => (
               <a 
                 key={tool} 
-                href={tool === 'Grace Library' ? '/library' : '#'}
+                href={tool === 'The Mystery of Grace Library' ? '/library' : '#'}
                 className="p-6 bg-primary text-secondary rounded-2xl flex items-center justify-between cursor-pointer hover:bg-accent transition-colors"
               >
                 <span className="font-medium tracking-wide">{tool}</span>
