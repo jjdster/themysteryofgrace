@@ -100,7 +100,7 @@ export default function Library() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-serif font-bold text-primary mb-4 tracking-tight">
-            Theological Library
+            Grace Library
           </h1>
           <div className="w-24 h-1 bg-accent mx-auto mb-6"></div>
           <p className="text-xl text-primary/70 max-w-3xl mx-auto font-light leading-relaxed">
