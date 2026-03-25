@@ -6,7 +6,7 @@ const books = [
   // Charles F. Baker
   { id: 'b1', title: 'Real Baptism', filename: 'BakerI01RealBaptism.pdf', author: 'Charles F. Baker' },
   { id: 'b2', title: 'Bible Truth', filename: 'BakerI02BibleTruth.pdf', author: 'Charles F. Baker' },
-  { id: 'b3', title: 'Understanding Acts', filename: 'BakerI03UnderstandingActs.pdf', author: 'Charles F. Baker' },
+  { id: 'b3', title: 'Understanding the Book of Acts', filename: 'BakerI03UnderstandingActs.pdf', author: 'Charles F. Baker' },
   { id: 'b4', title: 'Understanding the Gospels', filename: 'BakerI04UnderstandingGospels.pdf', author: 'Charles F. Baker' },
   { id: 'b5', title: 'A Dispensational Theology', filename: 'BakerI05ADispensationalTheology.pdf', author: 'Charles F. Baker' },
   { id: 'b6', title: 'Dispensational Synopsis of the New Testament', filename: 'BakerI06DispensationalSynopsisNT.pdf', author: 'Charles F. Baker' },
