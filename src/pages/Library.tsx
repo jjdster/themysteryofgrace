@@ -96,7 +96,8 @@ const authors = [
 // Configuration for PDF hosting
 // Change this to your GitHub Raw URL or Google Cloud Bucket URL
 // Example: 'https://raw.githubusercontent.com/jjdster/grace-library-assets/main'
-const PDF_BASE_URL = 'https://raw.githubusercontent.com/jjdster/grace-library-assets/main'; 
+// Using jsDelivr (cdn.jsdelivr.net) ensures PDFs open in the browser instead of downloading.
+const PDF_BASE_URL = 'https://cdn.jsdelivr.net/gh/jjdster/grace-library-assets@main'; 
 
 export default function Library() {
   const [activeAuthor, setActiveAuthor] = useState<string | null>(null);
