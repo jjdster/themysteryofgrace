@@ -48,7 +48,7 @@ export default function Mystery() {
             
             <div className="bg-primary/5 p-6 rounded-xl border-l-4 border-accent mb-8 space-y-4 italic text-sm">
               <div>
-                "But the Lord said unto him, Go thy way: for he is a chosen vessel unto me, to bear my name before the Gentiles, and kings, and the children of Israel: 16 For I will shew him how great things he must suffer for my name's sake."
+                "But the Lord said unto him, Go thy way: for he is a chosen vessel unto me, to bear my name before the Gentiles, and kings, and the children of Israel: 16 For I will show him how great things he must suffer for my name's sake."
                 <span className="block mt-1 font-bold not-italic">— Acts 9:15–16</span>
               </div>
               <div>

@@ -309,7 +309,7 @@ export default function Library() {
             <FileText className="h-12 w-12 mx-auto mb-6 text-accent-light opacity-80" />
             <h2 className="text-2xl font-serif font-bold mb-4">Study to Show Thyself Approved</h2>
             <p className="max-w-2xl mx-auto text-secondary/80 font-light leading-relaxed mb-8">
-              "Study to shew thyself approved unto God, a workman that needeth not to be ashamed, rightly dividing the word of truth." 
+              "Study to show thyself approved unto God, a workman that needeth not to be ashamed, rightly dividing the word of truth." 
               <br />
               <span className="italic opacity-60">— 2 Timothy 2:15</span>
             </p>

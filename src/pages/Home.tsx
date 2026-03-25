@@ -36,7 +36,7 @@ export default function Home() {
             transition={{ delay: 0.2 }}
             className="text-lg md:text-xl text-secondary/80 mb-10 font-light tracking-wide max-w-2xl mx-auto"
           >
-            "Study to shew thyself approved unto God, a workman that needeth not to be ashamed, rightly dividing the word of truth." — 2 Timothy 2:15
+            "Study to show thyself approved unto God, a workman that needeth not to be ashamed, rightly dividing the word of truth." — 2 Timothy 2:15
           </motion.p>
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
