@@ -1,8 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Book, Download, ExternalLink, FileText, ChevronLeft, User } from 'lucide-react';
+import { Book, Download, ExternalLink, FileText, ChevronLeft, User, Loader2 } from 'lucide-react';
+import { ref, listAll, getDownloadURL } from 'firebase/storage';
+import { storage } from '../firebase';
 
-const books = [
+interface BookType {
+  id: string;
+  title: string;
+  filename: string;
+  author: string;
+  downloadUrl?: string;
+}
+
+const initialBooks: BookType[] = [
   // Charles F. Baker
   { id: 'b1', title: 'Real Baptism', filename: 'BakerI01RealBaptism.pdf', author: 'Charles F. Baker' },
   { id: 'b2', title: 'Bible Truth', filename: 'BakerI02BibleTruth.pdf', author: 'Charles F. Baker' },
@@ -87,8 +97,73 @@ const authors = [
 
 export default function Library() {
   const [activeAuthor, setActiveAuthor] = useState<string | null>(null);
+  const [books, setBooks] = useState<BookType[]>(initialBooks);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchBooksFromStorage() {
+      try {
+        setLoading(true);
+        const storageRef = ref(storage, 'Librarypdfs');
+        const result = await listAll(storageRef);
+        
+        const booksWithUrls = await Promise.all(
+          result.items.map(async (item) => {
+            const url = await getDownloadURL(item);
+            const filename = item.name;
+            
+            // Try to find matching metadata from initialBooks
+            const existingBook = initialBooks.find(b => b.filename === filename);
+            
+            if (existingBook) {
+              return { ...existingBook, downloadUrl: url };
+            } else {
+              // Create a new entry for unknown files
+              // Try to infer author from filename (e.g., BakerI01...)
+              let author = 'Unknown Author';
+              if (filename.startsWith('Baker')) author = 'Charles F. Baker';
+              else if (filename.startsWith('Bulte')) author = 'Harry Bultema';
+              else if (filename.startsWith('Stam')) author = 'Cornelius R. Stam';
+              else if (filename.startsWith('Campb')) author = 'Donald G. Campbell';
+
+              // Clean up title from filename
+              const title = filename.replace(/\.pdf$/i, '').replace(/^[A-Z][a-z]+I\d+/, '').replace(/([A-Z])/g, ' $1').trim();
+
+              return {
+                id: `storage-${filename}`,
+                title: title || filename,
+                filename,
+                author,
+                downloadUrl: url
+              };
+            }
+          })
+        );
+
+        // Merge with initialBooks that might not be in storage yet (optional, but let's prioritize storage)
+        // For this request, we only want files from storage.
+        setBooks(booksWithUrls);
+      } catch (err) {
+        console.error('Error fetching books from storage:', err);
+        setError('Failed to load library resources. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchBooksFromStorage();
+  }, []);
 
   const filteredBooks = books.filter(book => book.author === activeAuthor);
+
+  if (loading && !activeAuthor) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-secondary-light">
+        <Loader2 className="h-12 w-12 text-accent animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -199,7 +274,7 @@ export default function Library() {
                       
                       <div className="mt-auto flex items-center space-x-4">
                         <a
-                          href={`/library/${book.filename}`}
+                          href={book.downloadUrl || `/library/${book.filename}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-primary text-secondary text-sm font-medium rounded-md hover:bg-primary-light transition-colors duration-200"
@@ -208,8 +283,8 @@ export default function Library() {
                           Read Online
                         </a>
                         <a
-                          href={`/library/${book.filename}`}
-                          download
+                          href={book.downloadUrl || `/library/${book.filename}`}
+                          download={book.filename}
                           className="inline-flex items-center justify-center p-2 text-primary/60 hover:text-accent hover:bg-accent/5 rounded-md transition-all duration-200"
                           title="Download PDF"
                         >
