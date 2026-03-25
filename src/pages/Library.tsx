@@ -93,6 +93,11 @@ const authors = [
   }
 ];
 
+// Configuration for PDF hosting
+// Change this to your GitHub Raw URL or Google Cloud Bucket URL
+// Example: 'https://raw.githubusercontent.com/jjdster/grace-library-assets/main'
+const PDF_BASE_URL = 'https://raw.githubusercontent.com/jjdster/grace-library-assets/main'; 
+
 export default function Library() {
   const [activeAuthor, setActiveAuthor] = useState<string | null>(null);
   const [books, setBooks] = useState<BookType[]>(initialBooks);
@@ -224,7 +229,7 @@ export default function Library() {
                       
                       <div className="mt-auto flex items-center space-x-4">
                         <a
-                          href={book.downloadUrl || `/library/${book.filename}`}
+                          href={book.downloadUrl || (PDF_BASE_URL.startsWith('http') ? `${PDF_BASE_URL}/${book.filename}` : `${PDF_BASE_URL}/${book.filename}`)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-primary text-secondary text-sm font-medium rounded-md hover:bg-primary-light transition-colors duration-200"
@@ -233,7 +238,7 @@ export default function Library() {
                           Read Online
                         </a>
                         <a
-                          href={book.downloadUrl || `/library/${book.filename}`}
+                          href={book.downloadUrl || (PDF_BASE_URL.startsWith('http') ? `${PDF_BASE_URL}/${book.filename}` : `${PDF_BASE_URL}/${book.filename}`)}
                           download={book.filename}
                           className="inline-flex items-center justify-center p-2 text-primary/60 hover:text-accent hover:bg-accent/5 rounded-md transition-all duration-200"
                           title="Download PDF"
