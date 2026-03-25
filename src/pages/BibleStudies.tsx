@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { Link } from 'react-router-dom';
 import { Play, FileText, Clock, ChevronRight } from 'lucide-react';
 
 export default function BibleStudies() {
@@ -106,14 +107,14 @@ export default function BibleStudies() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {['Online Bible', 'Greek Lexicon', 'Pauline Timeline', 'Grace Library'].map((tool) => (
-              <a 
+              <Link 
                 key={tool} 
-                href={tool === 'Grace Library' ? '/library' : '#'}
+                to={tool === 'Grace Library' ? '/library' : '#'}
                 className="p-6 bg-primary text-secondary rounded-2xl flex items-center justify-between cursor-pointer hover:bg-accent transition-colors"
               >
                 <span className="font-medium tracking-wide">{tool}</span>
                 <ChevronRight className="h-5 w-5" />
-              </a>
+              </Link>
             ))}
           </div>
         </section>

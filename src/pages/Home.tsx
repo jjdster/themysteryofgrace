@@ -43,23 +43,23 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4 }}
-            className="flex flex-col sm:flex-row justify-center gap-4"
+            className="flex flex-col sm:flex-row justify-center items-center gap-6 md:gap-8"
           >
             <Link
               to="/salvation"
-              className="px-8 py-4 bg-accent text-white rounded-full font-medium hover:bg-accent-light transition-all flex items-center justify-center group"
+              className="w-full sm:w-auto px-8 py-4 bg-accent text-white rounded-full font-medium hover:bg-accent-light transition-all flex items-center justify-center group text-center"
             >
               First Things First — Are You Saved?
             </Link>
             <Link
               to="/mystery"
-              className="px-8 py-4 border border-secondary/30 text-secondary rounded-full font-medium hover:bg-secondary/10 transition-all"
+              className="w-full sm:w-auto px-8 py-4 border border-secondary/30 text-secondary rounded-full font-medium hover:bg-secondary/10 transition-all text-center"
             >
               Discover the Mystery
             </Link>
             <Link
               to="/library"
-              className="px-8 py-4 bg-white/10 text-secondary rounded-full font-medium hover:bg-white/20 transition-all flex items-center justify-center"
+              className="w-full sm:w-auto px-8 py-4 bg-white/10 text-secondary rounded-full font-medium hover:bg-white/20 transition-all flex items-center justify-center text-center"
             >
               <Book className="mr-2 h-4 w-4" />
               Grace Library

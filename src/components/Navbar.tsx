@@ -36,12 +36,12 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Links */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center lg:space-x-4 xl:space-x-8">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className={`text-sm font-medium tracking-widest uppercase transition-colors hover:text-accent-light ${
+                className={`text-[10px] xl:text-xs font-medium tracking-widest uppercase transition-colors hover:text-accent-light whitespace-nowrap ${
                   location.pathname === link.path ? 'text-accent-light' : 'text-secondary'
                 }`}
               >
@@ -51,7 +51,7 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center">
+          <div className="lg:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="p-2 rounded-md hover:bg-primary-light transition-colors"
@@ -69,7 +69,7 @@ export default function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-primary border-t border-white/10"
+            className="lg:hidden bg-primary border-t border-white/10"
           >
             <div className="px-2 pt-2 pb-3 space-y-1">
               {navLinks.map((link) => (
