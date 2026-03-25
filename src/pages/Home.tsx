@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { ArrowRight, Book, Shield, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+// Force sync commit: show vs shew update
 export default function Home() {
   return (
     <motion.div 
