@@ -1,8 +1,6 @@
 import { motion } from 'motion/react';
 import { Mail, Send, MapPin, Phone, Loader2 } from 'lucide-react';
 import { useState, FormEvent } from 'react';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db, handleFirestoreError, OperationType } from '../firebase';
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
@@ -20,16 +18,15 @@ export default function Contact() {
       email: formData.get('email') as string,
       subject: formData.get('subject') as string,
       message: formData.get('message') as string,
-      createdAt: serverTimestamp(),
+      createdAt: new Date().toISOString(),
     };
 
     try {
-      const path = 'contact_messages';
-      await addDoc(collection(db, path), data);
+      // Firebase is disconnected. We'll just simulate a successful send.
+      console.log('Contact form data (simulated):', data);
       setSubmitted(true);
     } catch (err) {
       setError('Failed to send message. Please try again later.');
-      handleFirestoreError(err, OperationType.CREATE, 'contact_messages');
     } finally {
       setIsSubmitting(false);
     }

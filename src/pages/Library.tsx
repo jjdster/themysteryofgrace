@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Book, Download, ExternalLink, FileText, ChevronLeft, User, Loader2 } from 'lucide-react';
-import { ref, listAll, getDownloadURL } from 'firebase/storage';
-import { storage } from '../firebase';
 
 interface BookType {
   id: string;
@@ -102,57 +100,9 @@ export default function Library() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchBooksFromStorage() {
-      try {
-        setLoading(true);
-        const storageRef = ref(storage, 'Librarypdfs');
-        const result = await listAll(storageRef);
-        
-        const booksWithUrls = await Promise.all(
-          result.items.map(async (item) => {
-            const url = await getDownloadURL(item);
-            const filename = item.name;
-            
-            // Try to find matching metadata from initialBooks
-            const existingBook = initialBooks.find(b => b.filename === filename);
-            
-            if (existingBook) {
-              return { ...existingBook, downloadUrl: url };
-            } else {
-              // Create a new entry for unknown files
-              // Try to infer author from filename (e.g., BakerI01...)
-              let author = 'Unknown Author';
-              if (filename.startsWith('Baker')) author = 'Charles F. Baker';
-              else if (filename.startsWith('Bulte')) author = 'Harry Bultema';
-              else if (filename.startsWith('Stam')) author = 'Cornelius R. Stam';
-              else if (filename.startsWith('Campb')) author = 'Donald G. Campbell';
-
-              // Clean up title from filename
-              const title = filename.replace(/\.pdf$/i, '').replace(/^[A-Z][a-z]+I\d+/, '').replace(/([A-Z])/g, ' $1').trim();
-
-              return {
-                id: `storage-${filename}`,
-                title: title || filename,
-                filename,
-                author,
-                downloadUrl: url
-              };
-            }
-          })
-        );
-
-        // Merge with initialBooks that might not be in storage yet (optional, but let's prioritize storage)
-        // For this request, we only want files from storage.
-        setBooks(booksWithUrls);
-      } catch (err) {
-        console.error('Error fetching books from storage:', err);
-        setError('Failed to load library resources. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchBooksFromStorage();
+    // Firebase is disconnected. We'll just use the initialBooks.
+    setBooks(initialBooks);
+    setLoading(false);
   }, []);
 
   const filteredBooks = books.filter(book => book.author === activeAuthor);
