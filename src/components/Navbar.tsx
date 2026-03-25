@@ -25,15 +25,13 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 bg-primary text-secondary shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-20">
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2">
-              <span className="text-2xl font-serif font-bold tracking-wider text-accent-light">
-                Grace Library
-              </span>
-            </Link>
-          </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="flex flex-col items-center space-y-4">
+          <Link to="/" className="flex items-center">
+            <span className="text-2xl md:text-3xl font-serif font-bold tracking-wider text-accent-light text-center">
+              The Mystery of Grace
+            </span>
+          </Link>
 
           {/* Desktop Links */}
           <div className="hidden lg:flex items-center lg:space-x-4 xl:space-x-8">
@@ -49,16 +47,16 @@ export default function Navbar() {
               </Link>
             ))}
           </div>
+        </div>
 
-          {/* Mobile Menu Button */}
-          <div className="lg:hidden flex items-center">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-md hover:bg-primary-light transition-colors"
-            >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
+        {/* Mobile Menu Button - Absolute positioned for accessibility */}
+        <div className="lg:hidden absolute top-6 right-4">
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="p-2 rounded-md hover:bg-primary-light transition-colors"
+          >
+            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
         </div>
       </div>
 
