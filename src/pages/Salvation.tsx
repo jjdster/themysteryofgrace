@@ -71,11 +71,11 @@ export default function Salvation() {
             <ul className="space-y-4 text-primary/80">
               <li className="flex items-start">
                 <span className="font-bold mr-2">1.</span>
-                There is a judgment coming for all those who have not believed what God has said (Rev 20:11-15).
+                There is a judgment coming for all those who have not believed what God has said (Revelation 20:11–15).
               </li>
               <li className="flex items-start">
                 <span className="font-bold mr-2">2.</span>
-                It is impossible to truly understand Scripture without the presence of the Holy Spirit (1 Cor 2:14).
+                It is impossible to truly understand Scripture without the presence of the Holy Spirit (1 Corinthians 2:14).
               </li>
             </ul>
           </section>
@@ -87,8 +87,8 @@ export default function Salvation() {
             </div>
             <h2 className="text-3xl md:text-4xl font-serif text-primary mb-6">What Must You Do?</h2>
             <div className="max-w-2xl mx-auto space-y-6 text-lg">
-              <p className="font-bold text-primary">Believe the gospel—trust that Christ died for your sins, was buried, and rose again (1 Cor 15:1–4).</p>
-              <p className="text-primary/70">Trust in Him alone for your salvation, apart from works or any intrinsic righteousness (Rom 7:18).</p>
+              <p className="font-bold text-primary">Believe the gospel—trust that Christ died for your sins, was buried, and rose again (1 Corinthians 15:1–4).</p>
+              <p className="text-primary/70">Trust in Him alone for your salvation, apart from works or any intrinsic righteousness (Romans 7:18).</p>
             </div>
           </section>
         </motion.div>
