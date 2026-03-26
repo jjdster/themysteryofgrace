@@ -50,7 +50,7 @@ export default function Contact() {
         <p className="text-secondary/60 max-w-2xl mx-auto px-4">
           Have questions about the Mystery of Grace or the Revelation of the Mystery? We are here to help you in your study of the Word.
         </p>
-        <div className="mt-8 max-w-2xl mx-auto px-4 text-accent-light italic text-sm">
+        <div className="mt-8 max-w-2xl mx-auto px-4 text-accent-light italic text-lg">
           *** Please, if any one has any suggestion that might make this site more user friendly or, if you struggle finding what you are looking for or, if you find a typo or I misspeak, I would appreciate hearing from you. ***
         </div>
       </header>

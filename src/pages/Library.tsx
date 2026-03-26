@@ -135,7 +135,7 @@ export default function Library() {
           </h1>
           <div className="w-24 h-1 bg-accent mx-auto mb-6"></div>
           <p className="text-xl text-primary/70 max-w-3xl mx-auto font-light leading-relaxed">
-            Select an author below to explore their collection of Pauline Distinctive commentaries and theological guides.
+            As we search these writings, may the God of all grace direct our hearts and minds, protecting us from error and direct us into His truth. May He give us a spirit of wisdom and revelation in the knowledge of Him.
           </p>
         </div>
 

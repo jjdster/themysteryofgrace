@@ -141,8 +141,8 @@ export default function Home() {
                 It is my prayer that every person who visits this site will submit their will to God, asking Him to reveal Himself and His truth, so that we might all grow to know Him better.
               </p>
               
-              <div className="mt-12 pt-8 border-t border-primary/10 text-center italic text-primary/60">
-                <p className="mb-4">
+              <div className="mt-12 pt-8 border-t border-primary/10 text-center italic text-primary/90">
+                <p className="mb-4 text-lg">
                   *** Please, if any one has any suggestion that might make this site more user friendly or, if you struggle finding what you are looking for or, if you find a typo or I misspeak, I would appreciate hearing from you. ***
                 </p>
                 <a href="mailto:jjdster@gmail.com" className="text-accent font-bold hover:underline not-italic">

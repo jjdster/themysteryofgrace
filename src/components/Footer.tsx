@@ -15,7 +15,7 @@ export default function Footer() {
             <p className="text-secondary/60 max-w-md leading-relaxed">
               Dedicated to the study and promotion of the Pauline revelation and the Preaching of Jesus Christ according to the Revelation of the Mystery.
             </p>
-            <div className="mt-6 text-xs text-accent-light/70 italic leading-relaxed max-w-md">
+            <div className="mt-6 text-sm text-accent-light/90 italic leading-relaxed max-w-md">
               *** Please, if any one has any suggestion that might make this site more user friendly or, if you struggle finding what you are looking for or, if you find a typo or I misspeak, I would appreciate hearing from you. ***
               <a href="mailto:jjdster@gmail.com" className="block mt-1 text-accent-light hover:underline not-italic font-bold">jjdster@gmail.com</a>
             </div>
