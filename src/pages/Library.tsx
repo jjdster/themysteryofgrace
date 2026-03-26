@@ -68,6 +68,16 @@ const initialBooks: BookType[] = [
   { id: 'c5', title: 'Romans 1-8 Volume 1', filename: 'CampbI05Romans1.8Volume1.pdf', author: 'Donald G. Campbell' },
   { id: 'c6', title: 'Romans 9-16 Volume 2', filename: 'CampbI06Romans9.16Volume2.pdf', author: 'Donald G. Campbell' },
   { id: 'c7', title: 'Sovereignty of God', filename: 'CampbI07SovereigntyofGod.pdf', author: 'Donald G. Campbell' },
+
+  // Fink
+  { id: 'f1', title: 'Fink Resource 1', filename: 'FinckI01.pdf', author: 'Fink' },
+  { id: 'f2', title: 'Fink Resource 2', filename: 'FinckI02.pdf', author: 'Fink' },
+  { id: 'f3', title: 'Fink Resource 3', filename: 'FinckI03.pdf', author: 'Fink' },
+  { id: 'f4', title: 'Fink Resource 4', filename: 'FinckI04.pdf', author: 'Fink' },
+
+  // Wilson
+  { id: 'w1', title: 'Wilson Resource 1', filename: 'WilsoI01.pdf', author: 'Wilson' },
+  { id: 'w2', title: 'Wilson Resource 2', filename: 'WilsoI02.pdf', author: 'Wilson' },
 ];
 
 const authors = [
@@ -90,6 +100,16 @@ const authors = [
     name: 'Donald G. Campbell', 
     description: 'Theologian and author focused on dispensational truth and biblical commentaries.',
     count: 7
+  },
+  { 
+    name: 'Fink', 
+    description: 'Theological works and commentaries by Fink.',
+    count: 4
+  },
+  { 
+    name: 'Wilson', 
+    description: 'Theological works and commentaries by Wilson.',
+    count: 2
   }
 ];
 
