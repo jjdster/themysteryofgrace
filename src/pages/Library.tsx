@@ -76,8 +76,8 @@ const initialBooks: BookType[] = [
   { id: 'f4', title: 'Common Questions About the Grace Message', filename: 'FinckI04.pdf', author: 'Joel Fink' },
 
   // Wilson
-  { id: 'w1', title: 'Wilson Resource 1', filename: 'WilsoI01.pdf', author: 'Wilson' },
-  { id: 'w2', title: 'Wilson Resource 2', filename: 'WilsoI02.pdf', author: 'Wilson' },
+  { id: 'w1', title: 'So Run That You May Win', filename: 'WilsoI01-1.pdf', author: 'Roland Wilson' },
+  { id: 'w2', title: 'Thematic Preaching', filename: 'WilsoI02-1.pdf', author: 'Roland Wilson' },
 ];
 
 const authors = [
@@ -102,12 +102,12 @@ const authors = [
     count: 7
   },
   { 
-    name: 'Fink', 
+    name: 'Joel Fink', 
     description: 'Theological works and commentaries by Fink.',
     count: 4
   },
   { 
-    name: 'Wilson', 
+    name: 'Roland Wilson', 
     description: 'Theological works and commentaries by Wilson.',
     count: 2
   }
