@@ -70,10 +70,10 @@ const initialBooks: BookType[] = [
   { id: 'c7', title: 'Sovereignty of God', filename: 'CampbI07SovereigntyofGod.pdf', author: 'Donald G. Campbell' },
 
   // Fink
-  { id: 'f1', title: 'The Mystery', filename: 'FinckI01.pdf', author: 'Fink' },
-  { id: 'f2', title: 'Lordship Salvation', filename: 'FinckI02.pdf', author: 'Fink' },
-  { id: 'f3', title: 'The Power of God Unto Salvation', filename: 'FinckI03.pdf', author: 'Fink' },
-  { id: 'f4', title: 'Common Questions About the Grace Message', filename: 'FinckI04.pdf', author: 'Fink' },
+  { id: 'f1', title: 'The Mystery', filename: 'FinckI01.pdf', author: 'Joel Fink' },
+  { id: 'f2', title: 'Lordship Salvation', filename: 'FinckI02.pdf', author: 'Joel Fink' },
+  { id: 'f3', title: 'The Power of God Unto Salvation', filename: 'FinckI03.pdf', author: 'Joel Fink' },
+  { id: 'f4', title: 'Common Questions About the Grace Message', filename: 'FinckI04.pdf', author: 'Joel Fink' },
 
   // Wilson
   { id: 'w1', title: 'Wilson Resource 1', filename: 'WilsoI01.pdf', author: 'Wilson' },
