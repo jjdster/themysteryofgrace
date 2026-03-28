@@ -107,7 +107,7 @@ export default function VoiceAssistant() {
       streamRef.current = stream;
 
       // 3. Initialize AI
-      const ai = new GoogleGenAI({ apiKey: (process as any).env.GEMINI_API_KEY });
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       
       const sessionPromise = ai.live.connect({
         model: MODEL,
