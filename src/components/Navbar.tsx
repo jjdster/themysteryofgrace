@@ -1,11 +1,13 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, BookOpen, Mail, Home, Info, Youtube, Heart, User, Video, HelpCircle } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Menu, X, BookOpen, Mail, Home, Info, Youtube, Heart, User, Video, HelpCircle, ChevronDown } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLinksOpen, setIsLinksOpen] = useState(false);
   const location = useLocation();
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const navLinks = [
     { name: 'Home', path: '/', icon: Home },
@@ -17,12 +19,31 @@ export default function Navbar() {
     { name: 'Just Asking', path: '/asking', icon: HelpCircle },
     { name: 'Library', path: '/library', icon: BookOpen },
     { name: 'Live Study', path: '/live-study', icon: Video },
+    { 
+      name: 'Links', 
+      path: '/links', 
+      icon: BookOpen,
+      dropdown: [
+        { name: 'Parsons Publishing Company', path: 'https://www.parsonspublishingcompany.com', external: true }
+      ]
+    },
     { name: 'Contact', path: '/contact', icon: Mail },
   ];
 
   useEffect(() => {
     setIsOpen(false);
+    setIsLinksOpen(false);
   }, [location]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsLinksOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <nav className="sticky top-0 z-50 bg-primary text-secondary shadow-lg">
@@ -37,15 +58,63 @@ export default function Navbar() {
           {/* Desktop Links */}
           <div className="hidden lg:flex items-center lg:space-x-4 xl:space-x-8">
             {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`text-[10px] xl:text-xs font-medium tracking-widest uppercase transition-colors hover:text-accent-light whitespace-nowrap ${
-                  location.pathname === link.path ? 'text-accent-light' : 'text-secondary'
-                }`}
-              >
-                {link.name}
-              </Link>
+              <div key={link.name} className="relative flex flex-col items-center group">
+                {link.dropdown ? (
+                  <div 
+                    className="relative"
+                    onMouseEnter={() => setIsLinksOpen(true)}
+                    onMouseLeave={() => setIsLinksOpen(false)}
+                  >
+                    <button
+                      className={`flex items-center text-[10px] xl:text-xs font-medium tracking-widest uppercase transition-colors hover:text-accent-light whitespace-nowrap ${
+                        location.pathname === link.path ? 'text-accent-light' : 'text-secondary'
+                      }`}
+                    >
+                      {link.name}
+                      <ChevronDown className={`ml-1 h-3 w-3 transition-transform ${isLinksOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    <AnimatePresence>
+                      {isLinksOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 10 }}
+                          className="absolute left-1/2 -translate-x-1/2 mt-2 w-64 bg-primary border border-white/10 rounded-xl shadow-2xl py-2 z-50"
+                        >
+                          {link.dropdown.map((item) => (
+                            <a
+                              key={item.name}
+                              href={item.path}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block px-4 py-3 text-sm text-secondary hover:bg-white/5 hover:text-accent-light transition-colors"
+                            >
+                              {item.name}
+                            </a>
+                          ))}
+                          <div className="border-t border-white/10 my-1"></div>
+                          <Link
+                            to={link.path}
+                            className="block px-4 py-3 text-sm text-accent-light hover:bg-white/5 transition-colors font-bold"
+                          >
+                            View All Links
+                          </Link>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ) : (
+                  <Link
+                    to={link.path}
+                    className={`text-[10px] xl:text-xs font-medium tracking-widest uppercase transition-colors hover:text-accent-light whitespace-nowrap ${
+                      location.pathname === link.path ? 'text-accent-light' : 'text-secondary'
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                )}
+              </div>
             ))}
           </div>
         </div>
@@ -72,18 +141,66 @@ export default function Navbar() {
           >
             <div className="px-2 pt-2 pb-3 space-y-1">
               {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`flex items-center px-3 py-4 rounded-md text-base font-medium ${
-                    location.pathname === link.path
-                      ? 'bg-accent/20 text-accent-light'
-                      : 'text-secondary hover:bg-white/5'
-                  }`}
-                >
-                  <link.icon className="mr-3 h-5 w-5" />
-                  {link.name}
-                </Link>
+                <div key={link.name}>
+                  {link.dropdown ? (
+                    <>
+                      <button
+                        onClick={() => setIsLinksOpen(!isLinksOpen)}
+                        className={`w-full flex items-center justify-between px-3 py-4 rounded-md text-base font-medium ${
+                          location.pathname === link.path
+                            ? 'bg-accent/20 text-accent-light'
+                            : 'text-secondary hover:bg-white/5'
+                        }`}
+                      >
+                        <div className="flex items-center">
+                          <link.icon className="mr-3 h-5 w-5" />
+                          {link.name}
+                        </div>
+                        <ChevronDown className={`h-4 w-4 transition-transform ${isLinksOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                      <AnimatePresence>
+                        {isLinksOpen && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden bg-black/20 rounded-md mt-1"
+                          >
+                            {link.dropdown.map((item) => (
+                              <a
+                                key={item.name}
+                                href={item.path}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block px-11 py-3 text-sm text-secondary hover:text-accent-light"
+                              >
+                                {item.name}
+                              </a>
+                            ))}
+                            <Link
+                              to={link.path}
+                              className="block px-11 py-3 text-sm text-accent-light font-bold"
+                            >
+                              View All Links
+                            </Link>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </>
+                  ) : (
+                    <Link
+                      to={link.path}
+                      className={`flex items-center px-3 py-4 rounded-md text-base font-medium ${
+                        location.pathname === link.path
+                          ? 'bg-accent/20 text-accent-light'
+                          : 'text-secondary hover:bg-white/5'
+                      }`}
+                    >
+                      <link.icon className="mr-3 h-5 w-5" />
+                      {link.name}
+                    </Link>
+                  )}
+                </div>
               ))}
             </div>
           </motion.div>

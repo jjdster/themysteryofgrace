@@ -11,6 +11,7 @@ import Library from './pages/Library';
 import Asking from './pages/Asking';
 import Contact from './pages/Contact';
 import LiveStudy from './pages/LiveStudy';
+import Links from './pages/Links';
 import { motion, AnimatePresence } from 'motion/react';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -32,6 +33,7 @@ export default function App() {
                 <Route path="/asking" element={<Asking />} />
                 <Route path="/library" element={<Library />} />
                 <Route path="/live-study" element={<LiveStudy />} />
+                <Route path="/links" element={<Links />} />
                 <Route path="/contact" element={<Contact />} />
               </Routes>
             </AnimatePresence>
