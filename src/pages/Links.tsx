@@ -22,6 +22,11 @@ export default function Links() {
       title: "Forgotten Truths",
       url: "http://www.forgottentruths.com",
       description: "Teaching the Mystery that was kept secret since the world began."
+    },
+    {
+      title: "Parsons Publishing Company",
+      url: "https://www.parsonspublishingcompany.com",
+      description: "Providing literature and resources dedicated to the preaching of Jesus Christ according to the revelation of the Mystery."
     }
   ];
 
@@ -46,37 +51,35 @@ export default function Links() {
       </header>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10">
-        <div className="grid gap-6">
+        <div className="grid gap-8">
           {links.map((link, idx) => (
             <motion.div
               key={idx}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
-              className="bg-white rounded-3xl p-8 shadow-lg border border-primary/5 hover:border-accent/30 transition-all group"
+              className="bg-white rounded-3xl p-8 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] border border-primary/5 hover:border-accent/30 transition-all group"
             >
-              <div className="flex items-start justify-between">
-                <div className="flex items-start space-x-4">
-                  <div className="p-3 bg-accent/10 rounded-2xl text-accent shrink-0">
-                    <LinkIcon className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-serif font-bold text-primary mb-2 group-hover:text-accent transition-colors">
-                      {link.title}
-                    </h3>
-                    <p className="text-primary/70 leading-relaxed mb-4">
-                      {link.description}
-                    </p>
-                    <a 
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center text-accent font-bold hover:underline"
-                    >
-                      Visit Website
-                      <ExternalLink className="ml-2 h-4 w-4" />
-                    </a>
-                  </div>
+              <div className="flex items-start space-x-6">
+                <div className="p-4 bg-accent/10 rounded-2xl text-accent shrink-0">
+                  <LinkIcon className="h-8 w-8" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-serif font-bold text-primary mb-2 group-hover:text-accent transition-colors">
+                    {link.title}
+                  </h3>
+                  <p className="text-primary/70 leading-relaxed mb-6 text-lg">
+                    {link.description}
+                  </p>
+                  <a 
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center text-accent font-bold hover:text-accent-light transition-colors"
+                  >
+                    Visit Website
+                    <ExternalLink className="ml-2 h-4 w-4" />
+                  </a>
                 </div>
               </div>
             </motion.div>

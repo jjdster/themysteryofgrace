@@ -24,6 +24,10 @@ export default function Navbar() {
       path: '/links', 
       icon: BookOpen,
       dropdown: [
+        { name: 'Grace School of the Bible', path: 'https://www.graceschoolofthebible.org', external: true },
+        { name: 'Berean Bible Society', path: 'https://www.bereanbiblesociety.org', external: true },
+        { name: 'Grace Ambassadors', path: 'https://graceambassadors.com', external: true },
+        { name: 'Forgotten Truths', path: 'http://www.forgottentruths.com', external: true },
         { name: 'Parsons Publishing Company', path: 'https://www.parsonspublishingcompany.com', external: true }
       ]
     },
@@ -50,7 +54,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex flex-col items-center space-y-4">
           <Link to="/" className="flex items-center">
-            <span className="text-2xl md:text-3xl font-serif font-bold tracking-wider text-accent-light text-center">
+            <span className="text-2xl md:text-3xl font-serif font-bold tracking-wider text-[#ffcc00] text-center">
               The Mystery of Grace
             </span>
           </Link>
@@ -66,8 +70,10 @@ export default function Navbar() {
                     onMouseLeave={() => setIsLinksOpen(false)}
                   >
                     <button
-                      className={`flex items-center text-[10px] xl:text-xs font-medium tracking-widest uppercase transition-colors hover:text-accent-light whitespace-nowrap ${
-                        location.pathname === link.path ? 'text-accent-light' : 'text-secondary'
+                      className={`flex items-center px-4 py-2 rounded-full text-[10px] xl:text-xs font-bold tracking-widest uppercase transition-all whitespace-nowrap ${
+                        location.pathname === link.path 
+                          ? 'bg-blue-900 text-white border border-white/20' 
+                          : 'text-secondary hover:text-accent-light'
                       }`}
                     >
                       {link.name}
@@ -107,7 +113,7 @@ export default function Navbar() {
                 ) : (
                   <Link
                     to={link.path}
-                    className={`text-[10px] xl:text-xs font-medium tracking-widest uppercase transition-colors hover:text-accent-light whitespace-nowrap ${
+                    className={`text-[10px] xl:text-xs font-bold tracking-widest uppercase transition-colors hover:text-accent-light whitespace-nowrap ${
                       location.pathname === link.path ? 'text-accent-light' : 'text-secondary'
                     }`}
                   >

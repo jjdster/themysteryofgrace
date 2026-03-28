@@ -58,7 +58,12 @@ export default function LiveStudy() {
       setIsConnecting(true);
       setError(null);
 
-      // 1. Get user media
+      // 1. Check for mediaDevices support
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("Your browser does not support camera/microphone access or it is blocked by security settings.");
+      }
+
+      // 2. Get user media
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
         video: { width: 640, height: 480, frameRate: 15 }
@@ -66,13 +71,13 @@ export default function LiveStudy() {
       streamRef.current = stream;
       if (videoRef.current) videoRef.current.srcObject = stream;
 
-      // 2. Initialize Audio
+      // 3. Initialize Audio
       await initAudio();
 
-      // 3. Connect to Gemini Live API
+      // 4. Connect to Gemini Live API
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       const sessionPromise = ai.live.connect({
-        model: "gemini-2.5-flash-native-audio-preview-12-2025",
+        model: "gemini-3.1-flash-live-preview",
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
@@ -161,7 +166,17 @@ export default function LiveStudy() {
 
     } catch (err) {
       console.error("Failed to start session:", err);
-      setError("Could not access camera/microphone or connect to service.");
+      if (err instanceof Error) {
+        if (err.name === 'NotAllowedError') {
+          setError("Camera/Microphone access was denied. Please check your browser permissions.");
+        } else if (err.name === 'NotFoundError') {
+          setError("No camera or microphone found. Please connect your devices.");
+        } else {
+          setError(err.message || "Could not access camera/microphone or connect to service.");
+        }
+      } else {
+        setError("Could not access camera/microphone or connect to service.");
+      }
       setIsConnecting(false);
     }
   };

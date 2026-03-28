@@ -21,47 +21,60 @@ export default function Home() {
             referrerPolicy="no-referrer"
           />
         </div>
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <motion.h1
+        <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-6xl font-serif text-secondary mb-6 leading-tight"
+            className="mb-8"
           >
-            The Preaching of Jesus Christ According to <br />
-            <span className="text-accent-light italic text-3xl md:text-5xl">the Revelation of the Mystery</span>
-            <span className="block text-xl md:text-2xl mt-4 font-sans font-light tracking-widest opacity-60 uppercase">Romans 16:25</span>
-          </motion.h1>
-          <motion.p
+            <h1 className="text-4xl md:text-7xl font-serif text-white mb-2 leading-tight">
+              The Preaching of Jesus Christ
+            </h1>
+            <h2 className="text-3xl md:text-6xl font-serif text-white mb-4">
+              According to
+            </h2>
+            <p className="text-[#ffcc00] italic font-serif text-4xl md:text-7xl mb-6">
+              the Revelation of the Mystery
+            </p>
+            <span className="block text-xl md:text-2xl font-sans font-bold tracking-[0.3em] text-white/80 uppercase">
+              ROMANS 16:25
+            </span>
+          </motion.div>
+          
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-lg md:text-xl text-secondary/80 mb-10 font-light tracking-wide max-w-2xl mx-auto"
+            className="text-lg md:text-2xl text-white mb-12 font-serif italic max-w-3xl mx-auto leading-relaxed"
           >
-            "Study to show thyself approved unto God, a workman that needeth not to be ashamed, rightly dividing the word of truth." — 2 Timothy 2:15
-          </motion.p>
+            <p>
+              "Study to show thyself approved unto God, a workman that needeth not to be ashamed, rightly dividing the word of truth." — 2 Timothy 2:15
+            </p>
+          </motion.div>
+
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4 }}
-            className="flex flex-col sm:flex-row justify-center items-center gap-6 md:gap-8"
+            className="flex flex-col sm:flex-row justify-center items-center gap-4 md:gap-6"
           >
             <Link
               to="/salvation"
-              className="w-full sm:w-auto px-8 py-4 bg-accent text-white rounded-full font-medium hover:bg-accent-light transition-all flex items-center justify-center group text-center"
+              className="w-full sm:w-auto px-10 py-4 bg-accent text-white rounded-full font-bold hover:bg-accent-light transition-all text-center shadow-lg"
             >
               First Things First — Are You Saved?
             </Link>
             <Link
               to="/mystery"
-              className="w-full sm:w-auto px-8 py-4 border border-secondary/30 text-secondary rounded-full font-medium hover:bg-secondary/10 transition-all text-center"
+              className="w-full sm:w-auto px-10 py-4 border-2 border-white text-white rounded-full font-bold hover:bg-white/10 transition-all text-center"
             >
               Discover the Mystery
             </Link>
             <Link
               to="/library"
-              className="w-full sm:w-auto px-8 py-4 bg-white/10 text-secondary rounded-full font-medium hover:bg-white/20 transition-all flex items-center justify-center text-center"
+              className="w-full sm:w-auto px-10 py-4 bg-white/20 backdrop-blur-md border border-white/30 text-white rounded-full font-bold hover:bg-white/30 transition-all flex items-center justify-center text-center"
             >
-              <Book className="mr-2 h-4 w-4" />
+              <Book className="mr-2 h-5 w-5" />
               Grace Library
             </Link>
           </motion.div>
@@ -69,11 +82,23 @@ export default function Home() {
       </section>
 
       {/* Interactive Project Message */}
-      <section className="py-6 bg-primary/5 border-b border-primary/10">
+      <section className="py-16 bg-secondary border-b border-primary/10">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <p className="text-lg text-primary/70 font-serif italic">
-            This site is an interactive project and is alive and morphing with your help.  Please be patient and feel free to make suggestions and comments.
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-accent/10 text-accent text-xs font-bold uppercase tracking-widest rounded-full mb-6">
+            <Shield className="h-4 w-4" />
+            NEW INTERACTIVE RESOURCE
+          </div>
+          <h2 className="text-4xl md:text-5xl font-serif font-bold text-primary mb-6">Water Baptism Study Guide</h2>
+          <p className="text-lg text-primary/70 font-serif italic mb-8">
+            Explore the biblical view of baptism through our new AI-guided, scripture-first interactive experience.
           </p>
+          <Link 
+            to="/baptism-study"
+            className="inline-flex items-center gap-2 px-8 py-3 bg-primary text-secondary rounded-full font-bold hover:bg-primary-light transition-all group"
+          >
+            Start Interactive Study
+            <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+          </Link>
         </div>
       </section>
 

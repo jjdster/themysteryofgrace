@@ -5,6 +5,14 @@ import { Play, FileText, Clock, ChevronRight } from 'lucide-react';
 export default function BibleStudies() {
   const lessons = [
     {
+      title: "Water Baptism Study Guide",
+      category: "Interactive",
+      duration: "Self-Paced",
+      description: "A scripture-first, AI-guided study on the biblical view of baptism, focusing on identification and dispensational truth.",
+      status: "Available",
+      path: "/baptism-study"
+    },
+    {
       title: "Prophecy vs. Mystery",
       category: "Foundational",
       duration: "45 mins",
@@ -84,10 +92,17 @@ export default function BibleStudies() {
 
               <div className="flex items-center justify-between mt-auto">
                 {lesson.status === "Available" ? (
-                  <button className="flex items-center text-primary font-bold hover:text-accent transition-colors">
-                    <Play className="h-5 w-5 mr-2 fill-current" />
-                    Start Lesson
-                  </button>
+                  lesson.path ? (
+                    <Link to={lesson.path} className="flex items-center text-primary font-bold hover:text-accent transition-colors">
+                      <Play className="h-5 w-5 mr-2 fill-current" />
+                      Start Lesson
+                    </Link>
+                  ) : (
+                    <button className="flex items-center text-primary font-bold hover:text-accent transition-colors">
+                      <Play className="h-5 w-5 mr-2 fill-current" />
+                      Start Lesson
+                    </button>
+                  )
                 ) : (
                   <span className="text-primary/30 font-medium italic">Coming Soon</span>
                 )}
