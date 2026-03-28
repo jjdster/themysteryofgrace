@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
-import { HelpCircle, MessageSquare, PlayCircle } from 'lucide-react';
+import { HelpCircle, MessageSquare, PlayCircle, Mic } from 'lucide-react';
+import VoiceAssistant from '../components/VoiceAssistant';
 
 export default function Asking() {
   const faqs = [
@@ -43,7 +44,21 @@ export default function Asking() {
       </header>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10">
+        {/* Voice Assistant Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-16"
+        >
+          <VoiceAssistant />
+        </motion.div>
+
         <div className="space-y-6">
+          <div className="flex items-center space-x-2 mb-8 border-b border-primary/10 pb-4">
+            <HelpCircle className="h-5 w-5 text-accent" />
+            <h2 className="text-2xl font-serif text-primary">Frequently Asked Questions</h2>
+          </div>
           {faqs.map((faq, idx) => (
             <motion.div
               key={idx}
