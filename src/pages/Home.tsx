@@ -119,27 +119,31 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Statement of Purpose Section */}
+      {/* A Message to the Body of Christ Section */}
       <section className="py-24 bg-white border-y border-primary/5">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-secondary/30 p-8 md:p-12 rounded-3xl border border-primary/10 shadow-sm">
-            <h2 className="text-2xl md:text-3xl font-serif text-primary mb-8 text-center">Statement of Purpose</h2>
+            <h2 className="text-2xl md:text-3xl font-serif text-primary mb-8 text-center">A Message to the Body of Christ</h2>
             <div className="prose prose-lg max-w-none text-primary/80 space-y-6 leading-relaxed">
-              <p>
-                This site is dedicated to teaching the whole counsel of God and answering questions from Scripture concerning the sovereignty of God, salvation, sanctification, the Revelation of the Mystery, ecclesiology, and eschatology.
+              <p className="font-serif italic text-primary text-xl mb-6">
+                To the saints, the members of the Body of Christ:
               </p>
               <p>
-                It follows a dispensational hermeneutic based on the revelation given to the Apostle Paul concerning the Church, which is His Body—the Body of Christ.
+                God has blessed us with all spiritual blessings in heavenly places in Christ. Chosen in Him before the foundation of the world, we are saved by grace through faith. By one Spirit we are baptized into one body—the Body of Christ—and sealed unto the day of redemption. Each member is an heir of God and a joint-heir with Christ, guaranteed an eternal future in heaven.
               </p>
               <p>
-                Paul alone was chosen, called, and sent to the Gentiles by the resurrected, ascended, and glorified Lord Jesus Christ (Acts 26:15–18).
+                Faith, hope, and charity remain, and the greatest of these is charity. In the epistles of Paul we are instructed how to live as children of God through faith in Jesus Christ: <span className="italic">“Those things, which ye have both learned, and received, and heard, and seen in me, do: and the God of peace shall be with you”</span> (Philippians 4:9).
               </p>
               <p>
-                While I have no desire to argue with those who may disagree (Romans 14:22; 1 Corinthians 1:1–4), I welcome correction if I speak inaccurately or unclearly, seeking always to speak the truth in love (2 Timothy 2:15). I encourage you to seek the truth declared by the Word of God (John 13:13).
+                The purpose of this website is to focus on the good news entrusted to Paul, by which we are stablished, and to allow the Holy Spirit to shine His light into our hearts that we might believe—not because others believe, but because it is spiritually discerned. It is my prayer, by the grace of God, that we as members of the Body of Christ will be of one mind and heart, encouraging and edifying one another as we look for the blessed hope and the glorious appearing of our great God and Savior, Jesus Christ.
               </p>
-              <p className="font-serif italic text-primary pt-4">
-                It is my prayer that every person who visits this site will submit their will to God, asking Him to reveal Himself and His truth, so that we might all grow to know Him better.
-              </p>
+              <div className="font-serif italic text-primary pt-4 text-center space-y-2">
+                <p>“For whatsoever things were written aforetime were written for our learning, that we through patience and comfort of the scriptures might have hope.</p>
+                <p>Now the God of patience and consolation grant you to be likeminded one toward another according to Christ Jesus:</p>
+                <p>That ye may with one mind and one mouth glorify God, even the Father of our Lord Jesus Christ.</p>
+                <p>Wherefore receive ye one another, as Christ also received us to the glory of God.”</p>
+                <p className="not-italic font-sans text-sm font-bold mt-2">— Romans 15:4–7</p>
+              </div>
               
               <div className="mt-12 pt-8 border-t border-primary/10 text-center italic text-primary/90">
                 <p className="mb-4 text-lg">
