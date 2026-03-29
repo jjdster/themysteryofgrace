@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Play, FileText, Clock, ChevronRight } from 'lucide-react';
+import { Play, FileText, Clock, ChevronRight, Book, Shield, Users } from 'lucide-react';
 import ScriptureText from '../components/ScriptureText';
 
 export default function BibleStudies() {
@@ -115,6 +115,48 @@ export default function BibleStudies() {
             </motion.div>
           ))}
         </div>
+
+        {/* Overview Section */}
+        <section className="mt-24 py-16 bg-white rounded-3xl border border-primary/5 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-5xl font-serif text-primary mb-4">The Dispensation of Grace</h2>
+              <div className="w-24 h-1 bg-accent mx-auto"></div>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-12">
+              {[
+                {
+                  title: "Prophecy vs. Mystery",
+                  desc: "Understanding the distinction between God's plan for the Earth (Prophecy) and His plan for the Body of Christ (Mystery).",
+                  icon: Book,
+                },
+                {
+                  title: "Pauline Revelation",
+                  desc: "The unique message given to the Apostle Paul for us today, the Gentiles, in this present age of grace.",
+                  icon: Shield,
+                },
+                {
+                  title: "The Body of Christ",
+                  desc: "How we are joined together into one body, where there is neither Jew nor Gentile, but all are one in Christ.",
+                  icon: Users,
+                },
+              ].map((feature, idx) => (
+                <motion.div
+                  key={idx}
+                  whileHover={{ y: -10 }}
+                  className="p-8 rounded-2xl bg-secondary/30 border border-primary/5 shadow-sm hover:shadow-xl transition-all"
+                >
+                  <div className="w-14 h-14 rounded-full bg-primary/5 flex items-center justify-center mb-6">
+                    <feature.icon className="h-7 w-7 text-accent" />
+                  </div>
+                  <h3 className="text-xl font-serif font-bold text-primary mb-4">{feature.title}</h3>
+                  <p className="text-primary/70 leading-relaxed">{feature.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
 
         {/* Study Tools Section */}
         <section className="mt-24">

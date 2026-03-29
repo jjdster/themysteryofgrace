@@ -82,92 +82,27 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Interactive Project Message */}
-      <section className="py-16 bg-secondary border-b border-primary/10">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-accent/10 text-accent text-xs font-bold uppercase tracking-widest rounded-full mb-6">
-            <Shield className="h-4 w-4" />
-            NEW INTERACTIVE RESOURCE
-          </div>
-          <h2 className="text-4xl md:text-5xl font-serif font-bold text-primary mb-6">Water Baptism Study Guide</h2>
-          <p className="text-lg text-primary/70 font-serif italic mb-8">
-            Explore the biblical view of baptism through our new AI-guided, scripture-first interactive experience.
-          </p>
-          <Link 
-            to="/baptism-study"
-            className="inline-flex items-center gap-2 px-8 py-3 bg-primary text-secondary rounded-full font-bold hover:bg-primary-light transition-all group"
-          >
-            Start Interactive Study
-            <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
-      </section>
-
-      {/* Overview Section */}
-      <section className="py-24 bg-secondary">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-serif text-primary mb-4">The Dispensation of Grace</h2>
-            <div className="w-24 h-1 bg-accent mx-auto"></div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-12">
-            {[
-              {
-                title: "Prophecy vs. Mystery",
-                desc: "Understanding the distinction between God's plan for the Earth (Prophecy) and His plan for the Body of Christ (Mystery).",
-                icon: Book,
-              },
-              {
-                title: "Pauline Revelation",
-                desc: "The unique message given to the Apostle Paul for us today, the Gentiles, in this present age of grace.",
-                icon: Shield,
-              },
-              {
-                title: "The Body of Christ",
-                desc: "How we are joined together into one body, where there is neither Jew nor Gentile, but all are one in Christ.",
-                icon: Users,
-              },
-            ].map((feature, idx) => (
-              <motion.div
-                key={idx}
-                whileHover={{ y: -10 }}
-                className="p-8 rounded-2xl bg-white border border-primary/5 shadow-sm hover:shadow-xl transition-all"
-              >
-                <div className="w-14 h-14 rounded-full bg-primary/5 flex items-center justify-center mb-6">
-                  <feature.icon className="h-7 w-7 text-accent" />
-                </div>
-                <h3 className="text-xl font-serif font-bold text-primary mb-4">{feature.title}</h3>
-                <p className="text-primary/70 leading-relaxed">{feature.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* A Message to the Body of Christ Section */}
       <section className="py-24 bg-white border-y border-primary/5">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-secondary/30 p-8 md:p-12 rounded-3xl border border-primary/10 shadow-sm">
-            <h2 className="text-2xl md:text-3xl font-serif text-primary mb-8 text-center">A Message to the Body of Christ</h2>
             <div className="prose prose-lg max-w-none text-primary/80 space-y-6 leading-relaxed">
-              <p className="font-serif italic text-primary text-xl mb-6">
-                To the saints, the members of the Body of Christ:
+              <div className="font-serif italic text-primary text-xl mb-8 border-b border-primary/10 pb-6 text-center">
+                <p>“I therefore, the prisoner of the Lord, beseech you that ye walk worthy of the vocation wherewith ye are called, 2 With all lowliness and meekness, with longsuffering, forbearing one another in love; 3 Endeavouring to keep the unity of the Spirit in the bond of peace.”</p>
+                <p className="not-italic font-sans text-sm font-bold mt-2">— <ScriptureText text="Ephesians 4:1–3" /></p>
+              </div>
+
+              <p>
+                To the saints, the members of the Body of Christ: God has blessed us with all spiritual blessings in heavenly places in Christ. Chosen in Him before the foundation of the world, we are saved by grace through faith. By one Spirit we are baptized into one body—the Body of Christ—and sealed unto the day of redemption. Each member is an heir of God and a joint-heir with Christ, guaranteed an eternal future in heaven.
               </p>
               <p>
-                God has blessed us with all spiritual blessings in heavenly places in Christ. Chosen in Him before the foundation of the world, we are saved by grace through faith. By one Spirit we are baptized into one body—the Body of Christ—and sealed unto the day of redemption. Each member is an heir of God and a joint-heir with Christ, guaranteed an eternal future in heaven.
-              </p>
-              <p>
-                Faith, hope, and charity remain, and the greatest of these is charity. In the epistles of Paul we are instructed how to live as children of God through faith in Jesus Christ: <span className="italic">“Those things, which ye have both learned, and received, and heard, and seen in me, do: and the God of peace shall be with you”</span> (<ScriptureText text="Philippians 4:9" />).
+                Faith, hope, and charity remain, and the greatest of these is charity. In the epistles of Paul we are instructed how to live as children of God through faith in Jesus Christ: “Those things, which ye have both learned, and received, and heard, and seen in me, do: and the God of peace shall be with you” (<ScriptureText text="Philippians 4:9" />).
               </p>
               <p>
                 The purpose of this website is to focus on the good news entrusted to Paul, by which we are stablished, and to allow the Holy Spirit to shine His light into our hearts that we might believe—not because others believe, but because it is spiritually discerned. It is my prayer, by the grace of God, that we as members of the Body of Christ will be of one mind and heart, encouraging and edifying one another as we look for the blessed hope and the glorious appearing of our great God and Savior, Jesus Christ.
               </p>
               <div className="font-serif italic text-primary pt-4 text-center space-y-2">
-                <p>“For whatsoever things were written aforetime were written for our learning, that we through patience and comfort of the scriptures might have hope.</p>
-                <p>Now the God of patience and consolation grant you to be likeminded one toward another according to Christ Jesus:</p>
-                <p>That ye may with one mind and one mouth glorify God, even the Father of our Lord Jesus Christ.</p>
-                <p>Wherefore receive ye one another, as Christ also received us to the glory of God.”</p>
+                <p>“For whatsoever things were written aforetime were written for our learning… that we may with one mind and one mouth glorify God… Wherefore receive ye one another, as Christ also received us to the glory of God.”</p>
                 <p className="not-italic font-sans text-sm font-bold mt-2">— <ScriptureText text="Romans 15:4–7" /></p>
               </div>
               
