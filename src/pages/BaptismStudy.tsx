@@ -29,14 +29,27 @@ import ScriptureText from '../components/ScriptureText';
 
 // --- Logging Utility ---
 const studyLogger = {
-  log: (lessonTitle: string, interaction: { type: 'question' | 'quiz', data: any }) => {
+  log: async (lessonTitle: string, interaction: { type: 'question' | 'quiz', data: any }) => {
+    // 1. Local Storage Logging
     const logs = JSON.parse(localStorage.getItem('study_logs') || '[]');
-    logs.push({
+    const logEntry = {
       timestamp: new Date().toISOString(),
       lesson: lessonTitle,
       ...interaction
-    });
+    };
+    logs.push(logEntry);
     localStorage.setItem('study_logs', JSON.stringify(logs));
+
+    // 2. Remote Logging to Google Docs (via Backend)
+    try {
+      await fetch('/api/logs/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lesson: lessonTitle, interaction })
+      });
+    } catch (error) {
+      console.warn("Failed to send remote log:", error);
+    }
   },
   getLogs: () => JSON.parse(localStorage.getItem('study_logs') || '[]'),
   clearLogs: () => localStorage.removeItem('study_logs'),
