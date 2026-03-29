@@ -1,204 +1,105 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Camera, Mic, MicOff, Video, VideoOff, Play, Square, Loader2, Info, MessageSquare } from 'lucide-react';
-import { GoogleGenAI, Modality, LiveServerMessage } from "@google/genai";
+import { Send, Loader2, Info, MessageSquare, User, BookOpen } from 'lucide-react';
+import { GoogleGenAI } from "@google/genai";
+import ScriptureText from '../components/ScriptureText';
 
-// Audio configuration
-const SAMPLE_RATE = 16000;
+interface Message {
+  role: 'user' | 'model';
+  text: string;
+}
 
 export default function LiveStudy() {
-  const [isActive, setIsActive] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isVideoOff, setIsVideoOff] = useState(false);
-  const [transcription, setTranscription] = useState<string[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const chatRef = useRef<any>(null);
 
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const audioWorkletNodeRef = useRef<AudioWorkletNode | null>(null);
-  const sessionRef = useRef<any>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const videoIntervalRef = useRef<number | null>(null);
-
-  // Initialize Audio Context and Worklet
-  const initAudio = async () => {
-    if (!audioContextRef.current) {
-      audioContextRef.current = new AudioContext({ sampleRate: SAMPLE_RATE });
-      
-      // Create a simple audio worklet for capturing microphone data
-      const blob = new Blob([`
-        class AudioProcessor extends AudioWorkletProcessor {
-          process(inputs, outputs, parameters) {
-            const input = inputs[0];
-            if (input.length > 0) {
-              const channelData = input[0];
-              // Convert Float32 to Int16
-              const int16Data = new Int16Array(channelData.length);
-              for (let i = 0; i < channelData.length; i++) {
-                int16Data[i] = Math.max(-1, Math.min(1, channelData[i])) * 0x7FFF;
-              }
-              this.port.postMessage(int16Data.buffer, [int16Data.buffer]);
-            }
-            return true;
-          }
-        }
-        registerProcessor('audio-processor', AudioProcessor);
-      `], { type: 'application/javascript' });
-      
-      const url = URL.createObjectURL(blob);
-      await audioContextRef.current.audioWorklet.addModule(url);
-      audioWorkletNodeRef.current = new AudioWorkletNode(audioContextRef.current, 'audio-processor');
-    }
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const startSession = async () => {
-    try {
-      setIsConnecting(true);
-      setError(null);
-
-      // 1. Check for mediaDevices support
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error("Your browser does not support camera/microphone access or it is blocked by security settings.");
+  const scrollToLatestMessageTop = () => {
+    if (scrollContainerRef.current) {
+      const messageElements = scrollContainerRef.current.querySelectorAll('.message-item');
+      const lastElement = messageElements[messageElements.length - 1] as HTMLElement;
+      if (lastElement) {
+        lastElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-
-      // 2. Get user media
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: { width: 640, height: 480, frameRate: 15 }
-      });
-      streamRef.current = stream;
-      if (videoRef.current) videoRef.current.srcObject = stream;
-
-      // 3. Initialize Audio
-      await initAudio();
-
-      // 4. Connect to Gemini Live API
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const sessionPromise = ai.live.connect({
-        model: "gemini-3.1-flash-live-preview",
-        config: {
-          responseModalities: [Modality.AUDIO],
-          speechConfig: {
-            voiceConfig: { prebuiltVoiceConfig: { voiceName: "Zephyr" } },
-          },
-          systemInstruction: "You are a scholarly guide specializing in 'Grace Library' and the Pauline revelation. Your goal is to help the user understand the preaching of Jesus Christ according to the revelation of the mystery (Romans 16:25). Be respectful, insightful, and use scripture (KJV preferred) to support your points. You can see the user and hear them in real-time. If they show you a Bible verse or a book, try to read it and comment on it.",
-          inputAudioTranscription: {},
-          outputAudioTranscription: {},
-        },
-        callbacks: {
-          onopen: () => {
-            console.log("Live session opened");
-            setIsConnecting(false);
-            setIsActive(true);
-
-            // Start streaming audio
-            if (audioContextRef.current && audioWorkletNodeRef.current && streamRef.current) {
-              const source = audioContextRef.current.createMediaStreamSource(streamRef.current);
-              source.connect(audioWorkletNodeRef.current);
-              
-              audioWorkletNodeRef.current.port.onmessage = (event) => {
-                if (sessionRef.current && !isMuted) {
-                  const base64Data = btoa(String.fromCharCode(...new Uint8Array(event.data)));
-                  sessionRef.current.sendRealtimeInput({
-                    audio: { data: base64Data, mimeType: 'audio/pcm;rate=16000' }
-                  });
-                }
-              };
-            }
-
-            // Start streaming video frames
-            videoIntervalRef.current = window.setInterval(() => {
-              if (sessionRef.current && videoRef.current && canvasRef.current && !isVideoOff) {
-                const canvas = canvasRef.current;
-                const context = canvas.getContext('2d');
-                if (context) {
-                  context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-                  const base64Data = canvas.toDataURL('image/jpeg', 0.5).split(',')[1];
-                  sessionRef.current.sendRealtimeInput({
-                    video: { data: base64Data, mimeType: 'image/jpeg' }
-                  });
-                }
-              }
-            }, 500); // Send frame every 500ms
-          },
-          onmessage: async (message: LiveServerMessage) => {
-            // Handle audio output
-            const base64Audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
-            if (base64Audio && audioContextRef.current) {
-              const binaryString = atob(base64Audio);
-              const bytes = new Uint8Array(binaryString.length);
-              for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-              }
-              const int16Data = new Int16Array(bytes.buffer);
-              const float32Data = new Float32Array(int16Data.length);
-              for (let i = 0; i < int16Data.length; i++) {
-                float32Data[i] = int16Data[i] / 0x7FFF;
-              }
-
-              const audioBuffer = audioContextRef.current.createBuffer(1, float32Data.length, SAMPLE_RATE);
-              audioBuffer.getChannelData(0).set(float32Data);
-              const source = audioContextRef.current.createBufferSource();
-              source.buffer = audioBuffer;
-              source.connect(audioContextRef.current.destination);
-              source.start();
-            }
-
-            // Handle transcription
-            if (message.serverContent?.modelTurn?.parts?.[0]?.text) {
-              setTranscription(prev => [...prev, `AI: ${message.serverContent?.modelTurn?.parts?.[0]?.text}`].slice(-5));
-            }
-          },
-          onclose: () => {
-            stopSession();
-          },
-          onerror: (err) => {
-            console.error("Live session error:", err);
-            setError("Connection error. Please try again.");
-            stopSession();
-          }
-        }
-      });
-
-      sessionRef.current = await sessionPromise;
-
-    } catch (err) {
-      console.error("Failed to start session:", err);
-      if (err instanceof Error) {
-        if (err.name === 'NotAllowedError') {
-          setError("Camera/Microphone access was denied. Please check your browser permissions.");
-        } else if (err.name === 'NotFoundError') {
-          setError("No camera or microphone found. Please connect your devices.");
-        } else {
-          setError(err.message || "Could not access camera/microphone or connect to service.");
-        }
-      } else {
-        setError("Could not access camera/microphone or connect to service.");
-      }
-      setIsConnecting(false);
     }
-  };
-
-  const stopSession = () => {
-    if (videoIntervalRef.current) clearInterval(videoIntervalRef.current);
-    if (sessionRef.current) sessionRef.current.close();
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-    }
-    if (audioWorkletNodeRef.current) audioWorkletNodeRef.current.disconnect();
-    
-    sessionRef.current = null;
-    streamRef.current = null;
-    setIsActive(false);
-    setIsConnecting(false);
-    setTranscription([]);
   };
 
   useEffect(() => {
-    return () => stopSession();
+    if (messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      // If it's a model message and it's just starting, scroll to its top
+      if (lastMessage.role === 'model' && lastMessage.text.length < 20) {
+        const timer = setTimeout(scrollToLatestMessageTop, 50);
+        return () => clearTimeout(timer);
+      } else if (lastMessage.role === 'user') {
+        scrollToBottom();
+      }
+    }
+  }, [messages]);
+
+  // Initialize Chat
+  useEffect(() => {
+    const initChat = async () => {
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        setError("AI configuration is missing. Please check your environment.");
+        return;
+      }
+
+      const ai = new GoogleGenAI({ apiKey });
+      chatRef.current = ai.chats.create({
+        model: "gemini-3-flash-preview",
+        config: {
+          systemInstruction: "You are a scholarly guide specializing in 'Grace Library' and the Pauline revelation. Your goal is to help the user understand the preaching of Jesus Christ according to the revelation of the mystery (Romans 16:25). Be respectful, insightful, and use scripture (KJV preferred) to support your points. Keep your answers concise but deep in doctrine.",
+        },
+      });
+    };
+
+    initChat();
   }, []);
+
+  const handleSend = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!input.trim() || isLoading || !chatRef.current) return;
+
+    const userMessage = input.trim();
+    setInput('');
+    setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const result = await chatRef.current.sendMessageStream({
+        message: userMessage,
+      });
+
+      let fullText = '';
+      setMessages(prev => [...prev, { role: 'model', text: '' }]);
+
+      for await (const chunk of result) {
+        const chunkText = chunk.text;
+        fullText += chunkText;
+        setMessages(prev => {
+          const newMessages = [...prev];
+          newMessages[newMessages.length - 1] = { role: 'model', text: fullText };
+          return newMessages;
+        });
+      }
+    } catch (err) {
+      console.error("Chat error:", err);
+      setError("Failed to send message. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <motion.div 
@@ -207,93 +108,94 @@ export default function LiveStudy() {
       exit={{ opacity: 0 }}
       className="min-h-screen bg-primary pt-24 pb-12 px-4"
     >
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           
-          {/* Main Video Area */}
-          <div className="flex-grow w-full">
-            <div className="relative aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-secondary/10">
-              <video 
-                ref={videoRef} 
-                autoPlay 
-                playsInline 
-                muted 
-                className={`w-full h-full object-cover ${isVideoOff ? 'hidden' : 'block'}`}
-              />
-              
-              {isVideoOff && (
-                <div className="absolute inset-0 flex items-center justify-center bg-zinc-900">
-                  <VideoOff className="h-24 w-24 text-secondary/20" />
+          {/* Main Chat Area */}
+          <div className="flex-grow w-full flex flex-col h-[70vh] lg:h-[80vh]">
+            <div className="flex-grow bg-zinc-900/50 rounded-3xl border border-white/5 overflow-hidden flex flex-col shadow-2xl">
+              {/* Chat Header */}
+              <div className="px-6 py-4 border-bottom border-white/5 bg-black/20 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-accent/10 rounded-lg">
+                    <MessageSquare className="h-5 w-5 text-accent" />
+                  </div>
+                  <div>
+                    <h2 className="text-secondary font-serif font-bold">Scholarly Dialogue</h2>
+                    <p className="text-[10px] text-secondary/40 uppercase tracking-widest font-bold">According to the Mystery</p>
+                  </div>
                 </div>
-              )}
+              </div>
 
-              {/* Overlay Controls */}
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 px-6 py-3 bg-black/40 backdrop-blur-md rounded-full border border-white/10">
-                <button 
-                  onClick={() => setIsMuted(!isMuted)}
-                  className={`p-3 rounded-full transition-colors ${isMuted ? 'bg-red-500 text-white' : 'hover:bg-white/10 text-white'}`}
-                >
-                  {isMuted ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
-                </button>
-                
-                <button 
-                  onClick={() => setIsVideoOff(!isVideoOff)}
-                  className={`p-3 rounded-full transition-colors ${isVideoOff ? 'bg-red-500 text-white' : 'hover:bg-white/10 text-white'}`}
-                >
-                  {isVideoOff ? <VideoOff className="h-6 w-6" /> : <Video className="h-6 w-6" />}
-                </button>
-
-                <div className="w-px h-8 bg-white/20 mx-2" />
-
-                {!isActive ? (
-                  <button 
-                    onClick={startSession}
-                    disabled={isConnecting}
-                    className="flex items-center gap-2 px-6 py-3 bg-accent text-white rounded-full font-bold hover:bg-accent-light transition-all disabled:opacity-50"
-                  >
-                    {isConnecting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Play className="h-5 w-5" />}
-                    {isConnecting ? 'Connecting...' : 'Start Session'}
-                  </button>
-                ) : (
-                  <button 
-                    onClick={stopSession}
-                    className="flex items-center gap-2 px-6 py-3 bg-red-500 text-white rounded-full font-bold hover:bg-red-600 transition-all"
-                  >
-                    <Square className="h-5 w-5" />
-                    End Session
-                  </button>
+              {/* Messages List */}
+              <div 
+                ref={scrollContainerRef}
+                className="flex-grow overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-white/10 relative"
+              >
+                {messages.length === 0 && (
+                  <div className="h-full flex flex-col items-center justify-center text-center px-8">
+                    <BookOpen className="h-12 w-12 text-secondary/10 mb-4" />
+                    <h3 className="text-secondary/60 font-serif text-xl mb-2">Begin Your Study</h3>
+                    <p className="text-secondary/30 text-sm max-w-xs">
+                      Ask a question about the Dispensation of Grace or the Pauline revelation to start the dialogue.
+                    </p>
+                  </div>
                 )}
-              </div>
-
-              {/* Status Indicator */}
-              {isActive && (
-                <div className="absolute top-6 right-6 flex items-center gap-2 px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full animate-pulse">
-                  <div className="w-2 h-2 bg-white rounded-full" />
-                  LIVE
-                </div>
-              )}
-            </div>
-
-            {/* Transcription / Subtitles */}
-            <div className="mt-6 bg-zinc-900/50 rounded-2xl p-6 border border-white/5 min-h-[120px]">
-              <div className="flex items-center gap-2 text-secondary/40 text-xs font-bold uppercase tracking-widest mb-4">
-                <MessageSquare className="h-4 w-4" />
-                Live Conversation
-              </div>
-              <div className="space-y-2">
-                {transcription.length === 0 ? (
-                  <p className="text-secondary/20 italic">Start a session to begin the conversation...</p>
-                ) : (
-                  transcription.map((line, i) => (
-                    <motion.p 
+                
+                <AnimatePresence initial={false}>
+                  {messages.map((msg, i) => (
+                    <motion.div
                       key={i}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="text-secondary/80 font-serif italic"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`message-item flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
                     >
-                      {line}
-                    </motion.p>
-                  ))
+                      <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center border ${
+                        msg.role === 'user' 
+                          ? 'bg-accent/10 border-accent/20 text-accent' 
+                          : 'bg-zinc-800 border-white/5 text-secondary/60'
+                      }`}>
+                        {msg.role === 'user' ? <User className="h-5 w-5" /> : <BookOpen className="h-5 w-5" />}
+                      </div>
+                      <div className={`max-w-[80%] p-4 rounded-2xl font-serif leading-relaxed ${
+                        msg.role === 'user'
+                          ? 'bg-accent text-white rounded-tr-none'
+                          : 'bg-white/5 text-secondary/80 rounded-tl-none italic'
+                      }`}>
+                        {msg.text ? <ScriptureText text={msg.text} /> : (isLoading && i === messages.length - 1 ? (
+                          <div className="flex gap-1 py-1">
+                            <span className="w-1.5 h-1.5 bg-secondary/40 rounded-full animate-bounce" />
+                            <span className="w-1.5 h-1.5 bg-secondary/40 rounded-full animate-bounce [animation-delay:0.2s]" />
+                            <span className="w-1.5 h-1.5 bg-secondary/40 rounded-full animate-bounce [animation-delay:0.4s]" />
+                          </div>
+                        ) : null)}
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Input Area */}
+              <div className="p-6 bg-black/20 border-top border-white/5">
+                <form onSubmit={handleSend} className="relative">
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Ask about the Revelation of the Mystery..."
+                    className="w-full bg-zinc-800 border border-white/10 rounded-2xl px-6 py-4 pr-16 text-secondary focus:outline-none focus:border-accent/50 transition-colors font-serif italic"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isLoading || !input.trim()}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-3 bg-accent text-white rounded-xl hover:bg-accent-light transition-all disabled:opacity-50 disabled:hover:bg-accent"
+                  >
+                    {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                  </button>
+                </form>
+                {error && (
+                  <p className="mt-2 text-red-400 text-xs text-center">{error}</p>
                 )}
               </div>
             </div>
@@ -301,46 +203,40 @@ export default function LiveStudy() {
 
           {/* Sidebar Info */}
           <div className="w-full lg:w-80 flex-shrink-0 space-y-6">
-            <div className="bg-zinc-900/50 rounded-3xl p-8 border border-white/5">
+            <div className="bg-zinc-900/50 rounded-3xl p-8 border border-white/5 shadow-xl">
               <div className="flex items-center gap-3 mb-6 text-accent">
                 <Info className="h-6 w-6" />
-                <h2 className="text-xl font-serif text-secondary">Live Study</h2>
+                <h2 className="text-xl font-serif text-secondary">Study Guide</h2>
               </div>
               <p className="text-secondary/60 text-sm leading-relaxed mb-6">
-                Experience a real-time, face-to-face conversation with our AI scholarly guide. 
-                Discuss the "Grace Library," ask questions about the Pauline revelation, or even show your Bible to the camera for joint study.
+                This interactive dialogue is powered by an AI scholarly guide specialized in the Pauline revelation. 
               </p>
-              <ul className="space-y-4 text-xs text-secondary/40 font-medium uppercase tracking-wider">
-                <li className="flex items-center gap-3">
-                  <div className="w-1.5 h-1.5 bg-accent rounded-full" />
-                  Real-time Voice & Video
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-1.5 h-1.5 bg-accent rounded-full" />
-                  Scripture-focused Guidance
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-1.5 h-1.5 bg-accent rounded-full" />
-                  Interactive Bible Study
-                </li>
-              </ul>
+              <div className="space-y-4">
+                <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                  <h4 className="text-xs font-bold text-accent uppercase tracking-widest mb-2">Focus Areas</h4>
+                  <ul className="space-y-2 text-[10px] text-secondary/40 font-medium uppercase tracking-wider">
+                    <li className="flex items-center gap-2">
+                      <div className="w-1 h-1 bg-accent rounded-full" />
+                      Dispensation of Grace
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1 h-1 bg-accent rounded-full" />
+                      The Mystery (Rom 16:25)
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1 h-1 bg-accent rounded-full" />
+                      Pauline Epistles
+                    </li>
+                  </ul>
+                </div>
+                <p className="text-[10px] text-secondary/30 italic leading-relaxed">
+                  <ScriptureText text='"Now to him that is of power to stablish you according to my gospel, and the preaching of Jesus Christ, according to the revelation of the mystery..." — Romans 16:25' />
+                </p>
+              </div>
             </div>
-
-            {error && (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 text-red-400 text-sm"
-              >
-                {error}
-              </motion.div>
-            )}
           </div>
         </div>
       </div>
-
-      {/* Hidden canvas for frame capture */}
-      <canvas ref={canvasRef} width="640" height="480" className="hidden" />
     </motion.div>
   );
 }

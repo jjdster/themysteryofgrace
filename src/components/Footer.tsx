@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { BookOpen } from 'lucide-react';
+import ScriptureText from './ScriptureText';
 
 export default function Footer() {
   return (
@@ -38,9 +39,9 @@ export default function Footer() {
           <div>
             <h4 className="text-accent-light font-bold uppercase tracking-widest text-sm mb-6">Scripture</h4>
             <p className="text-secondary/60 italic text-sm leading-relaxed">
-              "To make all men see what is the fellowship of the mystery, which from the beginning of the world hath been hid in God, who created all things by Jesus Christ."
+              <ScriptureText text='"To make all men see what is the fellowship of the mystery, which from the beginning of the world hath been hid in God, who created all things by Jesus Christ."' />
             </p>
-            <span className="block mt-2 text-xs font-bold text-accent-light">— Ephesians 3:9</span>
+            <span className="block mt-2 text-xs font-bold text-accent-light">— <ScriptureText text="Ephesians 3:9" /></span>
           </div>
         </div>
 

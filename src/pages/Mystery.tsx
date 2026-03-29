@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { BookOpen, Scroll, Star } from 'lucide-react';
+import ScriptureText from '../components/ScriptureText';
 
 export default function Mystery() {
   return (
@@ -41,7 +42,7 @@ export default function Mystery() {
 
             <div className="bg-primary/5 p-6 rounded-xl border-l-4 border-accent mb-8 italic">
               "Now to him that is of power to stablish you according to my gospel, and the preaching of Jesus Christ, according to the revelation of the mystery, which was kept secret since the world began..." 
-              <span className="block mt-2 font-bold not-italic text-sm">— Romans 16:25</span>
+              <span className="block mt-2 font-bold not-italic text-sm">— <ScriptureText text="Romans 16:25" /></span>
             </div>
 
             <h3 className="text-xl font-serif font-bold text-primary mt-12 mb-4">The Apostle of the Gentiles</h3>
@@ -49,15 +50,15 @@ export default function Mystery() {
             <div className="bg-primary/5 p-6 rounded-xl border-l-4 border-accent mb-8 space-y-4 italic text-sm">
               <div>
                 "But the Lord said unto him, Go thy way: for he is a chosen vessel unto me, to bear my name before the Gentiles, and kings, and the children of Israel: 16 For I will show him how great things he must suffer for my name's sake."
-                <span className="block mt-1 font-bold not-italic">— Acts 9:15–16</span>
+                <span className="block mt-1 font-bold not-italic">— <ScriptureText text="Acts 9:15–16" /></span>
               </div>
               <div>
                 "And he said, The God of our fathers hath chosen thee, that thou shouldest know his will, and see that Just One, and shouldest hear the voice of his mouth. 15 For thou shalt be his witness unto all men of what thou hast seen and heard."
-                <span className="block mt-1 font-bold not-italic">— Acts 22:14–15</span>
+                <span className="block mt-1 font-bold not-italic">— <ScriptureText text="Acts 22:14–15" /></span>
               </div>
               <div>
                 "But rise, and stand upon thy feet: for I have appeared unto thee for this purpose, to make thee a minister and a witness both of these things which thou hast seen, and of those things in the which I will appear unto thee; 17 Delivering thee from the people, and from the Gentiles, unto whom now I send thee, 18 To open their eyes, and to turn them from darkness to light, and from the power of Satan unto God, that they may receive forgiveness of sins, and inheritance among them which are sanctified by faith that is in me."
-                <span className="block mt-1 font-bold not-italic">— Acts 26:16–18</span>
+                <span className="block mt-1 font-bold not-italic">— <ScriptureText text="Acts 26:16–18" /></span>
               </div>
             </div>
 
@@ -86,11 +87,11 @@ export default function Mystery() {
             <div className="bg-primary/5 p-6 rounded-xl border-l-4 border-accent mb-8 space-y-4 italic text-sm">
               <div>
                 "All scripture is given by inspiration of God, and is profitable for doctrine, for reproof, for correction, for instruction in righteousness: 17 That the man of God may be perfect, thoroughly furnished unto all good works."
-                <span className="block mt-2 font-bold not-italic">— 2 Timothy 3:16–17</span>
+                <span className="block mt-2 font-bold not-italic">— <ScriptureText text="2 Timothy 3:16–17" /></span>
               </div>
               <div>
                 "For this cause also thank we God without ceasing, because, when ye received the word of God which ye heard of us, ye received it not as the word of men, but as it is in truth, the word of God, which effectually worketh also in you that believe."
-                <span className="block mt-2 font-bold not-italic">— 1 Thessalonians 2:13</span>
+                <span className="block mt-2 font-bold not-italic">— <ScriptureText text="1 Thessalonians 2:13" /></span>
               </div>
             </div>
 

@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { ShieldAlert, Heart, Cross, CheckCircle } from 'lucide-react';
+import ScriptureText from '../components/ScriptureText';
 
 export default function Salvation() {
   return (
@@ -35,7 +36,7 @@ export default function Salvation() {
               <h2 className="text-2xl md:text-3xl font-serif text-primary m-0">The Human Condition</h2>
             </div>
             <p>
-              The entire human race is guilty (Romans 3:23). Since sin entered the world, every person has been born in sin and is sinful from birth (Psalm 51:5). In spite of some being elect, all were dead in trespasses and sins and were by nature the children of wrath (Ephesians 2:1–3).
+              <ScriptureText text="The entire human race is guilty (Romans 3:23). Since sin entered the world, every person has been born in sin and is sinful from birth (Psalm 51:5). In spite of some being elect, all were dead in trespasses and sins and were by nature the children of wrath (Ephesians 2:1–3)." />
             </p>
           </section>
 
@@ -46,7 +47,7 @@ export default function Salvation() {
               <h2 className="text-2xl md:text-3xl font-serif text-primary m-0">Salvation in Christ Alone</h2>
             </div>
             <p>
-              Salvation is in Christ alone (Acts 4:12). It is through the merits of Christ and His death on the cross of Calvary that God’s righteousness has been satisfied (Romans 3:25). He bore our sins in His body (1 Peter 2:24) and shed His blood so that those who believe would receive forgiveness (Colossians 2:13).
+              <ScriptureText text="Salvation is in Christ alone (Acts 4:12). It is through the merits of Christ and His death on the cross of Calvary that God’s righteousness has been satisfied (Romans 3:25). He bore our sins in His body (1 Peter 2:24) and shed His blood so that those who believe would receive forgiveness (Colossians 2:13)." />
             </p>
           </section>
 
@@ -57,11 +58,11 @@ export default function Salvation() {
               <h2 className="text-2xl md:text-3xl font-serif text-primary m-0">The Gospel of Grace</h2>
             </div>
             <p>
-              The gospel of the grace of God (Acts 20:24) is the gospel which God entrusted to Paul (1 Timothy 1:11), which he identifies as “my gospel” (Romans 16:25). This is the gospel that is to be preached at the present time (Galatians 1:6–10).
+              <ScriptureText text="The gospel of the grace of God (Acts 20:24) is the gospel which God entrusted to Paul (1 Timothy 1:11), which he identifies as “my gospel” (Romans 16:25). This is the gospel that is to be preached at the present time (Galatians 1:6–10)." />
             </p>
             <div className="bg-primary/5 p-8 rounded-2xl border-l-4 border-accent italic my-8">
               "That in the ages to come He might show the exceeding riches of His grace in His kindness toward us through Christ Jesus. For by grace are ye saved through faith; and that not of yourselves: it is the gift of God: not of works, lest any man should boast."
-              <span className="block mt-4 font-bold not-italic text-sm">— Ephesians 2:7–9</span>
+              <span className="block mt-4 font-bold not-italic text-sm">— <ScriptureText text="Ephesians 2:7–9" /></span>
             </div>
           </section>
 
@@ -71,11 +72,11 @@ export default function Salvation() {
             <ul className="space-y-4 text-primary/80">
               <li className="flex items-start">
                 <span className="font-bold mr-2">1.</span>
-                There is a judgment coming for all those who have not believed what God has said (Revelation 20:11–15).
+                <ScriptureText text="There is a judgment coming for all those who have not believed what God has said (Revelation 20:11–15)." />
               </li>
               <li className="flex items-start">
                 <span className="font-bold mr-2">2.</span>
-                It is impossible to truly understand Scripture without the presence of the Holy Spirit (1 Corinthians 2:14).
+                <ScriptureText text="It is impossible to truly understand Scripture without the presence of the Holy Spirit (1 Corinthians 2:14)." />
               </li>
             </ul>
           </section>
@@ -87,8 +88,12 @@ export default function Salvation() {
             </div>
             <h2 className="text-3xl md:text-4xl font-serif text-primary mb-6">What Must You Do?</h2>
             <div className="max-w-2xl mx-auto space-y-6 text-lg">
-              <p className="font-bold text-primary">Believe the gospel—trust that Christ died for your sins, was buried, and rose again (1 Corinthians 15:1–4).</p>
-              <p className="text-primary/70">Trust in Him alone for your salvation, apart from works or any intrinsic righteousness (Romans 7:18).</p>
+              <p className="font-bold text-primary">
+                <ScriptureText text="Believe the gospel—trust that Christ died for your sins, was buried, and rose again (1 Corinthians 15:1–4)." />
+              </p>
+              <p className="text-primary/70">
+                <ScriptureText text="Trust in Him alone for your salvation, apart from works or any intrinsic righteousness (Romans 7:18)." />
+              </p>
             </div>
           </section>
         </motion.div>

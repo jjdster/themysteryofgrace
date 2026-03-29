@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { Youtube, ExternalLink, PlayCircle } from 'lucide-react';
+import ScriptureText from '../components/ScriptureText';
 
 export default function Videos() {
   const channelUrl = "https://www.youtube.com/@markjjd";
@@ -117,8 +118,8 @@ export default function Videos() {
         {categories.map((category, catIdx) => (
           <div key={category.name} className={catIdx > 0 ? "mt-24" : ""}>
             <div className="mb-10">
-              <h2 className="text-3xl font-serif text-primary mb-2">{category.name}</h2>
-              <p className="text-primary/60 max-w-2xl">{category.description}</p>
+              <h2 className="text-3xl font-serif text-primary mb-2"><ScriptureText text={category.name} /></h2>
+              <p className="text-primary/60 max-w-2xl"><ScriptureText text={category.description} /></p>
               <div className="w-20 h-1 bg-accent mt-4"></div>
             </div>
             
@@ -148,7 +149,7 @@ export default function Videos() {
                   </a>
                   <div className="p-6">
                     <h3 className="text-lg font-serif font-bold text-primary mb-2 line-clamp-2 group-hover:text-accent transition-colors">
-                      {video.title}
+                      <ScriptureText text={video.title} />
                     </h3>
                     <div className="flex items-center text-primary/40 text-xs font-medium uppercase tracking-wider">
                       <span>{video.views}</span>

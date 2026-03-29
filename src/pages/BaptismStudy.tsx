@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   BookOpen, 
@@ -13,12 +13,14 @@ import {
   Lock, 
   RotateCcw, 
   Info,
+  FileText,
   ArrowRight,
   Lightbulb,
   AlertCircle
 } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 import { baptismStudyData, Module, Lesson, Question } from '../data/baptismStudyData';
+import ScriptureText from '../components/ScriptureText';
 
 // --- Types ---
 type StudyMode = 'solo' | 'group';
@@ -79,6 +81,7 @@ const AIGuide = ({
         SOURCE MATERIAL:
         Book: ${lesson.sourceText.book} by ${lesson.sourceText.author}
         Excerpt: ${lesson.sourceText.excerpt}
+        Summary: ${lesson.summary}
         
         GUIDELINES:
         1. Stay tightly scoped to the chosen source material and scriptures.
@@ -126,7 +129,7 @@ const AIGuide = ({
                 ? 'bg-accent text-white rounded-tr-none' 
                 : 'bg-white border border-primary/10 text-primary rounded-tl-none shadow-sm'
             }`}>
-              {msg.text}
+              <ScriptureText text={msg.text} />
             </div>
           </div>
         ))}
@@ -179,6 +182,13 @@ const Quiz = ({
   const [score, setScore] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
 
+  const getEncouragingRemark = (scorePercent: number) => {
+    if (scorePercent === 100) return "Excellent work! You have a firm grasp of these scriptural truths.";
+    if (scorePercent >= 80) return "Great job! You're very close to full mastery. A quick review might help clear up the last few points.";
+    if (scorePercent >= 60) return "Good effort! You're making progress. Try reviewing the summary again to strengthen your understanding.";
+    return "Don't be discouraged! These doctrines are deep. Take another look at the scriptures and the summary, then try again.";
+  };
+
   const currentQuestion = questions[currentIdx];
 
   const handleNext = () => {
@@ -207,8 +217,11 @@ const Quiz = ({
         <h2 className="text-3xl font-serif font-bold text-primary mb-2">
           {finalScore === 100 ? 'Mastery Achieved!' : 'Keep Studying'}
         </h2>
-        <p className="text-primary/60 mb-8">
+        <p className="text-primary/60 mb-2">
           You scored {score} out of {questions.length} correct.
+        </p>
+        <p className="text-accent font-medium italic mb-8 text-sm px-4">
+          "{getEncouragingRemark(finalScore)}"
         </p>
         <button 
           onClick={() => onComplete(finalScore)}
@@ -310,15 +323,17 @@ export default function BaptismStudy() {
   const currentModule = baptismStudyData[currentModuleIdx];
   const currentLesson = currentModule.lessons[currentLessonIdx];
 
-  const handleQuizComplete = (score: number) => {
-    if (score === 100) {
-      setIsMastered(true);
-      if (!completedModules.includes(currentModule.id)) {
-        setCompletedModules(prev => [...prev, currentModule.id]);
-      }
-    }
-    setShowQuiz(false);
-  };
+  useLayoutEffect(() => {
+    const scrollToTop = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.documentElement.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.body.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    };
+    scrollToTop();
+    // Small timeout to ensure it happens after any layout shifts or animations
+    const timer = setTimeout(scrollToTop, 10);
+    return () => clearTimeout(timer);
+  }, [currentModuleIdx, currentLessonIdx, showQuiz]);
 
   const nextLesson = () => {
     if (currentLessonIdx < currentModule.lessons.length - 1) {
@@ -330,6 +345,18 @@ export default function BaptismStudy() {
       setCurrentLessonIdx(0);
       setIsMastered(false);
       setShowQuiz(false);
+    }
+  };
+
+  const handleQuizComplete = (score: number) => {
+    setShowQuiz(false);
+    if (score === 100) {
+      setIsMastered(true);
+      if (!completedModules.includes(currentModule.id)) {
+        setCompletedModules(prev => [...prev, currentModule.id]);
+      }
+      // Advance to next lesson immediately
+      nextLesson();
     }
   };
 
@@ -444,7 +471,7 @@ export default function BaptismStudy() {
             <AnimatePresence mode="wait">
               {!showQuiz ? (
                 <motion.div
-                  key="lesson-content"
+                  key={`lesson-${currentModuleIdx}-${currentLessonIdx}`}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
@@ -495,6 +522,23 @@ export default function BaptismStudy() {
                       <div className="flex items-center justify-end gap-2 text-xs font-bold text-primary/40">
                         <span>— {currentLesson.sourceText.author},</span>
                         <span className="italic">{currentLesson.sourceText.book}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Comprehensive Summary Section */}
+                  <div className="space-y-6">
+                    <h3 className="flex items-center gap-2 text-sm font-bold text-primary/40 uppercase tracking-widest">
+                      <FileText className="h-4 w-4" />
+                      Comprehensive Summary
+                    </h3>
+                    <div className="bg-white p-10 rounded-[2.5rem] border border-primary/5 shadow-xl shadow-primary/5">
+                      <div className="prose prose-lg max-w-none">
+                        {currentLesson.summary.split('\n\n').map((paragraph, idx) => (
+                          <p key={idx} className="text-primary/80 leading-relaxed mb-6 font-light">
+                            <ScriptureText text={paragraph} />
+                          </p>
+                        ))}
                       </div>
                     </div>
                   </div>

@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { Play, FileText, Clock, ChevronRight } from 'lucide-react';
+import ScriptureText from '../components/ScriptureText';
 
 export default function BibleStudies() {
   const lessons = [
@@ -83,10 +84,10 @@ export default function BibleStudies() {
                   </div>
                 </div>
                 <h3 className="text-2xl font-serif font-bold text-primary mb-4 group-hover:text-accent transition-colors">
-                  {lesson.title}
+                  <ScriptureText text={lesson.title} />
                 </h3>
                 <p className="text-primary/70 mb-8 leading-relaxed">
-                  {lesson.description}
+                  <ScriptureText text={lesson.description} />
                 </p>
               </div>
 

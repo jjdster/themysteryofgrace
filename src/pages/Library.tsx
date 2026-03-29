@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Book, Download, ExternalLink, FileText, ChevronLeft, User, Loader2 } from 'lucide-react';
+import ScriptureText from '../components/ScriptureText';
 
 interface BookType {
   id: string;
@@ -155,7 +156,7 @@ export default function Library() {
           </h1>
           <div className="w-24 h-1 bg-accent mx-auto mb-6"></div>
           <p className="text-xl text-primary/70 max-w-3xl mx-auto font-light leading-relaxed">
-            As we search these writings, may the God of all grace direct our hearts and minds, protecting us from error and direct us into His truth. May He give us a spirit of wisdom and revelation in the knowledge of Him.
+            <ScriptureText text="As we search these writings, may the God of all grace direct our hearts and minds, protecting us from error and direct us into His truth. May He give us a spirit of wisdom and revelation in the knowledge of Him." />
           </p>
         </div>
 
@@ -285,9 +286,9 @@ export default function Library() {
             <FileText className="h-12 w-12 mx-auto mb-6 text-accent-light opacity-80" />
             <h2 className="text-2xl font-serif font-bold mb-4">Study to Show Thyself Approved</h2>
             <p className="max-w-2xl mx-auto text-secondary/80 font-light leading-relaxed mb-8">
-              "Study to show thyself approved unto God, a workman that needeth not to be ashamed, rightly dividing the word of truth." 
+              <ScriptureText text='"Study to show thyself approved unto God, a workman that needeth not to be ashamed, rightly dividing the word of truth."' />
               <br />
-              <span className="italic opacity-60">— 2 Timothy 2:15</span>
+              <span className="italic opacity-60">— <ScriptureText text="2 Timothy 2:15" /></span>
             </p>
           </div>
         </div>

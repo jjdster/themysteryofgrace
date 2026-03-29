@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { HelpCircle, MessageSquare, PlayCircle, Mic } from 'lucide-react';
 import VoiceAssistant from '../components/VoiceAssistant';
+import ScriptureText from '../components/ScriptureText';
 
 export default function Asking() {
   const faqs = [
@@ -79,7 +80,7 @@ export default function Asking() {
                     <MessageSquare className="h-5 w-5 text-primary/30 mt-1 shrink-0" />
                     <div className="space-y-4">
                       <p className="text-primary/70 leading-relaxed">
-                        {faq.answer}
+                        <ScriptureText text={faq.answer} />
                       </p>
                       {faq.videoUrl && (
                         <a 

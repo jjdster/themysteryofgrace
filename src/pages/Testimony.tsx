@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { Quote, ShieldCheck, Anchor, Sparkles } from 'lucide-react';
+import ScriptureText from '../components/ScriptureText';
 
 export default function Testimony() {
   return (
@@ -33,13 +34,13 @@ export default function Testimony() {
             <Quote className="absolute -top-8 -left-8 h-16 w-16 text-primary/5 -z-0" />
             <div className="relative z-10 prose prose-lg max-w-none text-primary/80 italic leading-relaxed font-serif">
               <p className="text-xl md:text-2xl text-primary mb-8 not-italic font-bold border-l-4 border-accent pl-6">
-                "I believe that the Spirit of God, using the testimony of the Word of Truth, convinced me of my sinfulness, convinced me that I was separated from God and that I deserved to go to Hell."
+                <ScriptureText text='"I believe that the Spirit of God, using the testimony of the Word of Truth, convinced me of my sinfulness, convinced me that I was separated from God and that I deserved to go to Hell."' />
               </p>
               <p>
-                I believe Jesus Christ shed His sinless blood on the cross of Calvary and died there because of and for my sins. I believe he was buried and rose again on the third day. I trust that His blood has paid for all my sins, past, present, and future.
+                <ScriptureText text="I believe Jesus Christ shed His sinless blood on the cross of Calvary and died there because of and for my sins. I believe he was buried and rose again on the third day. I trust that His blood has paid for all my sins, past, present, and future." />
               </p>
               <p>
-                I believe that I have been baptized by the Spirit of God into the Body of Christ and have been sealed unto the day of redemption. And I know there is therefore no condemnation to me and for all those who are in Christ Jesus.
+                <ScriptureText text="I believe that I have been baptized by the Spirit of God into the Body of Christ and have been sealed unto the day of redemption. And I know there is therefore no condemnation to me and for all those who are in Christ Jesus." />
               </p>
             </div>
           </section>
@@ -103,10 +104,10 @@ export default function Testimony() {
 
             <div className="prose prose-lg max-w-none text-primary/80 leading-relaxed">
               <p>
-                Water baptism is most definitely Scriptural. While being commanded historically for Israel, water baptism is not an ordinance or an instructed ritual for members of the Body of Christ. My assurance rests entirely upon my existence in Christ and His finished work. Acknowledging that I have no righteousness of my own, I know that God has imputed the righteousness of Christ to my account and He accepts me as righteous in Him.
+                <ScriptureText text="Water baptism is most definitely Scriptural. While being commanded historically for Israel, water baptism is not an ordinance or an instructed ritual for members of the Body of Christ. My assurance rests entirely upon my existence in Christ and His finished work. Acknowledging that I have no righteousness of my own, I know that God has imputed the righteousness of Christ to my account and He accepts me as righteous in Him." />
               </p>
               <p>
-                Because of this, I live in the confident hope of glorification, when all these positional realities will be fully experienced. That will be when Christ shall take the Church, which is His Body, off the earth to meet Him in the air. Knowing there is no condemnation to those who are in Christ Jesus, I rejoice in the assurance and completeness of my salvation in Christ Jesus, all to the praise of God's glorious grace!
+                <ScriptureText text="Because of this, I live in the confident hope of glorification, when all these positional realities will be fully experienced. That will be when Christ shall take the Church, which is His Body, off the earth to meet Him in the air. Knowing there is no condemnation to those who are in Christ Jesus, I rejoice in the assurance and completeness of my salvation in Christ Jesus, all to the praise of God's glorious grace!" />
               </p>
             </div>
           </section>

@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { ArrowRight, Book, Shield, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import ScriptureText from '../components/ScriptureText';
 
 // Force sync commit: show vs shew update
 export default function Home() {
@@ -37,7 +38,7 @@ export default function Home() {
               the Revelation of the Mystery
             </p>
             <span className="block text-xl md:text-2xl font-sans font-bold tracking-[0.3em] text-white/80 uppercase">
-              ROMANS 16:25
+              <ScriptureText text="ROMANS 16:25" />
             </span>
           </motion.div>
           
@@ -48,7 +49,7 @@ export default function Home() {
             className="text-lg md:text-2xl text-white mb-12 font-serif italic max-w-3xl mx-auto leading-relaxed"
           >
             <p>
-              "Study to show thyself approved unto God, a workman that needeth not to be ashamed, rightly dividing the word of truth." — 2 Timothy 2:15
+              <ScriptureText text='"Study to show thyself approved unto God, a workman that needeth not to be ashamed, rightly dividing the word of truth." — 2 Timothy 2:15' />
             </p>
           </motion.div>
 
@@ -157,7 +158,7 @@ export default function Home() {
                 God has blessed us with all spiritual blessings in heavenly places in Christ. Chosen in Him before the foundation of the world, we are saved by grace through faith. By one Spirit we are baptized into one body—the Body of Christ—and sealed unto the day of redemption. Each member is an heir of God and a joint-heir with Christ, guaranteed an eternal future in heaven.
               </p>
               <p>
-                Faith, hope, and charity remain, and the greatest of these is charity. In the epistles of Paul we are instructed how to live as children of God through faith in Jesus Christ: <span className="italic">“Those things, which ye have both learned, and received, and heard, and seen in me, do: and the God of peace shall be with you”</span> (Philippians 4:9).
+                Faith, hope, and charity remain, and the greatest of these is charity. In the epistles of Paul we are instructed how to live as children of God through faith in Jesus Christ: <span className="italic">“Those things, which ye have both learned, and received, and heard, and seen in me, do: and the God of peace shall be with you”</span> (<ScriptureText text="Philippians 4:9" />).
               </p>
               <p>
                 The purpose of this website is to focus on the good news entrusted to Paul, by which we are stablished, and to allow the Holy Spirit to shine His light into our hearts that we might believe—not because others believe, but because it is spiritually discerned. It is my prayer, by the grace of God, that we as members of the Body of Christ will be of one mind and heart, encouraging and edifying one another as we look for the blessed hope and the glorious appearing of our great God and Savior, Jesus Christ.
@@ -167,7 +168,7 @@ export default function Home() {
                 <p>Now the God of patience and consolation grant you to be likeminded one toward another according to Christ Jesus:</p>
                 <p>That ye may with one mind and one mouth glorify God, even the Father of our Lord Jesus Christ.</p>
                 <p>Wherefore receive ye one another, as Christ also received us to the glory of God.”</p>
-                <p className="not-italic font-sans text-sm font-bold mt-2">— Romans 15:4–7</p>
+                <p className="not-italic font-sans text-sm font-bold mt-2">— <ScriptureText text="Romans 15:4–7" /></p>
               </div>
               
               <div className="mt-12 pt-8 border-t border-primary/10 text-center italic text-primary/90">
@@ -189,7 +190,7 @@ export default function Home() {
           <blockquote className="text-2xl md:text-3xl font-serif italic leading-relaxed">
             "For I speak to you Gentiles, inasmuch as I am the apostle of the Gentiles, I magnify mine office."
           </blockquote>
-          <cite className="block mt-6 text-accent-light font-medium not-italic">— Romans 11:13</cite>
+          <cite className="block mt-6 text-accent-light font-medium not-italic">— <ScriptureText text="Romans 11:13" /></cite>
         </div>
       </section>
     </motion.div>

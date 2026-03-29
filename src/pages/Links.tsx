@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { ExternalLink, Link as LinkIcon } from 'lucide-react';
+import ScriptureText from '../components/ScriptureText';
 
 export default function Links() {
   const links = [
@@ -69,7 +70,7 @@ export default function Links() {
                     {link.title}
                   </h3>
                   <p className="text-primary/70 leading-relaxed mb-6 text-lg">
-                    {link.description}
+                    <ScriptureText text={link.description} />
                   </p>
                   <a 
                     href={link.url}

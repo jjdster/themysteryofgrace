@@ -15,11 +15,13 @@ import Links from './pages/Links';
 import BaptismStudy from './pages/BaptismStudy';
 import { motion, AnimatePresence } from 'motion/react';
 import ErrorBoundary from './components/ErrorBoundary';
+import ScrollToTop from './components/ScrollToTop';
 
 export default function App() {
   return (
     <ErrorBoundary>
       <Router>
+        <ScrollToTop />
         <div className="flex flex-col min-h-screen">
           <Navbar />
           <main className="flex-grow">
