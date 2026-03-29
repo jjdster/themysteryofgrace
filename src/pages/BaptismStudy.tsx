@@ -114,7 +114,7 @@ const AIGuide = ({
 
     try {
       const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) {
+      if (!apiKey || apiKey === "undefined" || apiKey === "") {
         setMessages(prev => [...prev, { role: 'guide', text: "API key is missing. Please check your environment variables." }]);
         return;
       }
@@ -315,7 +315,9 @@ const Quiz = ({
     setIsGeneratingReview(true);
     try {
       const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) throw new Error("API key missing");
+      if (!apiKey || apiKey === "undefined" || apiKey === "") {
+        throw new Error("API key missing");
+      }
       
       const ai = new GoogleGenAI({ apiKey });
       

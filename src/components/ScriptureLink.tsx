@@ -23,8 +23,8 @@ export default function ScriptureLink({ reference, children }: ScriptureLinkProp
     setIsLoading(true);
     try {
       const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) {
-        setVerseText("API key is missing.");
+      if (!apiKey || apiKey === "undefined" || apiKey === "") {
+        setVerseText("API key is missing. Please check your environment variables.");
         return;
       }
       const ai = new GoogleGenAI({ apiKey });
