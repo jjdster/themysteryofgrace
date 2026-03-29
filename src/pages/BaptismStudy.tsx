@@ -16,11 +16,40 @@ import {
   FileText,
   ArrowRight,
   Lightbulb,
-  AlertCircle
+  AlertCircle,
+  Download,
+  Trophy,
+  Home,
+  Loader2
 } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
+import { useNavigate, Link } from 'react-router-dom';
 import { baptismStudyData, Module, Lesson, Question } from '../data/baptismStudyData';
 import ScriptureText from '../components/ScriptureText';
+
+// --- Logging Utility ---
+const studyLogger = {
+  log: (lessonTitle: string, interaction: { type: 'question' | 'quiz', data: any }) => {
+    const logs = JSON.parse(localStorage.getItem('study_logs') || '[]');
+    logs.push({
+      timestamp: new Date().toISOString(),
+      lesson: lessonTitle,
+      ...interaction
+    });
+    localStorage.setItem('study_logs', JSON.stringify(logs));
+  },
+  getLogs: () => JSON.parse(localStorage.getItem('study_logs') || '[]'),
+  clearLogs: () => localStorage.removeItem('study_logs'),
+  download: () => {
+    const logs = studyLogger.getLogs();
+    const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `study_logs_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+  }
+};
 
 // --- Types ---
 type StudyMode = 'solo' | 'group';
@@ -71,7 +100,12 @@ const AIGuide = ({
     setIsLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        setMessages(prev => [...prev, { role: 'guide', text: "API key is missing. Please check your environment variables." }]);
+        return;
+      }
+      const ai = new GoogleGenAI({ apiKey });
       const prompt = `
         You are an interactive, scripture-first study guide for a lesson titled "${lesson.title}".
         CRITICAL: You MUST prioritize and defer to the Scriptures (KJV) first in every response. 
@@ -101,7 +135,17 @@ const AIGuide = ({
         contents: prompt,
       });
 
-      setMessages(prev => [...prev, { role: 'guide', text: response.text || "I'm sorry, I couldn't generate a response." }]);
+      const guideResponse = response.text || "I'm sorry, I couldn't generate a response.";
+      setMessages(prev => [...prev, { role: 'guide', text: guideResponse }]);
+      
+      // Log the interaction
+      studyLogger.log(lesson.title, {
+        type: 'question',
+        data: {
+          userQuestion: userMessage,
+          aiResponse: guideResponse
+        }
+      });
     } catch (error) {
       console.error("AI Error:", error);
       setMessages(prev => [...prev, { role: 'guide', text: "I'm having trouble connecting right now. Please try again in a moment." }]);
@@ -201,17 +245,20 @@ const AIGuide = ({
 };
 
 const Quiz = ({ 
-  questions, 
+  lesson,
   onComplete 
 }: { 
-  questions: Question[]; 
+  lesson: Lesson; 
   onComplete: (score: number) => void 
 }) => {
+  const [questions, setQuestions] = useState<Question[]>(lesson.questions);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [score, setScore] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
+  const [missedQuestionIndices, setMissedQuestionIndices] = useState<number[]>([]);
+  const [isGeneratingReview, setIsGeneratingReview] = useState(false);
 
   const getEncouragingRemark = (scorePercent: number) => {
     if (scorePercent === 100) return "Excellent work! You have a firm grasp of these scriptural truths.";
@@ -223,16 +270,106 @@ const Quiz = ({
   const currentQuestion = questions[currentIdx];
 
   const handleNext = () => {
-    if (selectedOption === currentQuestion.correctAnswer) {
+    const isCorrect = selectedOption === currentQuestion.correctAnswer;
+    
+    if (isCorrect) {
       setScore(s => s + 1);
+    } else {
+      setMissedQuestionIndices(prev => [...prev, currentIdx]);
     }
     
+    // Log individual question result
+    studyLogger.log(lesson.title, {
+      type: 'quiz',
+      data: {
+        question: currentQuestion.question,
+        selected: currentQuestion.options[selectedOption!],
+        correct: currentQuestion.options[currentQuestion.correctAnswer],
+        isCorrect
+      }
+    });
+
     if (currentIdx < questions.length - 1) {
       setCurrentIdx(currentIdx + 1);
       setSelectedOption(null);
       setShowFeedback(false);
     } else {
       setIsFinished(true);
+    }
+  };
+
+  const handleReview = async () => {
+    setIsGeneratingReview(true);
+    try {
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) throw new Error("API key missing");
+      
+      const ai = new GoogleGenAI({ apiKey });
+      
+      const missedQuestions = missedQuestionIndices.map(idx => questions[idx]);
+      const numNewQuestions = 5 - missedQuestions.length;
+      
+      const prompt = `
+        Generate ${numNewQuestions} new multiple-choice questions for a Bible study on "${lesson.title}".
+        The questions should be based on these scriptures: ${lesson.scripture.map(s => s.reference).join(', ')}.
+        The summary of the lesson is: ${lesson.summary}
+        
+        Return the result as a JSON array of Question objects.
+        Each Question object must have:
+        - id: string (unique)
+        - question: string
+        - options: string[] (exactly 4)
+        - correctAnswer: number (0-3)
+        - explanation: string
+        - type: "multiple-choice"
+      `;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                id: { type: Type.STRING },
+                question: { type: Type.STRING },
+                options: { type: Type.ARRAY, items: { type: Type.STRING } },
+                correctAnswer: { type: Type.INTEGER },
+                explanation: { type: Type.STRING },
+                type: { type: Type.STRING }
+              },
+              required: ["id", "question", "options", "correctAnswer", "explanation", "type"]
+            }
+          }
+        },
+        contents: prompt,
+      });
+
+      const newQuestions = JSON.parse(response.text);
+      const combinedQuestions = [...missedQuestions, ...newQuestions].slice(0, 5);
+      
+      setQuestions(combinedQuestions);
+      setCurrentIdx(0);
+      setScore(0);
+      setMissedQuestionIndices([]);
+      setSelectedOption(null);
+      setShowFeedback(false);
+      setIsFinished(false);
+    } catch (error) {
+      console.error("Error generating review questions:", error);
+      // Fallback: just repeat missed ones if generation fails
+      const missedQuestions = missedQuestionIndices.map(idx => questions[idx]);
+      setQuestions(missedQuestions.length > 0 ? missedQuestions : lesson.questions);
+      setCurrentIdx(0);
+      setScore(0);
+      setMissedQuestionIndices([]);
+      setSelectedOption(null);
+      setShowFeedback(false);
+      setIsFinished(false);
+    } finally {
+      setIsGeneratingReview(false);
     }
   };
 
@@ -254,12 +391,31 @@ const Quiz = ({
         <p className="text-accent font-medium italic mb-8 text-sm px-4">
           "{getEncouragingRemark(finalScore)}"
         </p>
-        <button 
-          onClick={() => onComplete(finalScore)}
-          className="px-8 py-3 bg-primary text-secondary rounded-xl font-bold hover:bg-primary-light transition-colors"
-        >
-          {finalScore === 100 ? 'Continue to Next Lesson' : 'Review and Retry'}
-        </button>
+        <div className="flex flex-col gap-3">
+          {finalScore === 100 ? (
+            <button 
+              onClick={() => onComplete(finalScore)}
+              className="px-8 py-3 bg-primary text-secondary rounded-xl font-bold hover:bg-primary-light transition-colors"
+            >
+              Continue
+            </button>
+          ) : (
+            <button 
+              onClick={handleReview}
+              disabled={isGeneratingReview}
+              className="px-8 py-3 bg-accent text-white rounded-xl font-bold hover:bg-accent/90 transition-colors flex items-center justify-center gap-2"
+            >
+              {isGeneratingReview ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Preparing Review...
+                </>
+              ) : (
+                'Review Missed Questions'
+              )}
+            </button>
+          )}
+        </div>
       </div>
     );
   }
@@ -343,6 +499,7 @@ const Quiz = ({
 // --- Main Page ---
 
 export default function BaptismStudy() {
+  const navigate = useNavigate();
   const [currentModuleIdx, setCurrentModuleIdx] = useState(0);
   const [currentLessonIdx, setCurrentLessonIdx] = useState(0);
   const [isLeaderMode, setIsLeaderMode] = useState(false);
@@ -350,6 +507,7 @@ export default function BaptismStudy() {
   const [completedModules, setCompletedModules] = useState<string[]>([]);
   const [showQuiz, setShowQuiz] = useState(false);
   const [isMastered, setIsMastered] = useState(false);
+  const [isStudyComplete, setIsStudyComplete] = useState(false);
 
   const currentModule = baptismStudyData[currentModuleIdx];
   const currentLesson = currentModule.lessons[currentLessonIdx];
@@ -364,7 +522,7 @@ export default function BaptismStudy() {
     // Small timeout to ensure it happens after any layout shifts or animations
     const timer = setTimeout(scrollToTop, 10);
     return () => clearTimeout(timer);
-  }, [currentModuleIdx, currentLessonIdx, showQuiz]);
+  }, [currentModuleIdx, currentLessonIdx, showQuiz, isStudyComplete]);
 
   const nextLesson = () => {
     if (currentLessonIdx < currentModule.lessons.length - 1) {
@@ -376,6 +534,9 @@ export default function BaptismStudy() {
       setCurrentLessonIdx(0);
       setIsMastered(false);
       setShowQuiz(false);
+    } else {
+      // All modules complete
+      setIsStudyComplete(true);
     }
   };
 
@@ -390,6 +551,57 @@ export default function BaptismStudy() {
       nextLesson();
     }
   };
+
+  if (isStudyComplete) {
+    return (
+      <div className="min-h-screen bg-secondary-light flex items-center justify-center p-4">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="max-w-2xl w-full bg-white rounded-[3rem] p-12 text-center shadow-2xl border border-primary/5"
+        >
+          <div className="w-24 h-24 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-8">
+            <Trophy className="h-12 w-12 text-accent" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-primary mb-6">Congratulations!</h1>
+          <p className="text-xl text-primary/60 mb-12 leading-relaxed">
+            You have successfully completed the interactive study on <span className="text-accent font-bold">The Biblical View of Water Baptism</span>. 
+            May these scriptural truths strengthen your walk in the dispensation of Grace.
+          </p>
+          
+          <div className="bg-secondary-light/50 p-8 rounded-3xl mb-12 text-left">
+            <h3 className="text-sm font-bold text-primary/40 uppercase tracking-widest mb-4">Suggested Next Lesson</h3>
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-xl font-serif font-bold text-primary">Prophecy vs. Mystery</h4>
+                <p className="text-sm text-primary/60">Learn to distinguish between God's earthly and heavenly programs.</p>
+              </div>
+              <Link to="/prophecy-mystery-study" className="p-3 bg-primary text-secondary rounded-full hover:bg-accent transition-colors">
+                <ChevronRight className="h-6 w-6" />
+              </Link>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button 
+              onClick={() => navigate('/bible-studies')}
+              className="px-10 py-4 bg-primary text-secondary rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-primary-light transition-all"
+            >
+              <Home className="h-5 w-5" />
+              Back to Bible Studies
+            </button>
+            <button 
+              onClick={() => studyLogger.download()}
+              className="px-10 py-4 border-2 border-primary/10 text-primary rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-primary/5 transition-all"
+            >
+              <Download className="h-5 w-5" />
+              Download Study Logs
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-secondary-light">
@@ -633,7 +845,7 @@ export default function BaptismStudy() {
                   exit={{ opacity: 0, scale: 0.95 }}
                 >
                   <Quiz 
-                    questions={currentLesson.questions} 
+                    lesson={currentLesson} 
                     onComplete={handleQuizComplete} 
                   />
                 </motion.div>
