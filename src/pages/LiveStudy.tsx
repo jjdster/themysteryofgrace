@@ -58,7 +58,7 @@ export default function LiveStudy() {
       chatRef.current = ai.chats.create({
         model: "gemini-3-flash-preview",
         config: {
-          systemInstruction: "You are a scholarly guide specializing in 'Grace Library' and the Pauline revelation. Your goal is to help the user understand the preaching of Jesus Christ according to the revelation of the mystery (Romans 16:25). Be respectful, insightful, and use scripture (KJV preferred) to support your points. Keep your answers concise but deep in doctrine.",
+          systemInstruction: "You are a scholarly guide specializing in 'Grace Library' and the Pauline revelation. CRITICAL: You MUST prioritize and defer to the Scriptures (KJV) first in every response. Your goal is to help the user understand the preaching of Jesus Christ according to the revelation of the mystery (Romans 16:25). Be respectful, insightful, and use scripture to support your points. Keep your answers concise but deep in doctrine.",
         },
       });
     };

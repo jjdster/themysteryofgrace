@@ -47,7 +47,7 @@ export default function Salvation() {
               <h2 className="text-2xl md:text-3xl font-serif text-primary m-0">Salvation in Christ Alone</h2>
             </div>
             <p>
-              <ScriptureText text="Salvation is in Christ alone (Acts 4:12). It is through the merits of Christ and His death on the cross of Calvary that God’s righteousness has been satisfied (Romans 3:25). He bore our sins in His body (1 Peter 2:24) and shed His blood so that those who believe would receive forgiveness (Colossians 2:13)." />
+              <ScriptureText text="Salvation is in Christ alone (Acts 4:12). It is through the merits of Christ and His death on the cross of Calvary that God’s righteousness has been satisfied (Romans 3:25). He bore our sins in His body (1 Peter 2:24) and shed His blood so that those who believe would receive forgiveness (Colossians 2:13, Ephesians 1:7)." />
             </p>
           </section>
 

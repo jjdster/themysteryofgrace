@@ -10,7 +10,6 @@ import {
   ShieldCheck, 
   Users, 
   User, 
-  Lock, 
   RotateCcw, 
   Info,
   FileText,
@@ -19,11 +18,9 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
-import { baptismStudyData, Module, Lesson, Question } from '../data/baptismStudyData';
+import { prophecyMysteryData } from '../data/prophecyMysteryData';
+import { Module, Lesson, Question } from '../data/baptismStudyData';
 import ScriptureText from '../components/ScriptureText';
-
-// --- Types ---
-type StudyMode = 'solo' | 'group';
 
 // --- Components ---
 
@@ -51,7 +48,7 @@ const AIGuide = ({
   const [input, setInput] = useState('');
   const [isEnlarged, setIsEnlarged] = useState(false);
   const [messages, setMessages] = useState<{ role: 'user' | 'guide'; text: string }[]>([
-    { role: 'guide', text: `Hello! I'm your study guide for this lesson on "${lesson.title}". What questions do you have about the scriptures or the source text we're looking at?` }
+    { role: 'guide', text: `Hello! I'm your study guide for this lesson on "${lesson.title}". What questions do you have about the distinctions between Prophecy and the Mystery?` }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -74,8 +71,8 @@ const AIGuide = ({
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       const prompt = `
         You are an interactive, scripture-first study guide for a lesson titled "${lesson.title}".
-        CRITICAL: You MUST prioritize and defer to the Scriptures (KJV) first in every response. 
-        Your goal is to help the user understand the biblical view of water baptism based ONLY on the provided scriptures and source material.
+        CRITICAL: You MUST prioritize and defer to the Scriptures (KJV) first in every response.
+        Your goal is to help the user understand the biblical distinction between Prophecy (God's program for Israel) and the Mystery (God's program for the Body of Christ) based ONLY on the provided scriptures and source material.
         
         SCRIPTURES:
         ${lesson.scripture.map(s => `${s.reference}: ${s.text}`).join('\n')}
@@ -214,10 +211,10 @@ const Quiz = ({
   const [isFinished, setIsFinished] = useState(false);
 
   const getEncouragingRemark = (scorePercent: number) => {
-    if (scorePercent === 100) return "Excellent work! You have a firm grasp of these scriptural truths.";
-    if (scorePercent >= 80) return "Great job! You're very close to full mastery. A quick review might help clear up the last few points.";
-    if (scorePercent >= 60) return "Good effort! You're making progress. Try reviewing the summary again to strengthen your understanding.";
-    return "Don't be discouraged! These doctrines are deep. Take another look at the scriptures and the summary, then try again.";
+    if (scorePercent === 100) return "Excellent work! You are rightly dividing the word of truth.";
+    if (scorePercent >= 80) return "Great job! You have a strong understanding of the distinctions.";
+    if (scorePercent >= 60) return "Good effort! Review the differences between Prophecy and Mystery to sharpen your understanding.";
+    return "Don't be discouraged! These are foundational truths that take time to grasp. Review the scriptures and try again.";
   };
 
   const currentQuestion = questions[currentIdx];
@@ -342,26 +339,23 @@ const Quiz = ({
 
 // --- Main Page ---
 
-export default function BaptismStudy() {
+export default function ProphecyMysteryStudy() {
   const [currentModuleIdx, setCurrentModuleIdx] = useState(0);
   const [currentLessonIdx, setCurrentLessonIdx] = useState(0);
   const [isLeaderMode, setIsLeaderMode] = useState(false);
-  const [studyMode, setStudyMode] = useState<StudyMode>('solo');
+  const [studyMode, setStudyMode] = useState<'solo' | 'group'>('solo');
   const [completedModules, setCompletedModules] = useState<string[]>([]);
   const [showQuiz, setShowQuiz] = useState(false);
   const [isMastered, setIsMastered] = useState(false);
 
-  const currentModule = baptismStudyData[currentModuleIdx];
+  const currentModule = prophecyMysteryData[currentModuleIdx];
   const currentLesson = currentModule.lessons[currentLessonIdx];
 
   useLayoutEffect(() => {
     const scrollToTop = () => {
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-      document.documentElement.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-      document.body.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     };
     scrollToTop();
-    // Small timeout to ensure it happens after any layout shifts or animations
     const timer = setTimeout(scrollToTop, 10);
     return () => clearTimeout(timer);
   }, [currentModuleIdx, currentLessonIdx, showQuiz]);
@@ -371,7 +365,7 @@ export default function BaptismStudy() {
       setCurrentLessonIdx(currentLessonIdx + 1);
       setIsMastered(false);
       setShowQuiz(false);
-    } else if (currentModuleIdx < baptismStudyData.length - 1) {
+    } else if (currentModuleIdx < prophecyMysteryData.length - 1) {
       setCurrentModuleIdx(currentModuleIdx + 1);
       setCurrentLessonIdx(0);
       setIsMastered(false);
@@ -386,7 +380,6 @@ export default function BaptismStudy() {
       if (!completedModules.includes(currentModule.id)) {
         setCompletedModules(prev => [...prev, currentModule.id]);
       }
-      // Advance to next lesson immediately
       nextLesson();
     }
   };
@@ -402,7 +395,7 @@ export default function BaptismStudy() {
               <span className="text-xs font-mono uppercase tracking-[0.2em] font-bold">Scripture-First Study</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-serif font-bold text-primary tracking-tight">
-              The Biblical View of Water Baptism
+              Prophecy vs. Mystery
             </h1>
           </div>
           
@@ -451,7 +444,7 @@ export default function BaptismStudy() {
             <div>
               <h3 className="text-[10px] uppercase tracking-widest font-bold text-primary/40 mb-6">Study Modules</h3>
               <div className="space-y-2">
-                {baptismStudyData.map((mod, idx) => (
+                {prophecyMysteryData.map((mod, idx) => (
                   <div 
                     key={mod.id}
                     className={`relative p-4 rounded-2xl border transition-all ${
@@ -488,7 +481,7 @@ export default function BaptismStudy() {
                 <Lightbulb className="h-8 w-8 text-accent mb-4" />
                 <h4 className="font-serif font-bold mb-2">Study Tip</h4>
                 <p className="text-xs text-secondary/70 leading-relaxed font-light">
-                  Take your time with the scriptures. The goal is mastery, not speed. Use the AI Guide to clarify any difficult concepts.
+                  Rightly dividing the word of truth is the key to understanding your Bible. Pay close attention to who is being addressed in each passage.
                 </p>
               </div>
               <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full -mr-16 -mt-16 blur-2xl" />
@@ -497,7 +490,7 @@ export default function BaptismStudy() {
 
           {/* Main Content Area */}
           <div className="lg:col-span-6">
-            <ProgressBar current={currentModuleIdx + 1} total={baptismStudyData.length} />
+            <ProgressBar current={currentModuleIdx + 1} total={prophecyMysteryData.length} />
             
             <AnimatePresence mode="wait">
               {!showQuiz ? (
@@ -657,9 +650,9 @@ export default function BaptismStudy() {
                     Leader Notes
                   </h5>
                   <ul className="space-y-3 text-xs text-primary/60 leading-relaxed list-disc pl-4">
-                    <li>Ask the group how they define "baptism" before reading the source text.</li>
-                    <li>Emphasize that "identification" is the key concept to unlock Paul's epistles.</li>
-                    <li>Contrast religious tradition with the specific wording in Romans 6:3.</li>
+                    <li>Ask the group if they can find the word "Mystery" in the Old Testament.</li>
+                    <li>Discuss the implications of a "secret" program vs. a "prophesied" one.</li>
+                    <li>Help the group see that Paul is our apostle for today.</li>
                   </ul>
                 </motion.div>
               )}

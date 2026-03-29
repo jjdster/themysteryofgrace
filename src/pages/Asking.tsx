@@ -1,6 +1,5 @@
 import { motion } from 'motion/react';
-import { HelpCircle, MessageSquare, PlayCircle, Mic } from 'lucide-react';
-import VoiceAssistant from '../components/VoiceAssistant';
+import { HelpCircle, MessageSquare, PlayCircle } from 'lucide-react';
 import ScriptureText from '../components/ScriptureText';
 
 export default function Asking() {
@@ -44,16 +43,7 @@ export default function Asking() {
         </p>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10">
-        {/* Voice Assistant Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mb-16"
-        >
-          <VoiceAssistant />
-        </motion.div>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
 
         <div className="space-y-6">
           <div className="flex items-center space-x-2 mb-8 border-b border-primary/10 pb-4">

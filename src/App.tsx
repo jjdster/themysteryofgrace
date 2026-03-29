@@ -13,6 +13,7 @@ import Contact from './pages/Contact';
 import LiveStudy from './pages/LiveStudy';
 import Links from './pages/Links';
 import BaptismStudy from './pages/BaptismStudy';
+import ProphecyMysteryStudy from './pages/ProphecyMysteryStudy';
 import { motion, AnimatePresence } from 'motion/react';
 import ErrorBoundary from './components/ErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
@@ -34,6 +35,7 @@ export default function App() {
                 <Route path="/videos" element={<Videos />} />
                 <Route path="/studies" element={<BibleStudies />} />
                 <Route path="/baptism-study" element={<BaptismStudy />} />
+                <Route path="/prophecy-mystery-study" element={<ProphecyMysteryStudy />} />
                 <Route path="/asking" element={<Asking />} />
                 <Route path="/library" element={<Library />} />
                 <Route path="/live-study" element={<LiveStudy />} />

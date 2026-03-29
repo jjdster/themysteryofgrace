@@ -26,7 +26,7 @@ export default function ScriptureLink({ reference, children }: ScriptureLinkProp
     try {
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: `Provide the full text of the following Bible verse(s) in the King James Version (KJV). Only provide the verse text, no other commentary: ${reference}`,
+        contents: `Provide the full text of the following Bible verse(s) in the King James Version (KJV). CRITICAL: Only provide the verse text, no other commentary, no introduction, and no conclusion. If multiple verses are requested, provide them as a single block of text: ${reference}`,
       });
       setVerseText(response.text || "Verse text not found.");
     } catch (error) {

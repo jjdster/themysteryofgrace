@@ -15,10 +15,11 @@ export default function BibleStudies() {
     },
     {
       title: "Prophecy vs. Mystery",
-      category: "Foundational",
-      duration: "45 mins",
-      description: "Learn to distinguish between God's earthly kingdom program and His heavenly body program.",
+      category: "Interactive",
+      duration: "Self-Paced",
+      description: "Learn to distinguish between God's earthly kingdom program and His heavenly body program through this AI-guided study.",
       status: "Available",
+      path: "/prophecy-mystery-study"
     },
     {
       title: "Law vs. Grace",

@@ -21,24 +21,18 @@ export default function VoiceAssistant() {
 
   const systemInstruction = `
     You are a scholarly Bible assistant focused on the "Preaching of Jesus Christ according to the Revelation of the Mystery" (Romans 16:25).
+    CRITICAL: You MUST prioritize and defer to the Scriptures (KJV) first in every response. 
     Your purpose is to answer questions not with tradition or denomination bias, but with the Scriptures rightly divided (2 Timothy 2:15).
     
     Key principles for your responses:
-    1. Distinguish between God's program for Israel (Prophecy) and His current program for the Body of Christ (the Mystery revealed to Paul).
-    2. Emphasize the Dispensation of the Grace of God.
-    3. Recognize Paul as the unique "Apostle of the Gentiles" (Romans 11:13).
-    4. Focus on the good news entrusted to Paul, by which we are stablished.
-    5. Use the King James Version (KJV) for scripture quotations where possible, as it is the standard for this resource.
-    6. Be encouraging, edifying, and scholarly.
-    7. If a question is outside the scope of the Scriptures or the Pauline revelation, gently guide the user back to the core message of grace.
-    
-    Content Context:
-    - God has blessed the Body of Christ with all spiritual blessings in heavenly places.
-    - We are chosen in Him before the foundation of the world, saved by grace through faith.
-    - By one Spirit we are baptized into one body—the Body of Christ—and sealed unto the day of redemption.
-    - Each member is an heir of God and a joint-heir with Christ.
-    - Faith, hope, and charity remain, and the greatest is charity.
-    - We live as children of God through faith in Jesus Christ, following the things learned from Paul (Philippians 4:9).
+    1. DEFER TO SCRIPTURE FIRST. Use the Bible as the ultimate authority.
+    2. Distinguish between God's program for Israel (Prophecy) and His current program for the Body of Christ (the Mystery revealed to Paul).
+    3. Emphasize the Dispensation of the Grace of God.
+    4. Recognize Paul as the unique "Apostle of the Gentiles" (Romans 11:13).
+    5. Focus on the good news entrusted to Paul, by which we are stablished.
+    6. Use the King James Version (KJV) for scripture quotations where possible, as it is the standard for this resource.
+    7. Be encouraging, edifying, and scholarly.
+    8. If a question is outside the scope of the Scriptures or the Pauline revelation, gently guide the user back to the core message of grace.
   `;
 
   const playNextInQueue = useCallback(async () => {
@@ -193,8 +187,12 @@ export default function VoiceAssistant() {
   }, [stopAssistant]);
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <div className="bg-white rounded-3xl p-8 shadow-xl border border-primary/10 relative overflow-hidden">
+    <div className={isActive ? "fixed inset-0 z-50 bg-secondary/95 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto" : "w-full max-w-md mx-auto"}>
+      <motion.div 
+        layout
+        initial={false}
+        className={`bg-white rounded-3xl p-8 shadow-2xl border border-primary/10 relative overflow-hidden transition-all duration-500 ${isActive ? 'w-full max-w-3xl min-h-[60vh] flex flex-col justify-center' : 'w-full'}`}
+      >
         {/* Background Animation */}
         <AnimatePresence>
           {isActive && (
@@ -208,12 +206,12 @@ export default function VoiceAssistant() {
         </AnimatePresence>
 
         <div className="relative z-10 flex flex-col items-center text-center">
-          <div className="mb-6 p-4 bg-primary/5 rounded-full">
-            <Mic className="h-10 w-10 text-primary" />
+          <div className={`mb-6 p-4 bg-primary/5 rounded-full transition-all duration-500 ${isActive ? 'scale-125' : ''}`}>
+            <Mic className={`text-primary transition-all duration-500 ${isActive ? 'h-16 w-16' : 'h-10 w-10'}`} />
           </div>
           
-          <h3 className="text-2xl font-serif text-primary mb-2">Voice Bible Study</h3>
-          <p className="text-primary/60 text-sm mb-8">
+          <h3 className={`font-serif text-primary mb-2 transition-all duration-500 ${isActive ? 'text-4xl' : 'text-2xl'}`}>Voice Bible Study</h3>
+          <p className={`text-primary/60 mb-8 transition-all duration-500 ${isActive ? 'text-lg max-w-xl' : 'text-sm'}`}>
             Ask questions about the Mystery and the Dispensation of Grace audibly.
           </p>
 
@@ -234,18 +232,18 @@ export default function VoiceAssistant() {
             <button
               onClick={isActive ? stopAssistant : startAssistant}
               disabled={isConnecting}
-              className={`relative z-10 w-24 h-24 rounded-full flex items-center justify-center transition-all shadow-lg ${
+              className={`relative z-10 rounded-full flex items-center justify-center transition-all shadow-lg ${
                 isActive 
-                  ? 'bg-accent text-white hover:bg-accent-light' 
-                  : 'bg-primary text-secondary hover:bg-primary-light'
+                  ? 'bg-accent text-white hover:bg-accent-light w-32 h-32' 
+                  : 'bg-primary text-secondary hover:bg-primary-light w-24 h-24'
               } ${isConnecting ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {isConnecting ? (
-                <Loader2 className="h-10 w-10 animate-spin" />
+                <Loader2 className={`animate-spin ${isActive ? 'h-14 w-14' : 'h-10 w-10'}`} />
               ) : isActive ? (
-                <MicOff className="h-10 w-10" />
+                <MicOff className={`h-14 w-14`} />
               ) : (
-                <Mic className="h-10 w-10" />
+                <Mic className={`h-10 w-10`} />
               )}
             </button>
           </div>
@@ -258,7 +256,7 @@ export default function VoiceAssistant() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="text-primary/40 text-xs font-medium uppercase tracking-widest"
+                  className={`text-primary/40 font-medium uppercase tracking-widest ${isActive ? 'text-sm' : 'text-xs'}`}
                 >
                   Establishing Connection...
                 </motion.p>
@@ -269,7 +267,7 @@ export default function VoiceAssistant() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="text-primary text-xs font-medium uppercase tracking-widest flex items-center justify-center"
+                  className={`text-primary font-medium uppercase tracking-widest flex items-center justify-center ${isActive ? 'text-sm' : 'text-xs'}`}
                 >
                   <span className="w-2 h-2 bg-primary rounded-full mr-2 animate-pulse" />
                   Listening
@@ -281,7 +279,7 @@ export default function VoiceAssistant() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="text-accent text-xs font-medium uppercase tracking-widest flex items-center justify-center"
+                  className={`text-accent font-medium uppercase tracking-widest flex items-center justify-center ${isActive ? 'text-sm' : 'text-xs'}`}
                 >
                   <Volume2 className="h-4 w-4 mr-2 animate-bounce" />
                   AI Responding
@@ -293,7 +291,7 @@ export default function VoiceAssistant() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="text-primary/40 text-xs font-medium uppercase tracking-widest"
+                  className={`text-primary/40 font-medium uppercase tracking-widest ${isActive ? 'text-sm' : 'text-xs'}`}
                 >
                   Tap to Start Voice Study
                 </motion.p>
@@ -306,12 +304,23 @@ export default function VoiceAssistant() {
               {error}
             </p>
           )}
+
+          {isActive && (
+            <button 
+              onClick={stopAssistant}
+              className="mt-12 text-primary/40 hover:text-primary text-xs uppercase tracking-widest font-bold transition-colors"
+            >
+              Minimize Guide
+            </button>
+          )}
         </div>
-      </div>
+      </motion.div>
       
-      <p className="text-center text-primary/40 text-[10px] mt-4 uppercase tracking-tighter">
-        Powered by Gemini 3.1 Flash Live • Pauline Revelation Context
-      </p>
+      {!isActive && (
+        <p className="text-center text-primary/40 text-[10px] mt-4 uppercase tracking-tighter">
+          Powered by Gemini 3.1 Flash Live • Pauline Revelation Context
+        </p>
+      )}
     </div>
   );
 }
