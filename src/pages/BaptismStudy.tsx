@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   BookOpen, 
   CheckCircle2, 

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Loader2, Info, MessageSquare, User, BookOpen } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 import ScriptureText from '../components/ScriptureText';

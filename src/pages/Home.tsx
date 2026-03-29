@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { ArrowRight, Book, Shield, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ScriptureText from '../components/ScriptureText';

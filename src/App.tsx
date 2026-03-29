@@ -14,7 +14,7 @@ import LiveStudy from './pages/LiveStudy';
 import Links from './pages/Links';
 import BaptismStudy from './pages/BaptismStudy';
 import ProphecyMysteryStudy from './pages/ProphecyMysteryStudy';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import ErrorBoundary from './components/ErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
 

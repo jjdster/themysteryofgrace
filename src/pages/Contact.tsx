@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Mail, Send, MapPin, Phone, Loader2 } from 'lucide-react';
 import { useState, FormEvent } from 'react';
 

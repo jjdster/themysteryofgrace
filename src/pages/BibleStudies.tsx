@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Play, FileText, Clock, ChevronRight } from 'lucide-react';
 import ScriptureText from '../components/ScriptureText';

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Book, Download, ExternalLink, FileText, ChevronLeft, User, Loader2 } from 'lucide-react';
 import ScriptureText from '../components/ScriptureText';
 

@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { ExternalLink, Link as LinkIcon } from 'lucide-react';
 import ScriptureText from '../components/ScriptureText';
 

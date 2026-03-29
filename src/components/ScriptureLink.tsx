@@ -8,8 +8,6 @@ interface ScriptureLinkProps {
   children?: React.ReactNode;
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
 export default function ScriptureLink({ reference, children }: ScriptureLinkProps) {
   const [verseText, setVerseText] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -24,6 +22,12 @@ export default function ScriptureLink({ reference, children }: ScriptureLinkProp
   const fetchVerse = async () => {
     setIsLoading(true);
     try {
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        setVerseText("API key is missing.");
+        return;
+      }
+      const ai = new GoogleGenAI({ apiKey });
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: `Provide the full text of the following Bible verse(s) in the King James Version (KJV). CRITICAL: Only provide the verse text, no other commentary, no introduction, and no conclusion. If multiple verses are requested, provide them as a single block of text: ${reference}`,
