@@ -88,9 +88,35 @@ async function startServer() {
       });
 
       res.json({ status: "ok", docId });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error logging to Google Docs:", error);
-      res.status(500).json({ error: "Failed to log to Google Docs" });
+      
+      // Fallback: Log to local file if Google Docs fails
+      try {
+        const logDir = path.join(process.cwd(), "logs");
+        if (!fs.existsSync(logDir)) fs.mkdirSync(logDir);
+        
+        const logFile = path.join(logDir, `study-logs-${new Date().toISOString().split('T')[0]}.txt`);
+        const logEntry = JSON.stringify({ 
+          timestamp: new Date().toISOString(), 
+          ...req.body,
+          error: error.message || "Unknown error"
+        }) + "\n";
+        
+        fs.appendFileSync(logFile, logEntry);
+        console.log("Logged to local fallback file successfully.");
+        
+        // Return 200 even if remote failed, but indicate the fallback
+        return res.status(200).json({ 
+          status: "fallback", 
+          message: "Remote quota exceeded, logged locally.",
+          error: error.message 
+        });
+      } catch (localError) {
+        console.error("Critical: Local fallback logging also failed:", localError);
+      }
+
+      res.status(500).json({ error: "Failed to log to Google Docs and local fallback" });
     }
   });
 

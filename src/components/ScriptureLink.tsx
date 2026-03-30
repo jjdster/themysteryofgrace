@@ -22,7 +22,7 @@ export default function ScriptureLink({ reference, children }: ScriptureLinkProp
   const fetchVerse = async () => {
     setIsLoading(true);
     try {
-      const apiKey = process.env.GEMINI_API_KEY;
+      const apiKey = process.env.GEMINI_API_KEY || (import.meta as any).env?.VITE_GEMINI_API_KEY;
       if (!apiKey || apiKey === "undefined" || apiKey === "") {
         setVerseText("API key is missing. Please check your environment variables.");
         return;

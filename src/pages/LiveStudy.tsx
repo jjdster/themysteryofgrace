@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Loader2, Info, MessageSquare, User, BookOpen } from 'lucide-react';
+import { Send, Loader2, Info, MessageSquare, User, BookOpen, Bug } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 import ScriptureText from '../components/ScriptureText';
+import { DebugPanel } from '../components/DebugPanel';
+import { studyLogger } from '../lib/logger';
 
 interface Message {
   role: 'user' | 'model';
@@ -48,9 +50,9 @@ export default function LiveStudy() {
   // Initialize Chat
   useEffect(() => {
     const initChat = async () => {
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) {
-        setError("AI configuration is missing. Please check your environment.");
+      const apiKey = process.env.GEMINI_API_KEY || (import.meta as any).env?.VITE_GEMINI_API_KEY;
+      if (!apiKey || apiKey === "undefined" || apiKey === "") {
+        setError("AI configuration is missing. Please check your environment variables.");
         return;
       }
 
@@ -93,6 +95,15 @@ export default function LiveStudy() {
           return newMessages;
         });
       }
+
+      // Log the interaction after stream finishes
+      studyLogger.log("Live Scholarly Dialogue", {
+        type: 'chat',
+        data: {
+          userMessage,
+          aiResponse: fullText
+        }
+      });
     } catch (err) {
       console.error("Chat error:", err);
       setError("Failed to send message. Please try again.");
@@ -237,6 +248,7 @@ export default function LiveStudy() {
           </div>
         </div>
       </div>
+      <DebugPanel />
     </motion.div>
   );
 }

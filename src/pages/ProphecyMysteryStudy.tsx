@@ -15,12 +15,16 @@ import {
   FileText,
   ArrowRight,
   Lightbulb,
-  AlertCircle
+  AlertCircle,
+  Bug,
+  Loader2
 } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 import { prophecyMysteryData } from '../data/prophecyMysteryData';
 import { Module, Lesson, Question } from '../data/baptismStudyData';
 import ScriptureText from '../components/ScriptureText';
+import { DebugPanel } from '../components/DebugPanel';
+import { studyLogger } from '../lib/logger';
 
 // --- Components ---
 
@@ -68,7 +72,12 @@ const AIGuide = ({
     setIsLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const apiKey = process.env.GEMINI_API_KEY || (import.meta as any).env?.VITE_GEMINI_API_KEY;
+      if (!apiKey || apiKey === "undefined" || apiKey === "") {
+        setMessages(prev => [...prev, { role: 'guide', text: "API key is missing. Please check your environment variables." }]);
+        return;
+      }
+      const ai = new GoogleGenAI({ apiKey });
       const prompt = `
         You are an interactive, scripture-first study guide for a lesson titled "${lesson.title}".
         CRITICAL: You MUST prioritize and defer to the Scriptures (KJV) first in every response.
@@ -98,7 +107,17 @@ const AIGuide = ({
         contents: prompt,
       });
 
-      setMessages(prev => [...prev, { role: 'guide', text: response.text || "I'm sorry, I couldn't generate a response." }]);
+      const guideResponse = response.text || "I'm sorry, I couldn't generate a response.";
+      setMessages(prev => [...prev, { role: 'guide', text: guideResponse }]);
+      
+      // Log the interaction
+      studyLogger.log(lesson.title, {
+        type: 'question',
+        data: {
+          userQuestion: userMessage,
+          aiResponse: guideResponse
+        }
+      });
     } catch (error) {
       console.error("AI Error:", error);
       setMessages(prev => [...prev, { role: 'guide', text: "I'm having trouble connecting right now. Please try again in a moment." }]);
@@ -198,9 +217,11 @@ const AIGuide = ({
 };
 
 const Quiz = ({ 
+  lesson,
   questions, 
   onComplete 
 }: { 
+  lesson: Lesson;
   questions: Question[]; 
   onComplete: (score: number) => void 
 }) => {
@@ -220,10 +241,22 @@ const Quiz = ({
   const currentQuestion = questions[currentIdx];
 
   const handleNext = () => {
-    if (selectedOption === currentQuestion.correctAnswer) {
+    const isCorrect = selectedOption === currentQuestion.correctAnswer;
+    if (isCorrect) {
       setScore(s => s + 1);
     }
     
+    // Log individual question result
+    studyLogger.log(lesson.title, {
+      type: 'quiz',
+      data: {
+        question: currentQuestion.question,
+        selected: currentQuestion.options[selectedOption!],
+        correct: currentQuestion.options[currentQuestion.correctAnswer],
+        isCorrect
+      }
+    });
+
     if (currentIdx < questions.length - 1) {
       setCurrentIdx(currentIdx + 1);
       setSelectedOption(null);
@@ -626,6 +659,7 @@ export default function ProphecyMysteryStudy() {
                   exit={{ opacity: 0, scale: 0.95 }}
                 >
                   <Quiz 
+                    lesson={currentLesson}
                     questions={currentLesson.questions} 
                     onComplete={handleQuizComplete} 
                   />
@@ -661,6 +695,7 @@ export default function ProphecyMysteryStudy() {
 
         </div>
       </div>
+      <DebugPanel />
     </div>
   );
 }
