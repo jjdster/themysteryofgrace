@@ -135,11 +135,16 @@ app.post("/api/logs/submit", async (req, res) => {
     }
   });
 
-  app.get("/api/logs/status", (req, res) => {
+  app.get(["/api/logs/status", "/api/logs/status/"], (req, res) => {
     const serviceAccountJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
     res.json({ 
+      status: "ALIVE",
       configured: !!serviceAccountJson,
-      userEmail: "jjdster@gmail.com"
+      userEmail: "jjdster@gmail.com",
+      env: {
+        NODE_ENV: process.env.NODE_ENV,
+        VERCEL: !!process.env.VERCEL
+      }
     });
   });
 

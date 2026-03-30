@@ -4,7 +4,13 @@ import { getGeminiApiKey } from '../lib/api';
 
 export const DebugPanel = () => {
   const [show, setShow] = useState(false);
-  const [logStatus, setLogStatus] = useState<{ configured: boolean; userEmail: string } | null>(null);
+  const [logStatus, setLogStatus] = useState<{ 
+    status?: string; 
+    configured: boolean; 
+    userEmail?: string; 
+    error?: string;
+    env?: any;
+  } | null>(null);
   const apiKeyProcess = process.env.GEMINI_API_KEY;
   const apiKeyVite = (import.meta as any).env?.VITE_GEMINI_API_KEY;
   const apiKeyResolved = getGeminiApiKey();
@@ -12,9 +18,17 @@ export const DebugPanel = () => {
   useEffect(() => {
     if (show) {
       fetch('/api/logs/status')
-        .then(res => res.json())
+        .then(async res => {
+          if (!res.ok) {
+            const text = await res.text();
+            throw new Error(`Status ${res.status}: ${text.substring(0, 30)}`);
+          }
+          return res.json();
+        })
         .then(data => setLogStatus(data))
-        .catch(() => setLogStatus(null));
+        .catch((err) => {
+          setLogStatus({ configured: false, error: err.message });
+        });
     }
   }, [show]);
 
@@ -79,9 +93,25 @@ export const DebugPanel = () => {
             <div className="text-white/40 uppercase text-[9px] tracking-tighter">Google Drive Logging</div>
             {logStatus?.configured ? <CheckCircle2 className="h-3 w-3 text-green-400" /> : <AlertCircle className="h-3 w-3 text-red-400" />}
           </div>
-          <div className={`font-bold ${logStatus?.configured ? 'text-green-400' : 'text-red-400'}`}>
-            {logStatus?.configured ? 'CONFIGURED' : 'NOT CONFIGURED'}
+          
+          <div className="flex flex-col gap-1">
+            <div className={`font-bold ${logStatus?.configured ? 'text-green-400' : 'text-red-400'}`}>
+              {logStatus?.configured ? 'CONFIGURED' : 'NOT CONFIGURED'}
+            </div>
+            
+            {logStatus?.status && (
+              <div className="text-[8px] text-white/60">Server Status: <span className="text-accent">{logStatus.status}</span></div>
+            )}
+            
+            {logStatus?.error && (
+              <div className="text-[8px] text-red-300 italic">Error: {logStatus.error}</div>
+            )}
+
+            {logStatus?.env && (
+              <div className="text-[7px] text-white/20">Vercel: {String(logStatus.env.VERCEL)} | {logStatus.env.NODE_ENV}</div>
+            )}
           </div>
+
           {logStatus?.configured && (
             <div className="text-[8px] text-white/40 mt-1 truncate">
               Sharing with: {logStatus.userEmail}
