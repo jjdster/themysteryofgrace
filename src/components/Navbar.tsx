@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, BookOpen, Mail, Home, Info, Youtube, Heart, User, Video, HelpCircle, ChevronDown } from 'lucide-react';
+import { Menu, X, BookOpen, Mail, Home, Info, Youtube, Heart, User, Video, HelpCircle, ChevronDown, Search as SearchIcon } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -18,6 +18,7 @@ export default function Navbar() {
     { name: 'Bible Studies', path: '/studies', icon: BookOpen },
     { name: 'Just Asking', path: '/asking', icon: HelpCircle },
     { name: 'Library', path: '/library', icon: BookOpen },
+    { name: 'Search', path: '/search', icon: SearchIcon },
     { name: 'Live Study', path: '/live-study', icon: Video },
     { 
       name: 'Links', 

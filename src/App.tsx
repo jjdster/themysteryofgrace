@@ -8,6 +8,7 @@ import Salvation from './pages/Salvation';
 import Testimony from './pages/Testimony';
 import BibleStudies from './pages/BibleStudies';
 import Library from './pages/Library';
+import Search from './pages/Search';
 import Asking from './pages/Asking';
 import Contact from './pages/Contact';
 import LiveStudy from './pages/LiveStudy';
@@ -38,6 +39,7 @@ export default function App() {
                 <Route path="/prophecy-mystery-study" element={<ProphecyMysteryStudy />} />
                 <Route path="/asking" element={<Asking />} />
                 <Route path="/library" element={<Library />} />
+                <Route path="/search" element={<Search />} />
                 <Route path="/live-study" element={<LiveStudy />} />
                 <Route path="/links" element={<Links />} />
                 <Route path="/contact" element={<Contact />} />

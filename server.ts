@@ -1,4 +1,4 @@
-import { serverApp as app } from "./api/index";
+import { serverApp as app } from "./api/index.ts";
 import express from "express";
 import dotenv from "dotenv";
 import path from "path";

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Book, Download, ExternalLink, FileText, ChevronLeft, User, Loader2 } from 'lucide-react';
+import { Book, Download, ExternalLink, FileText, ChevronLeft, User, Loader2, Search, X } from 'lucide-react';
 import ScriptureText from '../components/ScriptureText';
 
 interface BookType {
@@ -122,6 +122,7 @@ const PDF_BASE_URL = 'https://cdn.jsdelivr.net/gh/jjdster/grace-library-assets@m
 
 export default function Library() {
   const [activeAuthor, setActiveAuthor] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [books, setBooks] = useState<BookType[]>(initialBooks);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -132,7 +133,12 @@ export default function Library() {
     setLoading(false);
   }, []);
 
-  const filteredBooks = books.filter(book => book.author === activeAuthor);
+  const filteredBooks = books.filter(book => {
+    const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          book.author.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesAuthor = activeAuthor ? book.author === activeAuthor : true;
+    return matchesSearch && matchesAuthor;
+  });
 
   if (loading && !activeAuthor) {
     return (
@@ -160,8 +166,29 @@ export default function Library() {
           </p>
         </div>
 
+        <div className="max-w-md mx-auto mb-12 relative">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-primary/40" />
+            <input
+              type="text"
+              placeholder="Search books or authors..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-12 py-4 bg-white rounded-2xl border border-primary/10 shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all text-primary"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-secondary-light rounded-full transition-colors"
+              >
+                <X className="h-4 w-4 text-primary/40" />
+              </button>
+            )}
+          </div>
+        </div>
+
         <AnimatePresence mode="wait">
-          {!activeAuthor ? (
+          {(!activeAuthor && !searchQuery) ? (
             <motion.div
               key="author-selection"
               initial={{ opacity: 0, y: 20 }}
@@ -211,67 +238,88 @@ export default function Library() {
             >
               <div className="flex items-center justify-between mb-12">
                 <button
-                  onClick={() => setActiveAuthor(null)}
+                  onClick={() => {
+                    setActiveAuthor(null);
+                    setSearchQuery('');
+                  }}
                   className="flex items-center text-primary/60 hover:text-accent transition-colors group"
                 >
                   <ChevronLeft className="h-5 w-5 mr-1 group-hover:-translate-x-1 transition-transform" />
-                  Back to Authors
+                  {searchQuery && !activeAuthor ? 'Clear Search' : 'Back to Authors'}
                 </button>
                 <div className="text-right">
-                  <h2 className="text-2xl font-serif font-bold text-primary">{activeAuthor}</h2>
-                  <p className="text-sm text-primary/40 uppercase tracking-widest">{filteredBooks.length} Resources Available</p>
+                  <h2 className="text-2xl font-serif font-bold text-primary">
+                    {activeAuthor || (searchQuery ? 'Search Results' : '')}
+                  </h2>
+                  <p className="text-sm text-primary/40 uppercase tracking-widest">
+                    {filteredBooks.length} {filteredBooks.length === 1 ? 'Resource' : 'Resources'} Available
+                  </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filteredBooks.map((book, index) => (
-                  <motion.div
-                    key={book.id}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="bg-white rounded-xl shadow-md overflow-hidden border border-primary/10 hover:shadow-xl transition-all duration-300 group"
-                  >
-                    <div className="p-8 h-full flex flex-col">
-                      <div className="flex items-start justify-between mb-6">
-                        <div className="p-3 bg-accent/10 rounded-lg text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300">
-                          <Book className="h-6 w-6" />
+              {filteredBooks.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {filteredBooks.map((book, index) => (
+                    <motion.div
+                      key={book.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="bg-white rounded-xl shadow-md overflow-hidden border border-primary/10 hover:shadow-xl transition-all duration-300 group"
+                    >
+                      <div className="p-8 h-full flex flex-col">
+                        <div className="flex items-start justify-between mb-6">
+                          <div className="p-3 bg-accent/10 rounded-lg text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300">
+                            <Book className="h-6 w-6" />
+                          </div>
+                          <span className="text-xs font-mono text-primary/40 uppercase tracking-widest">
+                            PDF Resource
+                          </span>
                         </div>
-                        <span className="text-xs font-mono text-primary/40 uppercase tracking-widest">
-                          PDF Resource
-                        </span>
+                        
+                        <h3 className="text-xl font-serif font-bold text-primary mb-2 group-hover:text-accent transition-colors duration-300">
+                          {book.title}
+                        </h3>
+                        <p className="text-primary/60 text-sm mb-8 font-light italic">
+                          By {book.author}
+                        </p>
+                        
+                        <div className="mt-auto flex items-center space-x-4">
+                          <a
+                            href={book.downloadUrl || (PDF_BASE_URL.startsWith('http') ? `${PDF_BASE_URL}/${book.filename}` : `${PDF_BASE_URL}/${book.filename}`)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-primary text-secondary text-sm font-medium rounded-md hover:bg-primary-light transition-colors duration-200"
+                          >
+                            <ExternalLink className="mr-2 h-4 w-4" />
+                            Read Online
+                          </a>
+                          <a
+                            href={book.downloadUrl || (PDF_BASE_URL.startsWith('http') ? `${PDF_BASE_URL}/${book.filename}` : `${PDF_BASE_URL}/${book.filename}`)}
+                            download={book.filename}
+                            className="inline-flex items-center justify-center p-2 text-primary/60 hover:text-accent hover:bg-accent/5 rounded-md transition-all duration-200"
+                            title="Download PDF"
+                          >
+                            <Download className="h-5 w-5" />
+                          </a>
+                        </div>
                       </div>
-                      
-                      <h3 className="text-xl font-serif font-bold text-primary mb-2 group-hover:text-accent transition-colors duration-300">
-                        {book.title}
-                      </h3>
-                      <p className="text-primary/60 text-sm mb-8 font-light italic">
-                        By {book.author}
-                      </p>
-                      
-                      <div className="mt-auto flex items-center space-x-4">
-                        <a
-                          href={book.downloadUrl || (PDF_BASE_URL.startsWith('http') ? `${PDF_BASE_URL}/${book.filename}` : `${PDF_BASE_URL}/${book.filename}`)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-primary text-secondary text-sm font-medium rounded-md hover:bg-primary-light transition-colors duration-200"
-                        >
-                          <ExternalLink className="mr-2 h-4 w-4" />
-                          Read Online
-                        </a>
-                        <a
-                          href={book.downloadUrl || (PDF_BASE_URL.startsWith('http') ? `${PDF_BASE_URL}/${book.filename}` : `${PDF_BASE_URL}/${book.filename}`)}
-                          download={book.filename}
-                          className="inline-flex items-center justify-center p-2 text-primary/60 hover:text-accent hover:bg-accent/5 rounded-md transition-all duration-200"
-                          title="Download PDF"
-                        >
-                          <Download className="h-5 w-5" />
-                        </a>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-primary/20">
+                  <Search className="h-12 w-12 text-primary/20 mx-auto mb-4" />
+                  <h3 className="text-xl font-serif font-bold text-primary mb-2">No books found</h3>
+                  <p className="text-primary/60">Try adjusting your search terms or browse by author.</p>
+                  <button 
+                    onClick={() => setSearchQuery('')}
+                    className="mt-6 text-accent font-medium hover:underline"
+                  >
+                    Clear search
+                  </button>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
