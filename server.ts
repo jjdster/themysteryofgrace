@@ -1,5 +1,4 @@
 import express from "express";
-import { google } from "googleapis";
 import path from "path";
 import fs from "fs";
 import dotenv from "dotenv";
@@ -11,9 +10,10 @@ const PORT = 3000;
 
 app.use(express.json());
 
-// --- Diagnostic Endpoints ---
-app.get("/api/ping", (req, res) => res.json({ status: "PONG" }));
+// --- 1. Minimal Diagnostic Endpoint (Must be first) ---
+app.get("/api/ping", (req, res) => res.json({ status: "PONG", timestamp: new Date().toISOString() }));
 
+// --- 2. Status Endpoint ---
 app.get(["/api/logs/status", "/api/logs/status/"], (req, res) => {
   const serviceAccountJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
   let isConfigured = false;
@@ -40,9 +40,10 @@ app.get(["/api/logs/status", "/api/logs/status/"], (req, res) => {
   });
 });
 
-// --- Google Logging API ---
+// --- 3. Google Logging API (Lazy Loaded) ---
 app.post("/api/logs/submit", async (req, res) => {
   try {
+    const { google } = await import("googleapis");
     const { lesson, interaction } = req.body;
     const serviceAccountJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
 
@@ -126,7 +127,7 @@ app.post("/api/logs/submit", async (req, res) => {
   }
 });
 
-// --- Vite Middleware (Development Only) ---
+// --- 4. Static Files / Vite (Development Only) ---
 if (process.env.NODE_ENV !== "production") {
   import("vite").then(async ({ createServer: createViteServer }) => {
     const vite = await createViteServer({
@@ -146,7 +147,7 @@ if (process.env.NODE_ENV !== "production") {
   }
 }
 
-// Start server if not on Vercel
+// --- 5. Start Server (Local Only) ---
 if (!process.env.VERCEL) {
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
