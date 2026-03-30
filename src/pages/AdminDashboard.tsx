@@ -3,7 +3,8 @@ import { db, auth, OperationType, handleFirestoreError } from '../lib/firebase';
 import { collection, query, orderBy, onSnapshot, Timestamp } from 'firebase/firestore';
 import { useAuth } from '../lib/AuthProvider';
 import { motion } from 'framer-motion';
-import { Shield, Clock, User, BookOpen, MessageSquare, CheckCircle, Download, AlertCircle } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import { Shield, Clock, User, BookOpen, MessageSquare, CheckCircle, Download, AlertCircle, Loader2 } from 'lucide-react';
 
 interface StudyLog {
   id: string;
@@ -173,7 +174,18 @@ export default function AdminDashboard() {
                         ) : log.type === 'question' ? (
                           <div className="space-y-3">
                             <p className="text-sm font-bold text-primary/80">Q: {log.data.userQuestion}</p>
-                            <p className="text-xs text-primary/60 italic leading-relaxed">A: {log.data.aiResponse?.substring(0, 200)}...</p>
+                            {log.data.aiResponse ? (
+                              <div className="text-xs text-primary/60 italic leading-relaxed markdown-body">
+                                <ReactMarkdown>
+                                  {log.data.aiResponse.substring(0, 300) + (log.data.aiResponse.length > 300 ? '...' : '')}
+                                </ReactMarkdown>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2 text-[10px] text-accent font-bold uppercase tracking-widest animate-pulse">
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                                Response Pending...
+                              </div>
+                            )}
                           </div>
                         ) : (
                           <pre className="text-[10px] font-mono text-primary/60 overflow-x-auto">

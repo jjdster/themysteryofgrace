@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { GoogleGenAI, Type } from "@google/genai";
 import { useNavigate, Link } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 import { baptismStudyData, Module, Lesson, Question } from '../data/baptismStudyData';
 import ScriptureText from '../components/ScriptureText';
 import { DebugPanel } from '../components/DebugPanel';
@@ -83,6 +84,15 @@ const AIGuide = ({
     setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
     setIsLoading(true);
 
+    // Log the question immediately so we don't lose it if the AI fails or user navigates
+    await studyLogger.log(lesson.title, {
+      type: 'question',
+      data: {
+        userQuestion: userMessage,
+        status: 'pending'
+      }
+    });
+
     try {
       const apiKey = getGeminiApiKey();
       if (!apiKey) {
@@ -122,12 +132,13 @@ const AIGuide = ({
       const guideResponse = response.text || "I'm sorry, I couldn't generate a response.";
       setMessages(prev => [...prev, { role: 'guide', text: guideResponse }]);
       
-      // Log the interaction
+      // Log the full interaction (this will be a second entry, but it's safer)
       studyLogger.log(lesson.title, {
         type: 'question',
         data: {
           userQuestion: userMessage,
-          aiResponse: guideResponse
+          aiResponse: guideResponse,
+          status: 'completed'
         }
       });
     } catch (error) {
@@ -173,7 +184,26 @@ const AIGuide = ({
                   ? 'bg-accent text-white rounded-tr-none' 
                   : 'bg-white border border-primary/10 text-primary rounded-tl-none shadow-sm'
               }`}>
-                <ScriptureText text={msg.text} />
+                {msg.role === 'user' ? (
+                  <ScriptureText text={msg.text} />
+                ) : (
+                  <div className="markdown-body">
+                    <ReactMarkdown
+                      components={{
+                        p: ({ children }) => <p className="mb-4 last:mb-0">{children}</p>,
+                        h1: ({ children }) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
+                        h2: ({ children }) => <h2 className="text-md font-bold mb-2">{children}</h2>,
+                        h3: ({ children }) => <h3 className="text-sm font-bold mb-1">{children}</h3>,
+                        ul: ({ children }) => <ul className="list-disc pl-4 mb-4">{children}</ul>,
+                        ol: ({ children }) => <ol className="list-decimal pl-4 mb-4">{children}</ol>,
+                        li: ({ children }) => <li className="mb-1">{children}</li>,
+                        blockquote: ({ children }) => <blockquote className="border-l-4 border-accent/20 pl-4 italic mb-4">{children}</blockquote>,
+                      }}
+                    >
+                      {msg.text}
+                    </ReactMarkdown>
+                  </div>
+                )}
               </div>
             </div>
           ))}
