@@ -99,7 +99,7 @@ export default function Mystery() {
               Rightly dividing the Word of Truth does not mean that we are forsaking Christ and replacing Him with Paul, or, as some slanderously suggest, "We worship Paul more than Christ." Is it just possible that we might be believing what the Bible has declared. I was a Gentile and God sovereignly chose Paul to be my apostle. He received a body of truth that had been hidden in God up to the point in time when Christ revealed it to him.
             </p>
             <p>
-              Rightly dividing the Word of Truth means recognizing that while all Scripture is for us, not all Scripture is written to us or about us. When our eyes are illumined to the distinct message and ministry that God committed to Paul's trust, the Mystery, the Gospel of God's grace, many of the so-called contradictions of the Bible vanish. Our understanding and appreciation for the glorious riches of God's infinite grace envelops and empowers us as we become increasingly aware of our joy, our peace and and our rest in Christ.
+              Rightly dividing the Word of Truth means recognizing that while all Scripture is for us, not all Scripture is written to us or about us. When our eyes are illumined to the distinct message and ministry that God committed to Paul's trust, the Mystery, the Gospel of God's grace, many of the so-called contradictions of the Bible vanish. Our understanding and appreciation for the glorious riches of God's infinite grace envelops and empowers us as we become increasingly thankful and appreciative of our joy, our peace and and our rest in Christ.
             </p>
           </div>
         </motion.div>
