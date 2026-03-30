@@ -20,20 +20,29 @@ export const DebugPanel = () => {
     if (show) {
       // First try a simple ping
       fetch('/api/ping')
-        .then(res => res.json())
-        .then(pingData => {
-          if (pingData.status === 'PONG') {
-            // If ping works, fetch full status
-            return fetch('/api/logs/status');
+        .then(async res => {
+          const text = await res.text();
+          try {
+            const data = JSON.parse(text);
+            if (data.status === 'PONG') {
+              // If ping works, fetch full status
+              return fetch('/api/logs/status');
+            }
+            throw new Error(`Ping failed: ${text.substring(0, 50)}`);
+          } catch (e) {
+            throw new Error(`Ping error: ${text.substring(0, 50)}`);
           }
-          throw new Error("Ping failed");
         })
         .then(async res => {
+          const text = await res.text();
           if (!res.ok) {
-            const text = await res.text();
-            throw new Error(`Status ${res.status}: ${text.substring(0, 30)}`);
+            throw new Error(`Status ${res.status}: ${text.substring(0, 50)}`);
           }
-          return res.json();
+          try {
+            return JSON.parse(text);
+          } catch (e) {
+            throw new Error(`JSON parse error: ${text.substring(0, 50)}`);
+          }
         })
         .then(data => setLogStatus(data))
         .catch((err) => {
@@ -114,11 +123,11 @@ export const DebugPanel = () => {
             )}
             
             {logStatus?.error && (
-              <div className="text-[8px] text-red-300 italic">Error: {logStatus.error}</div>
+              <div className="text-[8px] text-red-300 italic break-all">Error: {logStatus.error}</div>
             )}
 
             {logStatus?.parseError && (
-              <div className="text-[8px] text-orange-300 italic">JSON Error: {logStatus.parseError}</div>
+              <div className="text-[8px] text-orange-300 italic break-all">JSON Error: {logStatus.parseError}</div>
             )}
 
             {logStatus?.env && (
