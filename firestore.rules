@@ -41,9 +41,19 @@ service cloud.firestore {
              data.timestamp is timestamp;
     }
 
+    function isValidStudySession(data) {
+      return data.keys().hasAll(['userId', 'userEmail', 'lessonTitle', 'startTime', 'lastUpdateTime', 'interactions']) &&
+             (data.userId is string || data.userId == null) &&
+             data.userEmail is string &&
+             data.lessonTitle is string &&
+             data.startTime is timestamp &&
+             data.lastUpdateTime is timestamp &&
+             data.interactions is list &&
+             data.interactions.size() < 100; // Prevent massive sessions
+    }
+
     match /study_logs/{logId} {
       // Allow anyone to create a log (including guests)
-      // We validate the data structure and ensure they can't spoof another user's ID if authenticated
       allow create: if isValidStudyLog(request.resource.data) && 
                       (!isAuthenticated() || request.resource.data.userId == request.auth.uid);
       
@@ -52,6 +62,20 @@ service cloud.firestore {
       
       // Logs are immutable once created
       allow update, delete: if false;
+    }
+
+    match /study_sessions/{sessionId} {
+      // Allow anyone to create/update a session (including guests)
+      allow create: if isValidStudySession(request.resource.data) && 
+                      (!isAuthenticated() || request.resource.data.userId == request.auth.uid);
+      
+      allow update: if isValidStudySession(request.resource.data) && 
+                      (!isAuthenticated() || request.resource.data.userId == request.auth.uid);
+      
+      // Only admins can read all sessions
+      allow read: if isAdmin();
+      
+      allow delete: if false;
     }
 
     match /users/{userId} {

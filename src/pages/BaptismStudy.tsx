@@ -57,12 +57,13 @@ const ProgressBar = ({ current, total }: { current: number; total: number }) => 
 
 const AIGuide = ({ 
   lesson, 
-  isLeaderMode 
+  isLeaderMode,
+  sessionId
 }: { 
   lesson: Lesson; 
-  isLeaderMode: boolean 
+  isLeaderMode: boolean;
+  sessionId: string;
 }) => {
-  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`);
   const [input, setInput] = useState('');
   const [isEnlarged, setIsEnlarged] = useState(false);
   const [messages, setMessages] = useState<{ role: 'user' | 'guide'; text: string }[]>([
@@ -101,6 +102,10 @@ const AIGuide = ({
         return;
       }
       const ai = new GoogleGenAI({ apiKey });
+      
+      // Build conversation history for context
+      const history = messages.map(m => `${m.role === 'user' ? 'USER' : 'GUIDE'}: ${m.text}`).join('\n');
+      
       const prompt = `
         You are an interactive, scripture-first study guide for a lesson titled "${lesson.title}".
         CRITICAL: You MUST prioritize and defer to the Scriptures (KJV) first in every response. 
@@ -121,6 +126,10 @@ const AIGuide = ({
         4. If a concept is not supported by the selected sources, say so clearly.
         5. Be educational, encouraging, and clear.
         6. ${isLeaderMode ? "You are in LEADER MODE. Provide additional facilitator notes and deeper theological insights for a small group setting." : "You are in SOLO MODE. Focus on helping the individual student grasp the core concepts."}
+        7. MAINTAIN CONTEXT. Refer back to previous parts of the conversation if relevant. Do not start every message with a generic welcome if the conversation is already underway.
+        
+        CONVERSATION HISTORY:
+        ${history}
         
         USER QUESTION: ${userMessage}
       `;
@@ -261,10 +270,12 @@ const AIGuide = ({
 
 const Quiz = ({ 
   lesson,
-  onComplete 
+  onComplete,
+  sessionId
 }: { 
   lesson: Lesson; 
-  onComplete: (score: number) => void 
+  onComplete: (score: number) => void;
+  sessionId: string;
 }) => {
   const [questions, setQuestions] = useState<Question[]>(lesson.questions);
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -294,7 +305,7 @@ const Quiz = ({
     }
     
     // Log individual question result
-    studyLogger.log(lesson.title, {
+    studyLogger.logSessionInteraction(sessionId, lesson.title, {
       type: 'quiz',
       data: {
         question: currentQuestion.question,
@@ -520,6 +531,7 @@ export default function BaptismStudy() {
   const navigate = useNavigate();
   const [currentModuleIdx, setCurrentModuleIdx] = useState(0);
   const [currentLessonIdx, setCurrentLessonIdx] = useState(0);
+  const [sessionId, setSessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`);
   const [isLeaderMode, setIsLeaderMode] = useState(false);
   const [studyMode, setStudyMode] = useState<StudyMode>('solo');
   const [completedModules, setCompletedModules] = useState<string[]>([]);
@@ -544,6 +556,9 @@ export default function BaptismStudy() {
   }, [currentModuleIdx, currentLessonIdx, showQuiz, isStudyComplete]);
 
   const nextLesson = () => {
+    // Reset session ID for new lesson
+    setSessionId(`session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`);
+    
     if (currentLessonIdx < currentModule.lessons.length - 1) {
       setCurrentLessonIdx(currentLessonIdx + 1);
       setIsMastered(false);
@@ -924,7 +939,8 @@ export default function BaptismStudy() {
                 >
                   <Quiz 
                     lesson={currentLesson} 
-                    onComplete={handleQuizComplete} 
+                    onComplete={handleQuizComplete}
+                    sessionId={sessionId}
                   />
                 </motion.div>
               )}
@@ -934,7 +950,11 @@ export default function BaptismStudy() {
           {/* AI Guide Area */}
           <div className="lg:col-span-3">
             <div className="sticky top-24">
-              <AIGuide lesson={currentLesson} isLeaderMode={isLeaderMode} />
+              <AIGuide 
+                lesson={currentLesson} 
+                isLeaderMode={isLeaderMode} 
+                sessionId={sessionId}
+              />
               
               {isLeaderMode && (
                 <motion.div 
