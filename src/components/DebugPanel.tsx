@@ -6,59 +6,13 @@ export const DebugPanel = () => {
   const [show, setShow] = useState(false);
   const [logStatus, setLogStatus] = useState<{ 
     status?: string; 
-    configured: boolean; 
     userEmail?: string; 
-    serviceAccountEmail?: string;
-    projectId?: string;
     error?: string;
-    parseError?: string;
     env?: any;
   } | null>(null);
-  const [isLogging, setIsLogging] = useState(false);
-  const [lastLogResult, setLastLogResult] = useState<{ success: boolean; message: string; docId?: string; sharingStatus?: string; folderFound?: boolean; docName?: string } | null>(null);
   const apiKeyProcess = process.env.GEMINI_API_KEY;
   const apiKeyVite = (import.meta as any).env?.VITE_GEMINI_API_KEY;
   const apiKeyResolved = getGeminiApiKey();
-
-  const runTestLog = async () => {
-    setIsLogging(true);
-    setLastLogResult(null);
-    try {
-      const response = await fetch('/api/logs/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          lesson: "Debug Test", 
-          interaction: { 
-            type: 'question', 
-            data: { userQuestion: "Test Ping", aiResponse: "Test Pong" } 
-          } 
-        })
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setLastLogResult({ 
-          success: true, 
-          message: "Log sent successfully!", 
-          docId: data.docId,
-          sharingStatus: data.sharingStatus,
-          folderFound: data.folderFound
-        });
-      } else {
-        setLastLogResult({ 
-          success: false, 
-          message: data.error || "Unknown error",
-          sharingStatus: data.sharingStatus,
-          folderFound: data.folderFound,
-          docName: data.docName
-        });
-      }
-    } catch (e: any) {
-      setLastLogResult({ success: false, message: e.message });
-    } finally {
-      setIsLogging(false);
-    }
-  };
 
   useEffect(() => {
     if (show) {
@@ -90,7 +44,7 @@ export const DebugPanel = () => {
         })
         .then(data => setLogStatus(data))
         .catch((err) => {
-          setLogStatus({ configured: false, error: err.message });
+          setLogStatus({ error: err.message });
         });
     }
   }, [show]);
@@ -151,15 +105,15 @@ export const DebugPanel = () => {
         </div>
 
         {/* Logging Status */}
-        <div className={`p-3 rounded-xl border ${logStatus?.configured ? 'bg-green-400/10 border-green-400/20' : 'bg-red-400/10 border-red-400/20'}`}>
+        <div className={`p-3 rounded-xl border bg-white/5 border-white/10`}>
           <div className="flex items-center justify-between mb-1">
-            <div className="text-white/40 uppercase text-[9px] tracking-tighter">Google Drive Logging</div>
-            {logStatus?.configured ? <CheckCircle2 className="h-3 w-3 text-green-400" /> : <AlertCircle className="h-3 w-3 text-red-400" />}
+            <div className="text-white/40 uppercase text-[9px] tracking-tighter">Firestore Logging</div>
+            <CheckCircle2 className="h-3 w-3 text-green-400" />
           </div>
           
           <div className="flex flex-col gap-1">
-            <div className={`font-bold ${logStatus?.configured ? 'text-green-400' : 'text-red-400'}`}>
-              {logStatus?.configured ? 'CONFIGURED' : 'NOT CONFIGURED'}
+            <div className={`font-bold text-green-400 uppercase`}>
+              ACTIVE
             </div>
             
             {logStatus?.status && (
@@ -170,66 +124,10 @@ export const DebugPanel = () => {
               <div className="text-[8px] text-red-300 italic break-all">Error: {logStatus.error}</div>
             )}
 
-            {logStatus?.parseError && (
-              <div className="text-[8px] text-orange-300 italic break-all">JSON Error: {logStatus.parseError}</div>
-            )}
-
             {logStatus?.env && (
               <div className="text-[7px] text-white/20">Vercel: {String(logStatus.env.VERCEL)} | {logStatus.env.NODE_ENV}</div>
             )}
           </div>
-
-          {logStatus?.configured && (
-            <div className="mt-2 space-y-2">
-              <div className="space-y-1">
-                <div className="text-[8px] text-white/40 truncate">
-                  Sharing with: {logStatus.userEmail}
-                </div>
-                <div className="text-[8px] text-white/40 truncate">
-                  Service Account: {logStatus.serviceAccountEmail}
-                </div>
-                <div className="text-[8px] text-white/40 truncate">
-                  Project ID: {logStatus.projectId}
-                </div>
-              </div>
-
-              <div className="pt-2 border-t border-white/5">
-                <button 
-                  onClick={runTestLog}
-                  disabled={isLogging}
-                  className="w-full py-1.5 bg-accent text-white rounded-lg text-[9px] font-bold hover:bg-accent/90 transition-colors disabled:opacity-50"
-                >
-                  {isLogging ? "Sending..." : "Send Test Log"}
-                </button>
-                {lastLogResult && (
-                  <div className={`mt-2 p-2 rounded-lg text-[8px] font-mono break-all ${lastLogResult.success ? 'bg-green-400/20 text-green-400' : 'bg-red-400/20 text-red-400'}`}>
-                    <div className="font-bold mb-1">{lastLogResult.message}</div>
-                    {lastLogResult.docId && (
-                      <div className="mt-1">
-                        <span className="text-white/60">Doc ID: </span>
-                        <a 
-                          href={`https://docs.google.com/document/d/${lastLogResult.docId}/edit`} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-accent hover:underline"
-                        >
-                          {lastLogResult.docId}
-                        </a>
-                      </div>
-                    )}
-                    {lastLogResult.sharingStatus && (
-                      <div className={`mt-1 ${lastLogResult.sharingStatus === 'success' ? 'text-green-400' : 'text-orange-400'}`}>
-                        Sharing: {lastLogResult.sharingStatus}
-                      </div>
-                    )}
-                    <div className="mt-1 text-white/40">
-                      Folder "Bible Study Logs": {lastLogResult.folderFound ? 'FOUND' : 'NOT FOUND'}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
         </div>
 
         <div className="grid grid-cols-2 gap-3">

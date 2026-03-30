@@ -79,17 +79,18 @@ const AIGuide = ({
     setInput('');
     setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
     setIsLoading(true);
-
-    // Log the question immediately so we don't lose it if the AI fails or user navigates
-    await studyLogger.logSessionInteraction(sessionId, lesson.title, {
-      type: 'question',
-      data: {
-        userQuestion: userMessage,
-        status: 'pending'
-      }
-    });
+    setInput('');
 
     try {
+      // Log the question immediately so we don't lose it if the AI fails or user navigates
+      await studyLogger.logSessionInteraction(sessionId, lesson.title, {
+        type: 'question',
+        data: {
+          userQuestion: userMessage,
+          status: 'pending'
+        }
+      });
+
       const apiKey = getGeminiApiKey();
       if (!apiKey) {
         setMessages(prev => [...prev, { role: 'guide', text: "API key is missing. Please check your environment variables." }]);

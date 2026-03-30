@@ -29,7 +29,7 @@ interface FirestoreErrorInfo {
   }
 }
 
-function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null, shouldThrow = true) {
   const errInfo: FirestoreErrorInfo = {
     error: error instanceof Error ? error.message : String(error),
     authInfo: {
@@ -49,7 +49,9 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
     path
   };
   console.error('Firestore Error: ', JSON.stringify(errInfo));
-  throw new Error(JSON.stringify(errInfo));
+  if (shouldThrow) {
+    throw new Error(JSON.stringify(errInfo));
+  }
 }
 
 // --- Logging Utility ---
@@ -68,7 +70,7 @@ export const studyLogger = {
         timestamp: serverTimestamp()
       });
     } catch (error) {
-      handleFirestoreError(error, OperationType.CREATE, path);
+      handleFirestoreError(error, OperationType.CREATE, path, false); // Don't throw
     }
   },
 
@@ -103,11 +105,11 @@ export const studyLogger = {
             interactions: [interactionEntry]
           });
         } else {
-          handleFirestoreError(err, OperationType.UPDATE, path);
+          handleFirestoreError(err, OperationType.UPDATE, path, false); // Don't throw
         }
       });
     } catch (error) {
-      handleFirestoreError(error, OperationType.WRITE, path);
+      handleFirestoreError(error, OperationType.WRITE, path, false); // Don't throw
     }
   },
 
