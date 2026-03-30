@@ -1,12 +1,22 @@
-import { useState } from 'react';
-import { Bug, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Bug, ChevronRight, CheckCircle2, AlertCircle } from 'lucide-react';
 import { getGeminiApiKey } from '../lib/api';
 
 export const DebugPanel = () => {
   const [show, setShow] = useState(false);
+  const [logStatus, setLogStatus] = useState<{ configured: boolean; userEmail: string } | null>(null);
   const apiKeyProcess = process.env.GEMINI_API_KEY;
   const apiKeyVite = (import.meta as any).env?.VITE_GEMINI_API_KEY;
   const apiKeyResolved = getGeminiApiKey();
+
+  useEffect(() => {
+    if (show) {
+      fetch('/api/logs/status')
+        .then(res => res.json())
+        .then(data => setLogStatus(data))
+        .catch(() => setLogStatus(null));
+    }
+  }, [show]);
 
   const mask = (key: string | undefined) => {
     if (!key || key === "undefined" || key === "") return "MISSING";
@@ -61,6 +71,22 @@ export const DebugPanel = () => {
           <div className={`font-bold ${apiKeyResolved ? 'text-green-400' : 'text-red-400'}`}>
             {mask(apiKeyResolved)}
           </div>
+        </div>
+
+        {/* Logging Status */}
+        <div className={`p-3 rounded-xl border ${logStatus?.configured ? 'bg-green-400/10 border-green-400/20' : 'bg-red-400/10 border-red-400/20'}`}>
+          <div className="flex items-center justify-between mb-1">
+            <div className="text-white/40 uppercase text-[9px] tracking-tighter">Google Drive Logging</div>
+            {logStatus?.configured ? <CheckCircle2 className="h-3 w-3 text-green-400" /> : <AlertCircle className="h-3 w-3 text-red-400" />}
+          </div>
+          <div className={`font-bold ${logStatus?.configured ? 'text-green-400' : 'text-red-400'}`}>
+            {logStatus?.configured ? 'CONFIGURED' : 'NOT CONFIGURED'}
+          </div>
+          {logStatus?.configured && (
+            <div className="text-[8px] text-white/40 mt-1 truncate">
+              Sharing with: {logStatus.userEmail}
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-3">

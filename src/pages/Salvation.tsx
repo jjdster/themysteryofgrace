@@ -10,17 +10,27 @@ export default function Salvation() {
       exit={{ opacity: 0 }}
       className="bg-secondary min-h-screen pb-20"
     >
-      <header className="bg-primary py-24 text-center px-4">
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-4xl md:text-6xl font-serif text-secondary mb-4"
-        >
-          First Things First — Are You Saved?
-        </motion.h1>
-        <p className="text-accent-light tracking-[0.2em] uppercase text-sm font-medium">
-          The Most Important Question of Your Life
-        </p>
+      <header className="relative bg-primary py-32 text-center px-4 overflow-hidden">
+        <div className="absolute inset-0 opacity-50">
+          <img
+            src="https://images.unsplash.com/photo-1510597074723-5fb81f6a3b75?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+            alt="Crucifixion Silhouette"
+            className="w-full h-full object-cover"
+            referrerPolicy="no-referrer"
+          />
+        </div>
+        <div className="relative z-10">
+          <motion.h1
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-4xl md:text-6xl font-serif text-secondary mb-4 drop-shadow-lg"
+          >
+            First Things First — Are You Saved?
+          </motion.h1>
+          <p className="text-accent-light tracking-[0.2em] uppercase text-sm font-medium drop-shadow-md">
+            The Most Important Question of Your Life
+          </p>
+        </div>
       </header>
 
       <div className="max-w-4xl mx-auto px-4 -mt-12">

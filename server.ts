@@ -28,7 +28,7 @@ async function startServer() {
         credentials: JSON.parse(serviceAccountJson),
         scopes: [
           "https://www.googleapis.com/auth/documents",
-          "https://www.googleapis.com/auth/drive.file",
+          "https://www.googleapis.com/auth/drive",
         ],
       });
 
@@ -58,7 +58,23 @@ async function startServer() {
         docId = createResponse.data.id!;
       }
 
-      // 2. Append the log entry
+      // 2. Share with the user (jjdster@gmail.com) so it appears in their Drive
+      try {
+        await drive.permissions.create({
+          fileId: docId,
+          requestBody: {
+            type: "user",
+            role: "writer",
+            emailAddress: "jjdster@gmail.com",
+          },
+          sendNotificationEmail: false,
+        });
+      } catch (shareError: any) {
+        // Silently ignore if already shared or permission error
+        console.log("Sharing status:", shareError.message || "Already shared or permission granted");
+      }
+
+      // 3. Append the log entry
       const timestamp = now.toISOString();
       let logText = `\n\n--- ${timestamp} ---\n`;
       logText += `Lesson: ${lesson}\n`;
@@ -118,6 +134,14 @@ async function startServer() {
 
       res.status(500).json({ error: "Failed to log to Google Docs and local fallback" });
     }
+  });
+
+  app.get("/api/logs/status", (req, res) => {
+    const serviceAccountJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+    res.json({ 
+      configured: !!serviceAccountJson,
+      userEmail: "jjdster@gmail.com"
+    });
   });
 
   // --- Vite Middleware ---
