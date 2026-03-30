@@ -16,9 +16,25 @@ interface StudyLog {
   timestamp: Timestamp;
 }
 
+interface StudySession {
+  id: string;
+  userId: string;
+  userEmail: string;
+  lessonTitle: string;
+  startTime: Timestamp;
+  lastUpdateTime: Timestamp;
+  interactions: {
+    type: 'question' | 'quiz' | 'chat';
+    data: any;
+    timestamp: string;
+  }[];
+}
+
 export default function AdminDashboard() {
   const { user } = useAuth();
   const [logs, setLogs] = useState<StudyLog[]>([]);
+  const [sessions, setSessions] = useState<StudySession[]>([]);
+  const [viewMode, setViewMode] = useState<'logs' | 'sessions'>('sessions');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,26 +43,38 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (!isAdmin) return;
 
-    const path = 'study_logs';
-    const q = query(collection(db, path), orderBy('timestamp', 'desc'));
+    const logsPath = 'study_logs';
+    const sessionsPath = 'study_sessions';
+    
+    const logsQuery = query(collection(db, logsPath), orderBy('timestamp', 'desc'));
+    const sessionsQuery = query(collection(db, sessionsPath), orderBy('lastUpdateTime', 'desc'));
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribeLogs = onSnapshot(logsQuery, (snapshot) => {
       const newLogs = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       })) as StudyLog[];
       setLogs(newLogs);
+    }, (err) => {
+      console.error("Logs fetch error:", err);
+    });
+
+    const unsubscribeSessions = onSnapshot(sessionsQuery, (snapshot) => {
+      const newSessions = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as StudySession[];
+      setSessions(newSessions);
       setLoading(false);
     }, (err) => {
-      try {
-        handleFirestoreError(err, OperationType.LIST, path);
-      } catch (e: any) {
-        setError(e.message);
-      }
+      console.error("Sessions fetch error:", err);
       setLoading(false);
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribeLogs();
+      unsubscribeSessions();
+    };
   }, [isAdmin]);
 
   if (!user) {
@@ -70,14 +98,33 @@ export default function AdminDashboard() {
   }
 
   const downloadCSV = () => {
-    const headers = ['Date', 'User', 'Lesson', 'Type', 'Details'];
-    const rows = logs.map(log => [
-      log.timestamp?.toDate().toLocaleString() || 'N/A',
-      log.userEmail || log.userId,
-      log.lessonTitle,
-      log.type,
-      JSON.stringify(log.data).replace(/"/g, '""')
-    ]);
+    const isSessions = viewMode === 'sessions';
+    const headers = isSessions 
+      ? ['Start Date', 'Last Update', 'User', 'Lesson', 'Interactions Count', 'Full Transcript']
+      : ['Date', 'User', 'Lesson', 'Type', 'Details'];
+
+    const rows = isSessions 
+      ? sessions.map(session => [
+          session.startTime?.toDate().toLocaleString() || 'N/A',
+          session.lastUpdateTime?.toDate().toLocaleString() || 'N/A',
+          session.userEmail || session.userId,
+          session.lessonTitle,
+          session.interactions.length.toString(),
+          session.interactions.map(i => {
+            const time = new Date(i.timestamp).toLocaleTimeString();
+            if (i.type === 'question') {
+              return `[${time}] Q: ${i.data.userQuestion} | A: ${i.data.aiResponse || 'Pending'}`;
+            }
+            return `[${time}] ${i.type}: ${JSON.stringify(i.data)}`;
+          }).join(' || ').replace(/"/g, '""')
+        ])
+      : logs.map(log => [
+          log.timestamp?.toDate().toLocaleString() || 'N/A',
+          log.userEmail || log.userId,
+          log.lessonTitle,
+          log.type,
+          JSON.stringify(log.data).replace(/"/g, '""')
+        ]);
 
     const csvContent = [
       headers.join(','),
@@ -88,7 +135,7 @@ export default function AdminDashboard() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `study_logs_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `study_${viewMode}_export_${new Date().toISOString().split('T')[0]}.csv`);
     link.click();
   };
 
@@ -104,13 +151,33 @@ export default function AdminDashboard() {
             <h1 className="text-4xl font-serif font-bold text-primary tracking-tight">Study Interaction Logs</h1>
           </div>
           
-          <button 
-            onClick={downloadCSV}
-            className="flex items-center gap-2 px-6 py-3 bg-primary text-secondary rounded-xl font-bold hover:bg-primary-light transition-all shadow-lg shadow-primary/10"
-          >
-            <Download className="h-5 w-5" />
-            Export to CSV
-          </button>
+          <div className="flex items-center gap-4">
+            <div className="flex bg-white p-1 rounded-xl border border-primary/10 shadow-sm">
+              <button 
+                onClick={() => setViewMode('sessions')}
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+                  viewMode === 'sessions' ? 'bg-primary text-secondary' : 'text-primary/60 hover:bg-primary/5'
+                }`}
+              >
+                Sessions
+              </button>
+              <button 
+                onClick={() => setViewMode('logs')}
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+                  viewMode === 'logs' ? 'bg-primary text-secondary' : 'text-primary/60 hover:bg-primary/5'
+                }`}
+              >
+                Raw Logs
+              </button>
+            </div>
+            <button 
+              onClick={downloadCSV}
+              className="flex items-center gap-2 px-6 py-3 bg-primary text-secondary rounded-xl font-bold hover:bg-primary-light transition-all shadow-lg shadow-primary/10"
+            >
+              <Download className="h-5 w-5" />
+              Export to CSV
+            </button>
+          </div>
         </div>
 
         {error && (
@@ -124,8 +191,114 @@ export default function AdminDashboard() {
         )}
 
         {loading ? (
-          <div className="flex justify-center py-24">
-            <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin" />
+          <div className="flex flex-col items-center justify-center py-24">
+            <Loader2 className="h-12 w-12 text-accent animate-spin mb-4" />
+            <p className="text-primary/60 font-serif italic">Gathering insights...</p>
+          </div>
+        ) : viewMode === 'sessions' ? (
+          <div className="grid gap-8">
+            {sessions.length === 0 ? (
+              <div className="bg-white p-12 rounded-3xl text-center border border-primary/5">
+                <p className="text-primary/40 italic">No sessions found yet.</p>
+              </div>
+            ) : (
+              sessions.map((session, idx) => (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                  key={session.id}
+                  className="bg-white rounded-3xl border border-primary/10 shadow-xl overflow-hidden"
+                >
+                  <div className="p-6 bg-primary text-secondary flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-accent/20 flex items-center justify-center">
+                        <BookOpen className="h-6 w-6 text-accent" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-serif font-bold">{session.lessonTitle}</h3>
+                        <div className="flex items-center gap-4 text-[10px] uppercase tracking-widest font-bold text-secondary/60 mt-1">
+                          <span className="flex items-center gap-1">
+                            <User className="h-3 w-3" />
+                            {session.userEmail}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            Started: {session.startTime?.toDate().toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="px-3 py-1 bg-accent/20 text-accent rounded-full text-[10px] font-bold uppercase tracking-widest">
+                        {session.interactions.length} Interactions
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="p-6 space-y-6 bg-secondary-light/30">
+                    {session.interactions.map((interaction, i) => (
+                      <div key={i} className="relative pl-8 border-l-2 border-primary/5 last:border-0 pb-6 last:pb-0">
+                        <div className="absolute left-[-9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-primary/10" />
+                        
+                        <div className="flex items-center gap-2 mb-3">
+                          {interaction.type === 'question' ? (
+                            <MessageSquare className="h-3 w-3 text-accent" />
+                          ) : interaction.type === 'quiz' ? (
+                            <CheckCircle className="h-3 w-3 text-green-600" />
+                          ) : (
+                            <Clock className="h-3 w-3 text-primary/40" />
+                          )}
+                          <span className="text-[10px] uppercase tracking-widest font-bold text-primary/40">
+                            {interaction.type} • {new Date(interaction.timestamp).toLocaleTimeString()}
+                          </span>
+                        </div>
+
+                        {interaction.type === 'question' ? (
+                          <div className="space-y-4">
+                            <div className="bg-white p-4 rounded-2xl border border-primary/5 shadow-sm">
+                              <p className="text-sm font-bold text-primary/80 mb-1">Question:</p>
+                              <p className="text-sm text-primary/70">{interaction.data.userQuestion}</p>
+                            </div>
+                            {interaction.data.aiResponse ? (
+                              <div className="bg-accent/5 p-4 rounded-2xl border border-accent/10 shadow-sm">
+                                <p className="text-sm font-bold text-accent mb-1">AI Response:</p>
+                                <div className="text-sm text-primary/80 leading-relaxed markdown-body italic">
+                                  <ReactMarkdown>{interaction.data.aiResponse}</ReactMarkdown>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2 text-[10px] text-accent font-bold uppercase tracking-widest animate-pulse px-4">
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                                Response Pending...
+                              </div>
+                            )}
+                          </div>
+                        ) : interaction.type === 'quiz' ? (
+                          <div className="bg-green-50/50 p-4 rounded-2xl border border-green-100">
+                            <p className="text-sm font-bold text-green-800 mb-2">Quiz Results</p>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                              <div>
+                                <p className="text-[10px] uppercase text-green-600 font-bold">Score</p>
+                                <p className="text-lg font-serif font-bold text-green-900">{Math.round(interaction.data.score)}%</p>
+                              </div>
+                              <div>
+                                <p className="text-[10px] uppercase text-green-600 font-bold">Correct</p>
+                                <p className="text-lg font-serif font-bold text-green-900">{interaction.data.correct}/{interaction.data.total}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <pre className="text-[10px] font-mono text-primary/60 overflow-x-auto p-4 bg-white rounded-xl border border-primary/5">
+                            {JSON.stringify(interaction.data, null, 2)}
+                          </pre>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              ))
+            )}
           </div>
         ) : (
           <div className="grid gap-6">

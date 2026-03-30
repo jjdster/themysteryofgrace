@@ -56,6 +56,7 @@ const AIGuide = ({
   lesson: Lesson; 
   isLeaderMode: boolean 
 }) => {
+  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`);
   const [input, setInput] = useState('');
   const [isEnlarged, setIsEnlarged] = useState(false);
   const [messages, setMessages] = useState<{ role: 'user' | 'guide'; text: string }[]>([
@@ -79,7 +80,7 @@ const AIGuide = ({
     setIsLoading(true);
 
     // Log the question immediately so we don't lose it if the AI fails or user navigates
-    await studyLogger.log(lesson.title, {
+    await studyLogger.logSessionInteraction(sessionId, lesson.title, {
       type: 'question',
       data: {
         userQuestion: userMessage,
@@ -126,8 +127,8 @@ const AIGuide = ({
       const guideResponse = response.text || "I'm sorry, I couldn't generate a response.";
       setMessages(prev => [...prev, { role: 'guide', text: guideResponse }]);
       
-      // Log the full interaction (this will be a second entry, but it's safer)
-      studyLogger.log(lesson.title, {
+      // Log the full interaction to the same session
+      studyLogger.logSessionInteraction(sessionId, lesson.title, {
         type: 'question',
         data: {
           userQuestion: userMessage,
