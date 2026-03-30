@@ -9,6 +9,7 @@ export const DebugPanel = () => {
     configured: boolean; 
     userEmail?: string; 
     error?: string;
+    parseError?: string;
     env?: any;
   } | null>(null);
   const apiKeyProcess = process.env.GEMINI_API_KEY;
@@ -17,7 +18,16 @@ export const DebugPanel = () => {
 
   useEffect(() => {
     if (show) {
-      fetch('/api/logs/status')
+      // First try a simple ping
+      fetch('/api/ping')
+        .then(res => res.json())
+        .then(pingData => {
+          if (pingData.status === 'PONG') {
+            // If ping works, fetch full status
+            return fetch('/api/logs/status');
+          }
+          throw new Error("Ping failed");
+        })
         .then(async res => {
           if (!res.ok) {
             const text = await res.text();
@@ -105,6 +115,10 @@ export const DebugPanel = () => {
             
             {logStatus?.error && (
               <div className="text-[8px] text-red-300 italic">Error: {logStatus.error}</div>
+            )}
+
+            {logStatus?.parseError && (
+              <div className="text-[8px] text-orange-300 italic">JSON Error: {logStatus.parseError}</div>
             )}
 
             {logStatus?.env && (
