@@ -8,13 +8,54 @@ export const DebugPanel = () => {
     status?: string; 
     configured: boolean; 
     userEmail?: string; 
+    serviceAccountEmail?: string;
+    projectId?: string;
     error?: string;
     parseError?: string;
     env?: any;
   } | null>(null);
+  const [isLogging, setIsLogging] = useState(false);
+  const [lastLogResult, setLastLogResult] = useState<{ success: boolean; message: string; docId?: string; sharingStatus?: string } | null>(null);
   const apiKeyProcess = process.env.GEMINI_API_KEY;
   const apiKeyVite = (import.meta as any).env?.VITE_GEMINI_API_KEY;
   const apiKeyResolved = getGeminiApiKey();
+
+  const runTestLog = async () => {
+    setIsLogging(true);
+    setLastLogResult(null);
+    try {
+      const response = await fetch('/api/logs/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          lesson: "Debug Test", 
+          interaction: { 
+            type: 'question', 
+            data: { userQuestion: "Test Ping", aiResponse: "Test Pong" } 
+          } 
+        })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setLastLogResult({ 
+          success: true, 
+          message: "Log sent successfully!", 
+          docId: data.docId,
+          sharingStatus: data.sharingStatus
+        });
+      } else {
+        setLastLogResult({ 
+          success: false, 
+          message: data.error || "Unknown error",
+          sharingStatus: data.sharingStatus
+        });
+      }
+    } catch (e: any) {
+      setLastLogResult({ success: false, message: e.message });
+    } finally {
+      setIsLogging(false);
+    }
+  };
 
   useEffect(() => {
     if (show) {
@@ -136,8 +177,51 @@ export const DebugPanel = () => {
           </div>
 
           {logStatus?.configured && (
-            <div className="text-[8px] text-white/40 mt-1 truncate">
-              Sharing with: {logStatus.userEmail}
+            <div className="mt-2 space-y-2">
+              <div className="space-y-1">
+                <div className="text-[8px] text-white/40 truncate">
+                  Sharing with: {logStatus.userEmail}
+                </div>
+                <div className="text-[8px] text-white/40 truncate">
+                  Service Account: {logStatus.serviceAccountEmail}
+                </div>
+                <div className="text-[8px] text-white/40 truncate">
+                  Project ID: {logStatus.projectId}
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-white/5">
+                <button 
+                  onClick={runTestLog}
+                  disabled={isLogging}
+                  className="w-full py-1.5 bg-accent text-white rounded-lg text-[9px] font-bold hover:bg-accent/90 transition-colors disabled:opacity-50"
+                >
+                  {isLogging ? "Sending..." : "Send Test Log"}
+                </button>
+                {lastLogResult && (
+                  <div className={`mt-2 p-2 rounded-lg text-[8px] font-mono break-all ${lastLogResult.success ? 'bg-green-400/20 text-green-400' : 'bg-red-400/20 text-red-400'}`}>
+                    <div className="font-bold mb-1">{lastLogResult.message}</div>
+                    {lastLogResult.docId && (
+                      <div className="mt-1">
+                        <span className="text-white/60">Doc ID: </span>
+                        <a 
+                          href={`https://docs.google.com/document/d/${lastLogResult.docId}/edit`} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-accent hover:underline"
+                        >
+                          {lastLogResult.docId}
+                        </a>
+                      </div>
+                    )}
+                    {lastLogResult.sharingStatus && (
+                      <div className={`mt-1 ${lastLogResult.sharingStatus === 'success' ? 'text-green-400' : 'text-orange-400'}`}>
+                        Sharing: {lastLogResult.sharingStatus}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
