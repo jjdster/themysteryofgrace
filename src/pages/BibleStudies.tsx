@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Play, FileText, Clock, ChevronRight, Book, Shield, Users } from 'lucide-react';
 import ScriptureText from '../components/ScriptureText';
+import { DebugPanel } from '../components/DebugPanel';
 
 export default function BibleStudies() {
   const lessons = [
@@ -178,6 +179,7 @@ export default function BibleStudies() {
           </div>
         </section>
       </div>
+      <DebugPanel />
     </motion.div>
   );
 }

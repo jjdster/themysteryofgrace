@@ -29,6 +29,7 @@ import { baptismStudyData, Module, Lesson, Question } from '../data/baptismStudy
 import ScriptureText from '../components/ScriptureText';
 import { DebugPanel } from '../components/DebugPanel';
 import { studyLogger } from '../lib/logger';
+import { getGeminiApiKey } from '../lib/api';
 
 // --- Types ---
 type StudyMode = 'solo' | 'group';
@@ -79,8 +80,8 @@ const AIGuide = ({
     setIsLoading(true);
 
     try {
-      const apiKey = process.env.GEMINI_API_KEY || (import.meta as any).env?.VITE_GEMINI_API_KEY;
-      if (!apiKey || apiKey === "undefined" || apiKey === "") {
+      const apiKey = getGeminiApiKey();
+      if (!apiKey) {
         setMessages(prev => [...prev, { role: 'guide', text: "API key is missing. Please check your environment variables." }]);
         return;
       }

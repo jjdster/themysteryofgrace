@@ -5,6 +5,7 @@ import { GoogleGenAI } from "@google/genai";
 import ScriptureText from '../components/ScriptureText';
 import { DebugPanel } from '../components/DebugPanel';
 import { studyLogger } from '../lib/logger';
+import { getGeminiApiKey } from '../lib/api';
 
 interface Message {
   role: 'user' | 'model';
@@ -50,8 +51,8 @@ export default function LiveStudy() {
   // Initialize Chat
   useEffect(() => {
     const initChat = async () => {
-      const apiKey = process.env.GEMINI_API_KEY || (import.meta as any).env?.VITE_GEMINI_API_KEY;
-      if (!apiKey || apiKey === "undefined" || apiKey === "") {
+      const apiKey = getGeminiApiKey();
+      if (!apiKey) {
         setError("AI configuration is missing. Please check your environment variables.");
         return;
       }

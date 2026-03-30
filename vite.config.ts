@@ -7,6 +7,9 @@ export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   const apiKey = process.env.GEMINI_API_KEY || env.GEMINI_API_KEY || "";
   
+  console.log(`[Vite Build] Mode: ${mode}`);
+  console.log(`[Vite Build] GEMINI_API_KEY found: ${apiKey ? 'YES (Masked: ' + apiKey.substring(0, 4) + '...)' : 'NO'}`);
+  
   return {
     plugins: [react(), tailwindcss()],
     define: {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { GoogleGenAI } from "@google/genai";
 import { Loader2 } from 'lucide-react';
+import { getGeminiApiKey } from '../lib/api';
 
 interface ScriptureLinkProps {
   reference: string;
@@ -22,8 +23,8 @@ export default function ScriptureLink({ reference, children }: ScriptureLinkProp
   const fetchVerse = async () => {
     setIsLoading(true);
     try {
-      const apiKey = process.env.GEMINI_API_KEY || (import.meta as any).env?.VITE_GEMINI_API_KEY;
-      if (!apiKey || apiKey === "undefined" || apiKey === "") {
+      const apiKey = getGeminiApiKey();
+      if (!apiKey) {
         setVerseText("API key is missing. Please check your environment variables.");
         return;
       }

@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Bug, ChevronRight } from 'lucide-react';
+import { getGeminiApiKey } from '../lib/api';
 
 export const DebugPanel = () => {
   const [show, setShow] = useState(false);
   const apiKeyProcess = process.env.GEMINI_API_KEY;
   const apiKeyVite = (import.meta as any).env?.VITE_GEMINI_API_KEY;
+  const apiKeyResolved = getGeminiApiKey();
 
   const mask = (key: string | undefined) => {
     if (!key || key === "undefined" || key === "") return "MISSING";
@@ -51,6 +53,13 @@ export const DebugPanel = () => {
           <div className="text-white/40 uppercase text-[9px] mb-1 tracking-tighter">import.meta.env.VITE_GEMINI_API_KEY</div>
           <div className={`font-bold ${apiKeyVite && apiKeyVite !== "undefined" ? 'text-green-400' : 'text-red-400'}`}>
             {mask(apiKeyVite)}
+          </div>
+        </div>
+
+        <div className="bg-accent/10 p-3 rounded-xl border border-accent/20">
+          <div className="text-accent uppercase text-[9px] mb-1 tracking-tighter font-bold">Resolved API Key (Used by App)</div>
+          <div className={`font-bold ${apiKeyResolved ? 'text-green-400' : 'text-red-400'}`}>
+            {mask(apiKeyResolved)}
           </div>
         </div>
 

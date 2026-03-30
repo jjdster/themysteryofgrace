@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { HelpCircle, MessageSquare, PlayCircle } from 'lucide-react';
 import ScriptureText from '../components/ScriptureText';
+import { DebugPanel } from '../components/DebugPanel';
 
 export default function Asking() {
   const faqs = [
@@ -102,6 +103,7 @@ export default function Asking() {
           </a>
         </div>
       </div>
+      <DebugPanel />
     </motion.div>
   );
 }
