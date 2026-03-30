@@ -17,15 +17,20 @@ import {
   Lightbulb,
   AlertCircle,
   Bug,
-  Loader2
+  Loader2,
+  X
 } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
+import { useNavigate } from 'react-router-dom';
 import { prophecyMysteryData } from '../data/prophecyMysteryData';
 import { Module, Lesson, Question } from '../data/baptismStudyData';
 import ScriptureText from '../components/ScriptureText';
 import { DebugPanel } from '../components/DebugPanel';
 import { studyLogger } from '../lib/logger';
 import { getGeminiApiKey } from '../lib/api';
+import { useAuth } from '../lib/AuthProvider';
+import { signInWithGoogle } from '../lib/firebase';
+import { LogIn } from 'lucide-react';
 
 // --- Components ---
 
@@ -374,6 +379,8 @@ const Quiz = ({
 // --- Main Page ---
 
 export default function ProphecyMysteryStudy() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [currentModuleIdx, setCurrentModuleIdx] = useState(0);
   const [currentLessonIdx, setCurrentLessonIdx] = useState(0);
   const [isLeaderMode, setIsLeaderMode] = useState(false);
@@ -381,6 +388,7 @@ export default function ProphecyMysteryStudy() {
   const [completedModules, setCompletedModules] = useState<string[]>([]);
   const [showQuiz, setShowQuiz] = useState(false);
   const [isMastered, setIsMastered] = useState(false);
+  const [dismissedAuthPrompt, setDismissedAuthPrompt] = useState(false);
 
   const currentModule = prophecyMysteryData[currentModuleIdx];
   const currentLesson = currentModule.lessons[currentLessonIdx];
@@ -524,6 +532,65 @@ export default function ProphecyMysteryStudy() {
 
           {/* Main Content Area */}
           <div className="lg:col-span-6">
+            {!user && !dismissedAuthPrompt && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                className="bg-white border-2 border-accent/20 p-6 rounded-[2rem] mb-8 shadow-xl shadow-accent/5 relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 p-2">
+                  <button 
+                    onClick={() => setDismissedAuthPrompt(true)}
+                    className="p-1 hover:bg-secondary-light rounded-full text-primary/20 hover:text-primary/40 transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                
+                <div className="flex flex-col md:flex-row gap-6 items-start">
+                  <div className="p-4 bg-accent/10 rounded-2xl text-accent flex-shrink-0">
+                    <ShieldCheck className="h-8 w-8" />
+                  </div>
+                  
+                  <div className="flex-1">
+                    <h4 className="text-lg font-serif font-bold text-primary mb-2">Enhance Your Study Experience</h4>
+                    <p className="text-sm text-primary/60 leading-relaxed mb-4">
+                      While you're welcome to study as a guest, signing in offers several benefits:
+                    </p>
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6">
+                      {[
+                        "Save your quiz progress",
+                        "Sync across devices",
+                        "Get teacher feedback",
+                        "View your study history"
+                      ].map((benefit, i) => (
+                        <li key={i} className="flex items-center gap-2 text-xs text-primary/70 font-medium">
+                          <CheckCircle2 className="h-3 w-3 text-green-500" />
+                          {benefit}
+                        </li>
+                      ))}
+                    </ul>
+                    
+                    <div className="flex flex-wrap gap-3">
+                      <button 
+                        onClick={() => signInWithGoogle()}
+                        className="px-6 py-2.5 bg-accent text-white rounded-xl text-xs font-bold hover:bg-accent-light transition-all shadow-lg shadow-accent/20 flex items-center gap-2"
+                      >
+                        <LogIn className="h-4 w-4" />
+                        Sign In with Google
+                      </button>
+                      <button 
+                        onClick={() => setDismissedAuthPrompt(true)}
+                        className="px-6 py-2.5 bg-secondary-light text-primary/60 rounded-xl text-xs font-bold hover:bg-primary/5 transition-all"
+                      >
+                        Continue as Guest
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
             <ProgressBar current={currentModuleIdx + 1} total={prophecyMysteryData.length} />
             
             <AnimatePresence mode="wait">

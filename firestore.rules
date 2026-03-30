@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: study_logs
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required, immutable) - The UID of the user
+    //   - lessonTitle: string (required) - The title of the lesson
+    //   - type: string (required, enum: ['question', 'quiz', 'chat']) - Type of interaction
+    //   - data: map (required) - The interaction details
+    //   - timestamp: timestamp (required) - When the interaction occurred
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "jjdster@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidStudyLog(data) {
+      return data.keys().hasAll(['userId', 'lessonTitle', 'type', 'data', 'timestamp']) &&
+             (data.userId is string || data.userId == null) &&
+             data.lessonTitle is string &&
+             data.lessonTitle.size() < 200 &&
+             data.type in ['question', 'quiz', 'chat'] &&
+             data.data is map &&
+             data.timestamp is timestamp;
+    }
+
+    match /study_logs/{logId} {
+      // Allow anyone to create a log (including guests)
+      // We validate the data structure and ensure they can't spoof another user's ID if authenticated
+      allow create: if isValidStudyLog(request.resource.data) && 
+                      (!isAuthenticated() || request.resource.data.userId == request.auth.uid);
+      
+      // Only admins can read all logs
+      allow read: if isAdmin();
+      
+      // Logs are immutable once created
+      allow update, delete: if false;
+    }
+
+    match /users/{userId} {
+      // Users can read/write their own profile
+      allow read, write: if isOwner(userId);
+      
+      // Admins can read all profiles
+      allow read: if isAdmin();
+    }
+  }
+}

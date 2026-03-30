@@ -10,6 +10,7 @@ import BibleStudies from './pages/BibleStudies';
 import Library from './pages/Library';
 import Search from './pages/Search';
 import Asking from './pages/Asking';
+import AdminDashboard from './pages/AdminDashboard';
 import Contact from './pages/Contact';
 import LiveStudy from './pages/LiveStudy';
 import Links from './pages/Links';
@@ -40,6 +41,7 @@ export default function App() {
                 <Route path="/asking" element={<Asking />} />
                 <Route path="/library" element={<Library />} />
                 <Route path="/search" element={<Search />} />
+                <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/live-study" element={<LiveStudy />} />
                 <Route path="/links" element={<Links />} />
                 <Route path="/contact" element={<Contact />} />

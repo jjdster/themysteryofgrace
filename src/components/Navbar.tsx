@@ -1,13 +1,18 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, BookOpen, Mail, Home, Info, Youtube, Heart, User, Video, HelpCircle, ChevronDown, Search as SearchIcon } from 'lucide-react';
+import { Menu, X, BookOpen, Mail, Home, Info, Youtube, Heart, User, Video, HelpCircle, ChevronDown, Search as SearchIcon, LogIn, LogOut, Shield } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../lib/AuthProvider';
+import { signInWithGoogle, signOut } from '../lib/firebase';
 
 export default function Navbar() {
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isLinksOpen, setIsLinksOpen] = useState(false);
   const location = useLocation();
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const isAdmin = user?.email === 'jjdster@gmail.com';
 
   const navLinks = [
     { name: 'Home', path: '/', icon: Home },
@@ -34,6 +39,10 @@ export default function Navbar() {
     },
     { name: 'Contact', path: '/contact', icon: Mail },
   ];
+
+  if (isAdmin) {
+    navLinks.splice(navLinks.length - 1, 0, { name: 'Admin', path: '/admin', icon: Shield });
+  }
 
   useEffect(() => {
     setIsOpen(false);
@@ -123,6 +132,27 @@ export default function Navbar() {
                 )}
               </div>
             ))}
+
+            {/* Auth Button */}
+            <div className="ml-4 pl-4 border-l border-white/10">
+              {user ? (
+                <button
+                  onClick={() => signOut()}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-secondary hover:bg-white/20 text-[10px] xl:text-xs font-bold tracking-widest uppercase transition-all"
+                >
+                  <LogOut className="h-3 w-3" />
+                  Sign Out
+                </button>
+              ) : (
+                <button
+                  onClick={() => signInWithGoogle()}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-accent text-primary hover:bg-accent-light text-[10px] xl:text-xs font-bold tracking-widest uppercase transition-all"
+                >
+                  <LogIn className="h-3 w-3" />
+                  Sign In
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -209,6 +239,36 @@ export default function Navbar() {
                   )}
                 </div>
               ))}
+
+              {/* Mobile Auth Button */}
+              <div className="pt-4 pb-2 border-t border-white/10 mt-4">
+                {user ? (
+                  <div className="space-y-4">
+                    <div className="px-3 flex items-center gap-3">
+                      {user.photoURL && <img src={user.photoURL} alt="" className="h-8 w-8 rounded-full" />}
+                      <div>
+                        <p className="text-sm font-bold text-secondary">{user.displayName}</p>
+                        <p className="text-[10px] text-secondary/60 uppercase tracking-widest">{user.email}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => signOut()}
+                      className="w-full flex items-center px-3 py-4 rounded-md text-base font-medium text-red-400 hover:bg-white/5"
+                    >
+                      <LogOut className="mr-3 h-5 w-5" />
+                      Sign Out
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => signInWithGoogle()}
+                    className="w-full flex items-center px-3 py-4 rounded-md text-base font-medium text-accent-light hover:bg-white/5"
+                  >
+                    <LogIn className="mr-3 h-5 w-5" />
+                    Sign In with Google
+                  </button>
+                )}
+              </div>
             </div>
           </motion.div>
         )}

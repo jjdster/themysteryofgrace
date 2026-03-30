@@ -1,0 +1,23 @@
+{
+  "entities": {
+    "StudyLog": {
+      "title": "Study Log",
+      "description": "A log entry for a user's interaction with a study lesson.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The UID of the user who performed the action." },
+        "lessonTitle": { "type": "string", "description": "The title of the lesson being studied." },
+        "type": { "type": "string", "enum": ["question", "quiz", "chat"], "description": "The type of interaction." },
+        "data": { "type": "object", "description": "The specific data for the interaction (e.g., question/answer, quiz score)." },
+        "timestamp": { "type": "string", "format": "date-time", "description": "When the interaction occurred." }
+      },
+      "required": ["lessonTitle", "type", "data", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/study_logs/{logId}": {
+      "schema": "StudyLog",
+      "description": "Collection of all study interactions across the platform."
+    }
+  }
+}

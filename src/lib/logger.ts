@@ -1,7 +1,10 @@
+import { db, auth, OperationType, handleFirestoreError } from './firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+
 // --- Logging Utility ---
 export const studyLogger = {
   log: async (lessonTitle: string, interaction: { type: 'question' | 'quiz' | 'chat', data: any }) => {
-    // 1. Local Storage Logging
+    // 1. Local Storage Logging (Immediate fallback)
     const logs = JSON.parse(localStorage.getItem('study_logs') || '[]');
     const logEntry = {
       timestamp: new Date().toISOString(),
@@ -11,22 +14,22 @@ export const studyLogger = {
     logs.push(logEntry);
     localStorage.setItem('study_logs', JSON.stringify(logs));
 
-    // 2. Remote Logging to Google Docs (via Backend)
+    // 2. Remote Logging to Firestore
+    const user = auth.currentUser;
+    const path = 'study_logs';
     try {
-      const response = await fetch('/api/logs/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lesson: lessonTitle, interaction })
+      await addDoc(collection(db, path), {
+        userId: user?.uid || null,
+        userEmail: user?.email || 'Guest', // For admin convenience
+        lessonTitle,
+        type: interaction.type,
+        data: interaction.data,
+        timestamp: serverTimestamp()
       });
-      
-      const result = await response.json();
-      if (result.status === 'fallback') {
-        console.info("Remote log fallback:", result.message);
-      } else if (!response.ok) {
-        console.warn("Remote log failed with status:", response.status);
-      }
     } catch (error) {
-      console.warn("Failed to send remote log:", error);
+      // We don't use handleFirestoreError here to avoid crashing the UI for guests
+      // if there's a temporary network/permission issue, but we log it.
+      console.error("Remote log failed:", error);
     }
   },
   getLogs: () => JSON.parse(localStorage.getItem('study_logs') || '[]'),
