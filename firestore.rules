@@ -49,13 +49,13 @@ service cloud.firestore {
              data.startTime is timestamp &&
              data.lastUpdateTime is timestamp &&
              data.interactions is list &&
-             data.interactions.size() < 100; // Prevent massive sessions
+             data.interactions.size() < 500; // Increased limit
     }
 
     match /study_logs/{logId} {
       // Allow anyone to create a log (including guests)
       allow create: if isValidStudyLog(request.resource.data) && 
-                      (!isAuthenticated() || request.resource.data.userId == request.auth.uid);
+                      (request.resource.data.userId == (isAuthenticated() ? request.auth.uid : null));
       
       // Only admins can read all logs
       allow read: if isAdmin();
@@ -67,10 +67,15 @@ service cloud.firestore {
     match /study_sessions/{sessionId} {
       // Allow anyone to create/update a session (including guests)
       allow create: if isValidStudySession(request.resource.data) && 
-                      (!isAuthenticated() || request.resource.data.userId == request.auth.uid);
+                      (request.resource.data.userId == (isAuthenticated() ? request.auth.uid : null));
       
       allow update: if isValidStudySession(request.resource.data) && 
-                      (!isAuthenticated() || request.resource.data.userId == request.auth.uid);
+                      (
+                        // Allow transition from null to current UID (claiming a guest session)
+                        (resource.data.userId == null && request.resource.data.userId == (isAuthenticated() ? request.auth.uid : null)) ||
+                        // Keep same UID
+                        (resource.data.userId != null && resource.data.userId == request.auth.uid && request.resource.data.userId == request.auth.uid)
+                      );
       
       // Only admins can read all sessions
       allow read: if isAdmin();

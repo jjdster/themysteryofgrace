@@ -1,6 +1,57 @@
 import { db, auth } from './firebase';
 import { collection, addDoc, serverTimestamp, doc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 
+export enum OperationType {
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  LIST = 'list',
+  GET = 'get',
+  WRITE = 'write',
+}
+
+interface FirestoreErrorInfo {
+  error: string;
+  operationType: OperationType;
+  path: string | null;
+  authInfo: {
+    userId: string | undefined;
+    email: string | null | undefined;
+    emailVerified: boolean | undefined;
+    isAnonymous: boolean | undefined;
+    tenantId: string | null | undefined;
+    providerInfo: {
+      providerId: string;
+      displayName: string | null;
+      email: string | null;
+      photoUrl: string | null;
+    }[];
+  }
+}
+
+function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  const errInfo: FirestoreErrorInfo = {
+    error: error instanceof Error ? error.message : String(error),
+    authInfo: {
+      userId: auth.currentUser?.uid,
+      email: auth.currentUser?.email,
+      emailVerified: auth.currentUser?.emailVerified,
+      isAnonymous: auth.currentUser?.isAnonymous,
+      tenantId: auth.currentUser?.tenantId,
+      providerInfo: auth.currentUser?.providerData.map(provider => ({
+        providerId: provider.providerId,
+        displayName: provider.displayName,
+        email: provider.email,
+        photoUrl: provider.photoURL
+      })) || []
+    },
+    operationType,
+    path
+  };
+  console.error('Firestore Error: ', JSON.stringify(errInfo));
+  throw new Error(JSON.stringify(errInfo));
+}
+
 // --- Logging Utility ---
 export const studyLogger = {
   // Legacy log method for simple events
@@ -17,13 +68,14 @@ export const studyLogger = {
         timestamp: serverTimestamp()
       });
     } catch (error) {
-      console.error("Remote log failed:", error);
+      handleFirestoreError(error, OperationType.CREATE, path);
     }
   },
 
   // New session-based logging for "Chain of Reasoning"
   logSessionInteraction: async (sessionId: string, lessonTitle: string, interaction: { type: 'question' | 'quiz' | 'chat', data: any }) => {
     const user = auth.currentUser;
+    const path = `study_sessions/${sessionId}`;
     const sessionRef = doc(db, 'study_sessions', sessionId);
     
     const interactionEntry = {
@@ -35,7 +87,10 @@ export const studyLogger = {
       // Try to update first, if it fails (doesn't exist), create it
       await updateDoc(sessionRef, {
         lastUpdateTime: serverTimestamp(),
-        interactions: arrayUnion(interactionEntry)
+        interactions: arrayUnion(interactionEntry),
+        // Update user info in case they logged in mid-session
+        userId: user?.uid || null,
+        userEmail: user?.email || 'Guest'
       }).catch(async (err) => {
         // If document doesn't exist, create it
         if (err.code === 'not-found') {
@@ -48,11 +103,11 @@ export const studyLogger = {
             interactions: [interactionEntry]
           });
         } else {
-          throw err;
+          handleFirestoreError(err, OperationType.UPDATE, path);
         }
       });
     } catch (error) {
-      console.error("Session log failed:", error);
+      handleFirestoreError(error, OperationType.WRITE, path);
     }
   },
 

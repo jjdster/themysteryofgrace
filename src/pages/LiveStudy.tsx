@@ -17,6 +17,7 @@ export default function LiveStudy() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sessionId] = useState(() => `live_session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const chatRef = useRef<any>(null);
@@ -98,7 +99,7 @@ export default function LiveStudy() {
       }
 
       // Log the interaction after stream finishes
-      studyLogger.log("Live Scholarly Dialogue", {
+      studyLogger.logSessionInteraction(sessionId, "Live Scholarly Dialogue", {
         type: 'chat',
         data: {
           userMessage,
