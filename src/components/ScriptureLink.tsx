@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import * as Tooltip from '@radix-ui/react-tooltip';
+import * as Popover from '@radix-ui/react-popover';
 import { GoogleGenAI } from "@google/genai";
-import { Loader2 } from 'lucide-react';
+import { Loader2, X, BookOpen } from 'lucide-react';
 import { getGeminiApiKey } from '../lib/api';
 
 interface ScriptureLinkProps {
@@ -43,37 +43,52 @@ export default function ScriptureLink({ reference, children }: ScriptureLinkProp
   };
 
   return (
-    <Tooltip.Provider delayDuration={300}>
-      <Tooltip.Root open={isOpen} onOpenChange={setIsOpen}>
-        <Tooltip.Trigger asChild>
-          <span className="text-accent hover:text-accent-light underline decoration-dotted cursor-help transition-colors">
-            {children || reference}
-          </span>
-        </Tooltip.Trigger>
-        <Tooltip.Portal>
-          <Tooltip.Content
-            className="z-50 max-w-xs bg-primary text-secondary p-4 rounded-xl shadow-2xl border border-white/10 animate-in fade-in zoom-in duration-200"
-            sideOffset={5}
-          >
-            <div className="space-y-2">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-accent">
-                {reference} (KJV)
-              </p>
+    <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
+      <Popover.Trigger asChild>
+        <button className="text-accent hover:text-accent-light underline decoration-dotted cursor-pointer transition-colors inline-flex items-center gap-1 group">
+          <span className="font-medium">{children || reference}</span>
+          <BookOpen className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+        </button>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content
+          className="z-[100] w-[90vw] max-w-sm bg-primary text-secondary p-6 rounded-[2rem] shadow-2xl border border-white/10 animate-in fade-in zoom-in duration-200 outline-none"
+          sideOffset={8}
+          align="center"
+        >
+          <div className="space-y-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <BookOpen className="h-4 w-4 text-accent" />
+                <p className="text-[10px] font-bold uppercase tracking-widest text-accent">
+                  {reference} (KJV)
+                </p>
+              </div>
+              <Popover.Close className="p-1 hover:bg-white/10 rounded-lg transition-colors text-secondary/40 hover:text-secondary">
+                <X className="h-4 w-4" />
+              </Popover.Close>
+            </div>
+            
+            <div className="min-h-[60px] flex flex-col justify-center">
               {isLoading ? (
-                <div className="flex items-center gap-2 py-2">
-                  <Loader2 className="h-4 w-4 animate-spin text-accent" />
-                  <span className="text-xs text-secondary/60">Searching the scriptures...</span>
+                <div className="flex items-center gap-3 py-4">
+                  <Loader2 className="h-5 w-5 animate-spin text-accent" />
+                  <span className="text-xs text-secondary/60 font-serif italic">Searching the scriptures...</span>
                 </div>
               ) : (
-                <p className="text-sm font-serif italic leading-relaxed">
+                <p className="text-sm font-serif italic leading-relaxed text-secondary/90">
                   "{verseText}"
                 </p>
               )}
             </div>
-            <Tooltip.Arrow className="fill-primary" />
-          </Tooltip.Content>
-        </Tooltip.Portal>
-      </Tooltip.Root>
-    </Tooltip.Provider>
+            
+            <div className="pt-2 text-center">
+              <p className="text-[9px] text-secondary/20 uppercase tracking-widest">Scripture-First Study Guide</p>
+            </div>
+          </div>
+          <Popover.Arrow className="fill-primary" />
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   );
 }

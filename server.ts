@@ -7,14 +7,13 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-async function startServer() {
-  const app = express();
-  const PORT = 3000;
+const app = express();
+const PORT = 3000;
 
-  app.use(express.json());
+app.use(express.json());
 
-  // --- Google Logging API ---
-  app.post("/api/logs/submit", async (req, res) => {
+// --- Google Logging API ---
+app.post("/api/logs/submit", async (req, res) => {
     try {
       const { lesson, interaction } = req.body;
       const serviceAccountJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
@@ -159,9 +158,10 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-}
+  if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  }
 
-startServer();
+export default app;
