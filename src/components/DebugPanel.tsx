@@ -15,7 +15,7 @@ export const DebugPanel = () => {
     env?: any;
   } | null>(null);
   const [isLogging, setIsLogging] = useState(false);
-  const [lastLogResult, setLastLogResult] = useState<{ success: boolean; message: string; docId?: string; sharingStatus?: string } | null>(null);
+  const [lastLogResult, setLastLogResult] = useState<{ success: boolean; message: string; docId?: string; sharingStatus?: string; folderFound?: boolean; docName?: string } | null>(null);
   const apiKeyProcess = process.env.GEMINI_API_KEY;
   const apiKeyVite = (import.meta as any).env?.VITE_GEMINI_API_KEY;
   const apiKeyResolved = getGeminiApiKey();
@@ -41,13 +41,16 @@ export const DebugPanel = () => {
           success: true, 
           message: "Log sent successfully!", 
           docId: data.docId,
-          sharingStatus: data.sharingStatus
+          sharingStatus: data.sharingStatus,
+          folderFound: data.folderFound
         });
       } else {
         setLastLogResult({ 
           success: false, 
           message: data.error || "Unknown error",
-          sharingStatus: data.sharingStatus
+          sharingStatus: data.sharingStatus,
+          folderFound: data.folderFound,
+          docName: data.docName
         });
       }
     } catch (e: any) {
@@ -219,6 +222,9 @@ export const DebugPanel = () => {
                         Sharing: {lastLogResult.sharingStatus}
                       </div>
                     )}
+                    <div className="mt-1 text-white/40">
+                      Folder "Bible Study Logs": {lastLogResult.folderFound ? 'FOUND' : 'NOT FOUND'}
+                    </div>
                   </div>
                 )}
               </div>

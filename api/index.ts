@@ -75,24 +75,55 @@ app.post("/api/logs/submit", async (req, res) => {
     const now = new Date();
     const monthYear = now.toLocaleString("default", { month: "long", year: "numeric" });
     const docName = `Study Logs - ${monthYear}`;
+    const folderName = "Bible Study Logs";
 
-    // Find or create the document
+    // 1. Find the "Bible Study Logs" folder
+    let folderId: string | undefined;
+    let folderFound = false;
+    try {
+      const folderSearch = await drive.files.list({
+        q: `name = '${folderName}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false`,
+        fields: "files(id, name)",
+      });
+
+      if (folderSearch.data.files && folderSearch.data.files.length > 0) {
+        folderId = folderSearch.data.files[0].id!;
+        folderFound = true;
+      }
+    } catch (e: any) {
+      console.error("Folder search error:", e.message);
+    }
+
+    // 2. Find or create the document
     let docId: string | undefined;
     const searchResponse = await drive.files.list({
-      q: `name = '${docName}' and mimeType = 'application/vnd.google-apps.document' and trashed = false`,
+      q: `name = '${docName}' and mimeType = 'application/vnd.google-apps.document' and trashed = false${folderId ? ` and '${folderId}' in parents` : ''}`,
       fields: "files(id, name)",
     });
 
     if (searchResponse.data.files && searchResponse.data.files.length > 0) {
       docId = searchResponse.data.files[0].id!;
     } else {
-      const createResponse = await drive.files.create({
-        requestBody: {
-          name: docName,
-          mimeType: "application/vnd.google-apps.document",
-        },
-      });
-      docId = createResponse.data.id!;
+      try {
+        const createResponse = await drive.files.create({
+          requestBody: {
+            name: docName,
+            mimeType: "application/vnd.google-apps.document",
+            parents: folderId ? [folderId] : undefined,
+          },
+        });
+        docId = createResponse.data.id!;
+      } catch (e: any) {
+        if (e.message.includes("quota")) {
+          return res.status(500).json({
+            error: "Quota Exceeded",
+            message: "The service account cannot create files. Please create a blank Doc named '" + docName + "' in your folder and share it with the service account.",
+            folderFound,
+            docName
+          });
+        }
+        throw e;
+      }
     }
 
     // Share with the user
