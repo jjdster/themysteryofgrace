@@ -36,6 +36,9 @@ import { useAuth } from '../lib/AuthProvider';
 import { signInWithGoogle } from '../lib/firebase';
 import { LogIn } from 'lucide-react';
 
+const RESTRICTED_AUTHORS = ['Charles F. Baker', 'Harry Bultema', 'Cornelius R. Stam', 'C.R. Stam'];
+const ALLOWED_BUILDER_EMAIL = 'jjdster@gmail.com';
+
 // --- Types ---
 type StudyMode = 'solo' | 'group';
 
@@ -541,8 +544,17 @@ export default function BaptismStudy() {
   const [isStudyComplete, setIsStudyComplete] = useState(false);
   const [dismissedAuthPrompt, setDismissedAuthPrompt] = useState(false);
 
-  const currentModule = baptismStudyData[currentModuleIdx];
-  const currentLesson = currentModule.lessons[currentLessonIdx];
+  const hasBuilderAccess = user?.email === ALLOWED_BUILDER_EMAIL;
+
+  const visibleStudyData = baptismStudyData.map(module => ({
+    ...module,
+    lessons: module.lessons.filter(lesson => 
+      hasBuilderAccess || !RESTRICTED_AUTHORS.includes(lesson.sourceText.author)
+    )
+  })).filter(module => module.lessons.length > 0);
+
+  const currentModule = visibleStudyData[currentModuleIdx];
+  const currentLesson = currentModule?.lessons[currentLessonIdx];
 
   useLayoutEffect(() => {
     const scrollToTop = () => {
@@ -564,7 +576,7 @@ export default function BaptismStudy() {
       setCurrentLessonIdx(currentLessonIdx + 1);
       setIsMastered(false);
       setShowQuiz(false);
-    } else if (currentModuleIdx < baptismStudyData.length - 1) {
+    } else if (currentModuleIdx < visibleStudyData.length - 1) {
       setCurrentModuleIdx(currentModuleIdx + 1);
       setCurrentLessonIdx(0);
       setIsMastered(false);
@@ -698,7 +710,7 @@ export default function BaptismStudy() {
             <div>
               <h3 className="text-[10px] uppercase tracking-widest font-bold text-primary/40 mb-6">Study Modules</h3>
               <div className="space-y-2">
-                {baptismStudyData.map((mod, idx) => (
+                {visibleStudyData.map((mod, idx) => (
                   <div 
                     key={mod.id}
                     className={`relative p-4 rounded-2xl border transition-all ${

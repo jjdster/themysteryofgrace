@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Book, Download, ExternalLink, FileText, ChevronLeft, User, Loader2, Search, X } from 'lucide-react';
+import { Book, Download, ExternalLink, FileText, ChevronLeft, User, Loader2, Search, X, Lock } from 'lucide-react';
 import ScriptureText from '../components/ScriptureText';
+import { auth } from '../lib/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 interface BookType {
   id: string;
@@ -120,20 +122,44 @@ const authors = [
 // Using jsDelivr (cdn.jsdelivr.net) ensures PDFs open in the browser instead of downloading.
 const PDF_BASE_URL = 'https://cdn.jsdelivr.net/gh/jjdster/grace-library-assets@main'; 
 
+const RESTRICTED_AUTHORS = ['Charles F. Baker', 'Harry Bultema', 'Cornelius R. Stam', 'C.R. Stam'];
+const ALLOWED_BUILDER_EMAIL = 'jjdster@gmail.com';
+
 export default function Library() {
   const [activeAuthor, setActiveAuthor] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [books, setBooks] = useState<BookType[]>(initialBooks);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUserEmail(user?.email || null);
+      setLoading(false);
+    });
+
     // Firebase is disconnected. We'll just use the initialBooks.
     setBooks(initialBooks);
-    setLoading(false);
+    
+    return () => unsubscribe();
   }, []);
 
+  const hasBuilderAccess = currentUserEmail === ALLOWED_BUILDER_EMAIL;
+
+  const visibleAuthors = authors.filter(author => {
+    if (RESTRICTED_AUTHORS.includes(author.name)) {
+      return hasBuilderAccess;
+    }
+    return true;
+  });
+
   const filteredBooks = books.filter(book => {
+    // Hide restricted books if not builder
+    if (RESTRICTED_AUTHORS.includes(book.author) && !hasBuilderAccess) {
+      return false;
+    }
+
     const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           book.author.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesAuthor = activeAuthor ? book.author === activeAuthor : true;
@@ -196,7 +222,7 @@ export default function Library() {
               exit={{ opacity: 0, y: -20 }}
               className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto"
             >
-              {authors.map((author) => (
+              {visibleAuthors.map((author) => (
                 <button
                   key={author.name}
                   onClick={() => setActiveAuthor(author.name)}
@@ -325,6 +351,12 @@ export default function Library() {
         </AnimatePresence>
 
         <div className="mt-20 p-8 bg-primary rounded-2xl text-secondary text-center shadow-2xl relative overflow-hidden">
+          {!hasBuilderAccess && (
+            <div className="mb-8 p-4 bg-accent/10 border border-accent/20 rounded-xl inline-flex items-center gap-3 text-accent">
+              <Lock className="h-5 w-5" />
+              <span className="text-sm font-medium">Some scholarly resources are restricted to site builders.</span>
+            </div>
+          )}
           <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none">
             <div className="absolute top-[-10%] left-[-5%] w-64 h-64 rounded-full bg-accent blur-3xl"></div>
             <div className="absolute bottom-[-10%] right-[-5%] w-64 h-64 rounded-full bg-accent blur-3xl"></div>

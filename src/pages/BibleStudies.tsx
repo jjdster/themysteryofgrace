@@ -3,8 +3,14 @@ import { Link } from 'react-router-dom';
 import { Play, FileText, Clock, ChevronRight, Book, Shield, Users } from 'lucide-react';
 import ScriptureText from '../components/ScriptureText';
 import { DebugPanel } from '../components/DebugPanel';
+import { useAuth } from '../lib/AuthProvider';
+
+const ALLOWED_BUILDER_EMAIL = 'jjdster@gmail.com';
 
 export default function BibleStudies() {
+  const { user } = useAuth();
+  const hasBuilderAccess = user?.email === ALLOWED_BUILDER_EMAIL;
+
   const lessons = [
     {
       title: "Water Baptism Study Guide",
@@ -20,7 +26,8 @@ export default function BibleStudies() {
       duration: "Self-Paced",
       description: "Learn to distinguish between God's earthly kingdom program and His heavenly body program through this AI-guided study.",
       status: "Available",
-      path: "/prophecy-mystery-study"
+      path: "/prophecy-mystery-study",
+      restricted: true
     },
     {
       title: "Law vs. Grace",
@@ -43,7 +50,7 @@ export default function BibleStudies() {
       description: "A deep dive into the unity of the Spirit in the bond of peace.",
       status: "Coming Soon",
     },
-  ];
+  ].filter(lesson => !lesson.restricted || hasBuilderAccess);
 
   return (
     <motion.div 

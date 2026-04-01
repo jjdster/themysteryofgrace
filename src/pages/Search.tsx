@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search as SearchIcon, Book, FileText, User, ChevronRight, Loader2, Sparkles, X, AlertCircle } from 'lucide-react';
+import { Search as SearchIcon, Book, FileText, User, ChevronRight, Loader2, Sparkles, X, AlertCircle, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { GoogleGenAI } from "@google/genai";
 import { baptismStudyData } from '../data/baptismStudyData';
 import { prophecyMysteryData } from '../data/prophecyMysteryData';
 import ScriptureText from '../components/ScriptureText';
+import { auth } from '../lib/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 // Book list from Library.tsx (should ideally be in a shared data file)
 const libraryBooks = [
@@ -67,6 +69,9 @@ const libraryBooks = [
   { id: 'w2', title: 'Thematic Preaching', author: 'Roland Wilson' },
 ];
 
+const RESTRICTED_AUTHORS = ['Charles F. Baker', 'Harry Bultema', 'Cornelius R. Stam', 'C.R. Stam'];
+const ALLOWED_BUILDER_EMAIL = 'jjdster@gmail.com';
+
 interface SearchResult {
   type: 'book' | 'lesson' | 'author';
   title: string;
@@ -82,6 +87,16 @@ export default function Search() {
   const [isSearching, setIsSearching] = useState(false);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUserEmail(user?.email || null);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const hasBuilderAccess = currentUserEmail === ALLOWED_BUILDER_EMAIL;
 
   const handleSearch = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -97,6 +112,11 @@ export default function Search() {
 
     // Search Library
     libraryBooks.forEach(book => {
+      // Hide restricted books if not builder
+      if (RESTRICTED_AUTHORS.includes(book.author) && !hasBuilderAccess) {
+        return;
+      }
+
       if (book.title.toLowerCase().includes(lowerQuery) || book.author.toLowerCase().includes(lowerQuery)) {
         localResults.push({
           type: 'book',
@@ -140,8 +160,9 @@ export default function Search() {
       Your goal is to help users find information within the Grace Library and Bible Studies.
       
       LIBRARY CONTEXT:
-      The library contains books by Charles F. Baker, Harry Bultema, Cornelius R. Stam, Donald G. Campbell, Joel Fink, and Roland Wilson.
+      The library contains books by ${hasBuilderAccess ? 'Charles F. Baker, Harry Bultema, Cornelius R. Stam, ' : ''}Donald G. Campbell, Joel Fink, and Roland Wilson.
       Key themes: Dispensationalism, Right Division, The Mystery, Pauline Revelation, Grace.
+      ${!hasBuilderAccess ? 'NOTE: Some scholarly resources by Baker, Bultema, and Stam are restricted and should not be mentioned unless the user has builder access.' : ''}
       
       STUDY DATA CONTEXT:
       We have detailed studies on Baptism (Identification) and Prophecy vs Mystery.
@@ -323,7 +344,7 @@ export default function Search() {
                 Search Tips
               </h3>
               <ul className="text-sm text-primary/60 space-y-3 font-light">
-                <li>• Search for specific authors like "Stam" or "Baker"</li>
+                {hasBuilderAccess && <li>• Search for specific authors like "Stam" or "Baker"</li>}
                 <li>• Search for topics like "Baptism", "Acts", or "Law"</li>
                 <li>• Use the AI Insights to find connections between different resources</li>
                 <li>• The search covers book titles, authors, and detailed study summaries</li>

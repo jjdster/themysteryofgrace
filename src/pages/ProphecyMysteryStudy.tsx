@@ -33,6 +33,9 @@ import { useAuth } from '../lib/AuthProvider';
 import { signInWithGoogle } from '../lib/firebase';
 import { LogIn } from 'lucide-react';
 
+const RESTRICTED_AUTHORS = ['Charles F. Baker', 'Harry Bultema', 'Cornelius R. Stam', 'C.R. Stam'];
+const ALLOWED_BUILDER_EMAIL = 'jjdster@gmail.com';
+
 // --- Components ---
 
 const ProgressBar = ({ current, total }: { current: number; total: number }) => {
@@ -434,8 +437,17 @@ export default function ProphecyMysteryStudy() {
   const [isMastered, setIsMastered] = useState(false);
   const [dismissedAuthPrompt, setDismissedAuthPrompt] = useState(false);
 
-  const currentModule = prophecyMysteryData[currentModuleIdx];
-  const currentLesson = currentModule.lessons[currentLessonIdx];
+  const hasBuilderAccess = user?.email === ALLOWED_BUILDER_EMAIL;
+
+  const visibleStudyData = prophecyMysteryData.map(module => ({
+    ...module,
+    lessons: module.lessons.filter(lesson => 
+      hasBuilderAccess || !RESTRICTED_AUTHORS.includes(lesson.sourceText.author)
+    )
+  })).filter(module => module.lessons.length > 0);
+
+  const currentModule = visibleStudyData[currentModuleIdx];
+  const currentLesson = currentModule?.lessons[currentLessonIdx];
 
   useLayoutEffect(() => {
     const scrollToTop = () => {
@@ -454,7 +466,7 @@ export default function ProphecyMysteryStudy() {
       setCurrentLessonIdx(currentLessonIdx + 1);
       setIsMastered(false);
       setShowQuiz(false);
-    } else if (currentModuleIdx < prophecyMysteryData.length - 1) {
+    } else if (currentModuleIdx < visibleStudyData.length - 1) {
       setCurrentModuleIdx(currentModuleIdx + 1);
       setCurrentLessonIdx(0);
       setIsMastered(false);
@@ -533,7 +545,7 @@ export default function ProphecyMysteryStudy() {
             <div>
               <h3 className="text-[10px] uppercase tracking-widest font-bold text-primary/40 mb-6">Study Modules</h3>
               <div className="space-y-2">
-                {prophecyMysteryData.map((mod, idx) => (
+                {visibleStudyData.map((mod, idx) => (
                   <div 
                     key={mod.id}
                     className={`relative p-4 rounded-2xl border transition-all ${
@@ -638,7 +650,7 @@ export default function ProphecyMysteryStudy() {
                 </div>
               </motion.div>
             )}
-            <ProgressBar current={currentModuleIdx + 1} total={prophecyMysteryData.length} />
+            <ProgressBar current={currentModuleIdx + 1} total={visibleStudyData.length} />
             
             <AnimatePresence mode="wait">
               {!showQuiz ? (
