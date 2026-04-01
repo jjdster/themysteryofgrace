@@ -8,7 +8,7 @@ import { signInWithGoogle, signOut } from '../lib/firebase';
 export default function Navbar() {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [isLinksOpen, setIsLinksOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const location = useLocation();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -18,9 +18,27 @@ export default function Navbar() {
     { name: 'Home', path: '/', icon: Home },
     { name: 'Are You Saved?', path: '/salvation', icon: Heart },
     { name: 'Testimony', path: '/testimony', icon: User },
-    { name: 'The Mystery', path: '/mystery', icon: Info },
+    { 
+      name: 'The Mystery', 
+      path: '/mystery', 
+      icon: Info,
+      dropdown: [
+        { name: 'The Mystery Revealed (Rom 16:25)', path: '/mystery' },
+        { name: 'The Apostle of the Gentiles (Acts 9:15-16)', path: '/mystery' },
+        { name: 'The Dispensation of Grace (Eph 3:1-2)', path: '/mystery' }
+      ]
+    },
     { name: 'Videos', path: '/videos', icon: Youtube },
-    { name: 'Bible Studies', path: '/studies', icon: BookOpen },
+    { 
+      name: 'Bible Studies', 
+      path: '/studies', 
+      icon: BookOpen,
+      dropdown: [
+        { name: 'Water Baptism Study (Acts 8:36-38)', path: '/baptism-study' },
+        { name: 'Prophecy vs. Mystery (Rom 16:25)', path: '/prophecy-mystery-study' },
+        { name: 'Law vs. Grace (Rom 6:14)', path: '/studies' }
+      ]
+    },
     { name: 'Just Asking', path: '/asking', icon: HelpCircle },
     { name: 'Library', path: '/library', icon: BookOpen },
     { name: 'Search', path: '/search', icon: SearchIcon },
@@ -46,13 +64,13 @@ export default function Navbar() {
 
   useEffect(() => {
     setIsOpen(false);
-    setIsLinksOpen(false);
+    setOpenDropdown(null);
   }, [location]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsLinksOpen(false);
+        setOpenDropdown(null);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -76,8 +94,8 @@ export default function Navbar() {
                 {link.dropdown ? (
                   <div 
                     className="relative"
-                    onMouseEnter={() => setIsLinksOpen(true)}
-                    onMouseLeave={() => setIsLinksOpen(false)}
+                    onMouseEnter={() => setOpenDropdown(link.name)}
+                    onMouseLeave={() => setOpenDropdown(null)}
                   >
                     <button
                       className={`flex items-center px-4 py-2 rounded-full text-[10px] xl:text-xs font-bold tracking-widest uppercase transition-all whitespace-nowrap ${
@@ -87,11 +105,11 @@ export default function Navbar() {
                       }`}
                     >
                       {link.name}
-                      <ChevronDown className={`ml-1 h-3 w-3 transition-transform ${isLinksOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDown className={`ml-1 h-3 w-3 transition-transform ${openDropdown === link.name ? 'rotate-180' : ''}`} />
                     </button>
                     
                     <AnimatePresence>
-                      {isLinksOpen && (
+                      {openDropdown === link.name && (
                         <motion.div
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -99,22 +117,32 @@ export default function Navbar() {
                           className="absolute left-1/2 -translate-x-1/2 mt-2 w-64 bg-primary border border-white/10 rounded-xl shadow-2xl py-2 z-50"
                         >
                           {link.dropdown.map((item) => (
-                            <a
-                              key={item.name}
-                              href={item.path}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="block px-4 py-3 text-sm text-secondary hover:bg-white/5 hover:text-accent-light transition-colors"
-                            >
-                              {item.name}
-                            </a>
+                            item.external ? (
+                              <a
+                                key={item.name}
+                                href={item.path}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block px-4 py-3 text-sm text-secondary hover:bg-white/5 hover:text-accent-light transition-colors"
+                              >
+                                {item.name}
+                              </a>
+                            ) : (
+                              <Link
+                                key={item.name}
+                                to={item.path}
+                                className="block px-4 py-3 text-sm text-secondary hover:bg-white/5 hover:text-accent-light transition-colors"
+                              >
+                                {item.name}
+                              </Link>
+                            )
                           ))}
                           <div className="border-t border-white/10 my-1"></div>
                           <Link
                             to={link.path}
                             className="block px-4 py-3 text-sm text-accent-light hover:bg-white/5 transition-colors font-bold"
                           >
-                            View All Links
+                            View All {link.name}
                           </Link>
                         </motion.div>
                       )}
@@ -182,7 +210,7 @@ export default function Navbar() {
                   {link.dropdown ? (
                     <>
                       <button
-                        onClick={() => setIsLinksOpen(!isLinksOpen)}
+                        onClick={() => setOpenDropdown(openDropdown === link.name ? null : link.name)}
                         className={`w-full flex items-center justify-between px-3 py-4 rounded-md text-base font-medium ${
                           location.pathname === link.path
                             ? 'bg-accent/20 text-accent-light'
@@ -193,10 +221,10 @@ export default function Navbar() {
                           <link.icon className="mr-3 h-5 w-5" />
                           {link.name}
                         </div>
-                        <ChevronDown className={`h-4 w-4 transition-transform ${isLinksOpen ? 'rotate-180' : ''}`} />
+                        <ChevronDown className={`h-4 w-4 transition-transform ${openDropdown === link.name ? 'rotate-180' : ''}`} />
                       </button>
                       <AnimatePresence>
-                        {isLinksOpen && (
+                        {openDropdown === link.name && (
                           <motion.div
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: 'auto', opacity: 1 }}
@@ -204,21 +232,31 @@ export default function Navbar() {
                             className="overflow-hidden bg-black/20 rounded-md mt-1"
                           >
                             {link.dropdown.map((item) => (
-                              <a
-                                key={item.name}
-                                href={item.path}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="block px-11 py-3 text-sm text-secondary hover:text-accent-light"
-                              >
-                                {item.name}
-                              </a>
+                              item.external ? (
+                                <a
+                                  key={item.name}
+                                  href={item.path}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="block px-11 py-3 text-sm text-secondary hover:text-accent-light"
+                                >
+                                  {item.name}
+                                </a>
+                              ) : (
+                                <Link
+                                  key={item.name}
+                                  to={item.path}
+                                  className="block px-11 py-3 text-sm text-secondary hover:text-accent-light"
+                                >
+                                  {item.name}
+                                </Link>
+                              )
                             ))}
                             <Link
                               to={link.path}
                               className="block px-11 py-3 text-sm text-accent-light font-bold"
                             >
-                              View All Links
+                              View All {link.name}
                             </Link>
                           </motion.div>
                         )}
