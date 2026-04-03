@@ -40,7 +40,15 @@ export default function Navbar() {
       ]
     },
     { name: 'Just Asking', path: '/asking', icon: HelpCircle },
-    { name: 'Library', path: '/library', icon: BookOpen },
+    { 
+      name: 'Library', 
+      path: '/library', 
+      icon: BookOpen,
+      dropdown: [
+        { name: 'Books of Charles F. Baker', path: '/library?author=Charles F. Baker' },
+        { name: 'Books of Harry Bultema', path: '/library?author=Harry Bultema' }
+      ]
+    },
     { name: 'Search', path: '/search', icon: SearchIcon },
     { name: 'Live Study', path: '/live-study', icon: Video },
     { 

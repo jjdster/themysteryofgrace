@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSearchParams } from 'react-router-dom';
 import { Book, Download, ExternalLink, FileText, ChevronLeft, User, Loader2, Search, X, Lock } from 'lucide-react';
 import ScriptureText from '../components/ScriptureText';
 import { auth } from '../lib/firebase';
@@ -126,7 +127,9 @@ const RESTRICTED_AUTHORS = ['Charles F. Baker', 'Harry Bultema', 'Cornelius R. S
 const ALLOWED_BUILDER_EMAIL = 'jjdster@gmail.com';
 
 export default function Library() {
-  const [activeAuthor, setActiveAuthor] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialAuthor = searchParams.get('author');
+  const [activeAuthor, setActiveAuthor] = useState<string | null>(initialAuthor);
   const [searchQuery, setSearchQuery] = useState('');
   const [books, setBooks] = useState<BookType[]>(initialBooks);
   const [loading, setLoading] = useState(true);
@@ -139,11 +142,23 @@ export default function Library() {
       setLoading(false);
     });
 
+    // Handle initial author from query param
+    setActiveAuthor(initialAuthor);
+
     // Firebase is disconnected. We'll just use the initialBooks.
     setBooks(initialBooks);
     
     return () => unsubscribe();
-  }, []);
+  }, [initialAuthor]);
+
+  // Update URL when activeAuthor changes
+  useEffect(() => {
+    if (activeAuthor) {
+      setSearchParams({ author: activeAuthor });
+    } else {
+      setSearchParams({});
+    }
+  }, [activeAuthor, setSearchParams]);
 
   const hasBuilderAccess = currentUserEmail === ALLOWED_BUILDER_EMAIL;
 
