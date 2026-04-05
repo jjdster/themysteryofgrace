@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Lock, User, Loader2 } from 'lucide-react';
+import { X, Mail, Lock, User, Loader2, Eye, EyeOff } from 'lucide-react';
 import { signInWithGoogle, signInWithEmailAndPassword, createUserWithEmailAndPassword, auth } from '../lib/firebase';
 import { useAuth } from '../lib/AuthProvider';
 
@@ -13,6 +13,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { setAuthError } = useAuth();
 
@@ -33,7 +34,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       setIsLoading(false);
     }
   };
-
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
@@ -64,11 +64,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             exit={{ opacity: 0, scale: 0.95 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
           >
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative border border-gray-100">
               <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
                 <X className="h-5 w-5" />
               </button>
-              <h2 className="text-2xl font-bold mb-6">{mode === 'signin' ? 'Sign In' : 'Create Account'}</h2>
+              <h2 className="text-2xl font-bold mb-6 text-gray-900">{mode === 'signin' ? 'Sign In' : 'Create Account'}</h2>
               
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="relative">
@@ -77,26 +77,33 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Email"
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-accent outline-none"
+                    placeholder="email@provider.com"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent outline-none text-gray-900"
                     required
                   />
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password"
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-accent outline-none"
+                    placeholder="password"
+                    className="w-full pl-10 pr-12 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent outline-none text-gray-900"
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
                 </div>
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-accent text-white py-2 rounded-lg font-bold hover:bg-accent-light transition-colors flex items-center justify-center gap-2"
+                  className="w-full bg-accent text-white py-2.5 rounded-lg font-bold hover:bg-accent-light transition-colors flex items-center justify-center gap-2"
                 >
                   {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : (mode === 'signin' ? 'Sign In' : 'Sign Up')}
                 </button>
@@ -111,7 +118,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               <button
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
-                className="w-full border border-gray-300 py-2 rounded-lg font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                className="w-full border border-gray-300 py-2.5 rounded-lg font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 text-gray-700"
               >
                 <User className="h-5 w-5" />
                 Continue with Google
