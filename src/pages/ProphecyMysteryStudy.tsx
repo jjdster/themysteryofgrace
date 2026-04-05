@@ -432,17 +432,9 @@ export default function ProphecyMysteryStudy() {
   const [sessionId, setSessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`);
   const [isLeaderMode, setIsLeaderMode] = useState(false);
 
-  const handleSignIn = async () => {
-    try {
-      await signInWithGoogle();
-    } catch (error: any) {
-      console.error("Sign in error:", error);
-      if (error.code === 'auth/unauthorized-domain') {
-        setAuthError("This domain is not authorized for Google Sign-In. Please add it to your Firebase Console under Authentication -> Settings -> Authorized domains.");
-      } else if (error.code !== 'auth/popup-closed-by-user') {
-        setAuthError(error.message || "Failed to sign in with Google.");
-      }
-    }
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const handleSignIn = () => {
+    setIsAuthModalOpen(true);
   };
   const [studyMode, setStudyMode] = useState<'solo' | 'group'>('solo');
   const [completedModules, setCompletedModules] = useState<string[]>([]);

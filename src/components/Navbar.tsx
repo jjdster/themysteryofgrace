@@ -3,29 +3,18 @@ import { Menu, X, BookOpen, Mail, Home, Info, Youtube, Heart, User, Video, HelpC
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../lib/AuthProvider';
-import { signInWithGoogle, signOut } from '../lib/firebase';
+import { signOut } from '../lib/firebase';
+import AuthModal from './AuthModal';
 
 export default function Navbar() {
   const { user, setAuthError } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  const handleSignIn = async () => {
-    try {
-      await signInWithGoogle();
-    } catch (error: any) {
-      console.error("Sign in error:", error);
-      if (error.code === 'auth/unauthorized-domain') {
-        setAuthError("This domain is not authorized for Google Sign-In. Please add it to your Firebase Console under Authentication -> Settings -> Authorized domains.");
-      } else if (error.code === 'auth/popup-closed-by-user') {
-        // Ignore if user just closed the popup
-      } else {
-        setAuthError(error.message || "Failed to sign in with Google.");
-      }
-    }
-  };
   const location = useLocation();
   const dropdownRef = useRef<HTMLDivElement>(null);
+
 
   const isAdmin = user?.email === 'jjdster@gmail.com';
 
@@ -186,7 +175,7 @@ export default function Navbar() {
                 </button>
               ) : (
                 <button
-                  onClick={handleSignIn}
+                  onClick={() => setIsAuthModalOpen(true)}
                   className="flex items-center gap-2 px-4 py-2 rounded-full bg-accent text-primary hover:bg-accent-light text-[10px] xl:text-xs font-bold tracking-widest uppercase transition-all"
                 >
                   <LogIn className="h-3 w-3" />
@@ -312,11 +301,11 @@ export default function Navbar() {
                   </div>
                 ) : (
                   <button
-                    onClick={handleSignIn}
+                    onClick={() => setIsAuthModalOpen(true)}
                     className="w-full flex items-center px-3 py-4 rounded-md text-base font-medium text-accent-light hover:bg-white/5"
                   >
                     <LogIn className="mr-3 h-5 w-5" />
-                    Sign In with Google
+                    Sign In
                   </button>
                 )}
               </div>
@@ -324,6 +313,7 @@ export default function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </nav>
   );
 }

@@ -543,9 +543,12 @@ export default function BaptismStudy() {
       await signInWithGoogle();
     } catch (error: any) {
       console.error("Sign in error:", error);
-      if (error.code === 'auth/unauthorized-domain') {
+      const errorCode = error?.code || error?.message;
+      if (errorCode?.includes('auth/unauthorized-domain')) {
         setAuthError("This domain is not authorized for Google Sign-In. Please add it to your Firebase Console under Authentication -> Settings -> Authorized domains.");
-      } else if (error.code !== 'auth/popup-closed-by-user') {
+      } else if (errorCode?.includes('auth/popup-closed-by-user')) {
+        // Ignore if user just closed the popup
+      } else {
         setAuthError(error.message || "Failed to sign in with Google.");
       }
     }
