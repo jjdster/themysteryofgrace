@@ -45,6 +45,121 @@ export default function Mystery() {
               <span className="block mt-2 font-bold not-italic text-sm">— <ScriptureText text="Romans 16:25" /></span>
             </div>
 
+            {/* Deep Dive Section */}
+            <motion.div 
+              id="grammar-deep-dive"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="my-12 p-8 bg-secondary/30 rounded-3xl border border-primary/10"
+            >
+              <h3 className="text-2xl font-serif font-bold text-primary mb-6 flex items-center">
+                <BookOpen className="mr-3 h-6 w-6 text-accent" />
+                Deep Dive: The Grammar of Romans 16:25
+              </h3>
+              
+              <div className="space-y-6 text-sm md:text-base">
+                <p>
+                  There is strong grammatical and structural justification for seeing these two phrases as "one and the same" in the context of Romans 16:25. While the Granville Sharp Rule doesn't apply here, a different grammatical feature called <strong>Apposition</strong> does.
+                </p>
+                
+                <p>
+                  In Greek, when two phrases are placed side-by-side to rename or define each other, they are in apposition. In this specific verse, Paul uses a structure that links three distinct descriptions of the message he was commissioned to preach.
+                </p>
+
+                <div className="bg-white/50 p-6 rounded-xl border border-primary/5 font-serif italic text-center my-6">
+                  "...according to <span className="text-accent font-bold">my gospel [A]</span>, and (kai) <span className="text-accent font-bold">the preaching of Jesus Christ [B]</span>, according to <span className="text-accent font-bold">the revelation of the mystery [C]</span>..."
+                </div>
+
+                <div className="space-y-8">
+                  <section>
+                    <h4 className="font-bold text-primary mb-2">1. The use of Kai as an Explanatory "And"</h4>
+                    <p>
+                      In Greek, the word <span className="italic">kai</span> (and) doesn't always mean "this plus something else." It can be used <strong>egetically</strong> (to explain). In this sense, it means "and specifically," or "which is to say."
+                    </p>
+                    <p className="mt-2 text-primary/70">
+                      Paul is likely using <span className="italic">kai</span> here to define "my gospel." He isn't saying he has a gospel plus a different preaching of Jesus; he is saying his gospel is the preaching of Jesus Christ viewed through a specific lens: the Revelation of the Mystery.
+                    </p>
+                  </section>
+
+                  <section>
+                    <h4 className="font-bold text-primary mb-2">2. Matching Case and Structure</h4>
+                    <p>
+                      Both "my gospel" (<span className="italic">to euaggelion mou</span>) and "the preaching" (<span className="italic">to kērygma</span>) are:
+                    </p>
+                    <ul className="list-disc pl-5 mt-2 space-y-1 text-primary/70">
+                      <li><strong>Accusative:</strong> They both follow the preposition <span className="italic">kata</span> (according to).</li>
+                      <li><strong>Articular:</strong> They both have the definite article "the."</li>
+                    </ul>
+                    <p className="mt-2 text-primary/70">
+                      This parallel structure signals to the reader that Paul is stacking descriptions. He starts with a personal term ("my gospel") and then immediately clarifies its content ("the preaching of Jesus Christ") and its source/character ("according to the revelation of the mystery").
+                    </p>
+                  </section>
+
+                  <section>
+                    <h4 className="font-bold text-primary mb-2">The "Mystery" as the Defining Factor</h4>
+                    <p>
+                      The phrase "according to the revelation of the mystery" acts as a modifier for the preaching of Jesus Christ. This is what makes the message distinctively "Pauline."
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                      <div className="p-4 bg-white/40 rounded-lg border border-primary/5">
+                        <span className="block text-[10px] uppercase tracking-widest text-accent font-bold mb-1">The Subject</span>
+                        <span className="text-sm font-serif">Jesus Christ</span>
+                      </div>
+                      <div className="p-4 bg-white/40 rounded-lg border border-primary/5">
+                        <span className="block text-[10px] uppercase tracking-widest text-accent font-bold mb-1">The Method</span>
+                        <span className="text-sm font-serif">Preaching</span>
+                      </div>
+                      <div className="p-4 bg-white/40 rounded-lg border border-primary/5">
+                        <span className="block text-[10px] uppercase tracking-widest text-accent font-bold mb-1">The Perspective</span>
+                        <span className="text-sm font-serif">The Revelation of the Mystery</span>
+                      </div>
+                    </div>
+                    <p className="mt-4 text-primary/70">
+                      If these were separate messages, Paul would be contradicting his own point about the unity of the "dispensation of the grace of God" committed to him. By linking them this way, he shows that "the preaching of Jesus Christ" is not always the same as "the mystery"—but when it is preached according to that revelation, it constitutes the gospel Paul calls "mine."
+                    </p>
+                  </section>
+                </div>
+
+                <div className="mt-10 overflow-hidden rounded-xl border border-primary/10 shadow-sm">
+                  <table className="w-full text-left text-xs md:text-sm">
+                    <thead className="bg-primary text-secondary">
+                      <tr>
+                        <th className="px-4 py-3 font-serif">Phrase</th>
+                        <th className="px-4 py-3 font-serif">Role in the Sentence</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-primary/10">
+                      <tr className="bg-white/30">
+                        <td className="px-4 py-3 font-bold text-primary">"My Gospel"</td>
+                        <td className="px-4 py-3 text-primary/70">The Title Paul gives to his specific commission.</td>
+                      </tr>
+                      <tr>
+                        <td className="px-4 py-3 font-bold text-primary">"The Preaching of Jesus Christ"</td>
+                        <td className="px-4 py-3 text-primary/70">The Core Subject of that commission.</td>
+                      </tr>
+                      <tr className="bg-white/30">
+                        <td className="px-4 py-3 font-bold text-primary">"According to the Revelation of the Mystery"</td>
+                        <td className="px-4 py-3 text-primary/70">The Specific Manner/Information by which Christ is now being preached.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+                <div className="mt-12 p-8 bg-accent/5 border-2 border-accent/20 rounded-2xl relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <Scroll className="h-16 w-16 text-accent" />
+                  </div>
+                  <p className="text-primary font-serif text-lg md:text-2xl font-bold italic leading-relaxed text-center relative z-10">
+                    "Grammatically, these are not three different things, but one message described with increasing detail."
+                  </p>
+                  <div className="mt-4 flex justify-center">
+                    <div className="h-1 w-24 bg-accent/30 rounded-full" />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
             <h3 className="text-xl font-serif font-bold text-primary mt-12 mb-4">The Apostle of the Gentiles</h3>
             
             <div className="bg-primary/5 p-6 rounded-xl border-l-4 border-accent mb-8 space-y-4 italic text-sm">

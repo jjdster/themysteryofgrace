@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Book, Shield, Users } from 'lucide-react';
+import { ArrowRight, Book, Shield, Users, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ScriptureText from '../components/ScriptureText';
 
@@ -40,6 +40,13 @@ export default function Home() {
             <span className="block text-xl md:text-2xl font-sans font-bold tracking-[0.3em] text-white/80 uppercase">
               <ScriptureText text="ROMANS 16:25" />
             </span>
+            <Link 
+              to="/mystery#grammar-deep-dive" 
+              className="inline-flex items-center mt-4 text-accent-light hover:text-white transition-colors text-sm font-medium tracking-widest uppercase group"
+            >
+              <BookOpen className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
+              Explore the Grammatical Depth
+            </Link>
           </motion.div>
           
           <motion.div
@@ -99,7 +106,7 @@ export default function Home() {
                 Faith, hope, and charity remain, and the greatest of these is charity. In the epistles of Paul we are instructed how to live as children of God through faith in Jesus Christ: “Those things, which ye have both learned, and received, and heard, and seen in me, do: and the God of peace shall be with you” (<ScriptureText text="Philippians 4:9" />).
               </p>
               <p>
-                The purpose of this website is to focus on the good news entrusted to Paul, by which we are stablished, and to allow the Holy Spirit to shine His light into our hearts that we might believe—not because others believe, but because it is spiritually discerned. It is my prayer, by the grace of God, that we as members of the Body of Christ will be of one mind and heart, encouraging and edifying one another as we look for the blessed hope and the glorious appearing of our great God and Savior, Jesus Christ.
+                The purpose of this website is to focus on the good news entrusted to Paul, by which we are <Link to="/mystery#grammar-deep-dive" className="text-accent hover:underline font-bold">stablished</Link>, and to allow the Holy Spirit to shine His light into our hearts that we might believe—not because others believe, but because it is spiritually discerned. It is my prayer, by the grace of God, that we as members of the Body of Christ will be of one mind and heart, encouraging and edifying one another as we look for the blessed hope and the glorious appearing of our great God and Savior, Jesus Christ.
               </p>
               <div className="font-serif italic text-primary pt-4 text-center space-y-2">
                 <p>“For whatsoever things were written aforetime were written for our learning… that we may with one mind and one mouth glorify God… Wherefore receive ye one another, as Christ also received us to the glory of God.”</p>

@@ -2,9 +2,17 @@ import { useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 export default function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
   useLayoutEffect(() => {
+    if (hash) {
+      const element = document.getElementById(hash.replace('#', ''));
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+    }
+
     const scrollToTop = () => {
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       document.documentElement.scrollTo({ top: 0, left: 0, behavior: 'instant' });
@@ -13,7 +21,7 @@ export default function ScrollToTop() {
     scrollToTop();
     const timer = setTimeout(scrollToTop, 10);
     return () => clearTimeout(timer);
-  }, [pathname]);
+  }, [pathname, hash]);
 
   return null;
 }

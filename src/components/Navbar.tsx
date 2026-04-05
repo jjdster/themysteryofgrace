@@ -49,7 +49,8 @@ export default function Navbar() {
         { name: 'Berean Bible Society', path: 'https://www.bereanbiblesociety.org', external: true },
         { name: 'Grace Ambassadors', path: 'https://graceambassadors.com', external: true },
         { name: 'Forgotten Truths', path: 'http://www.forgottentruths.com', external: true },
-        { name: 'Parsons Publishing Company', path: 'https://www.parsonspublishingcompany.com', external: true }
+        { name: 'Parsons Publishing Company', path: 'https://www.parsonspublishingcompany.com', external: true },
+        { name: 'Les Feldick Ministries', path: 'https://www.lesfeldick.org/index.html', external: true }
       ]
     },
     { name: 'Contact', path: '/contact', icon: Mail },
