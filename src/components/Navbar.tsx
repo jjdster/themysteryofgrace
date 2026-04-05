@@ -6,9 +6,24 @@ import { useAuth } from '../lib/AuthProvider';
 import { signInWithGoogle, signOut } from '../lib/firebase';
 
 export default function Navbar() {
-  const { user } = useAuth();
+  const { user, setAuthError } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+  const handleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error: any) {
+      console.error("Sign in error:", error);
+      if (error.code === 'auth/unauthorized-domain') {
+        setAuthError("This domain is not authorized for Google Sign-In. Please add it to your Firebase Console under Authentication -> Settings -> Authorized domains.");
+      } else if (error.code === 'auth/popup-closed-by-user') {
+        // Ignore if user just closed the popup
+      } else {
+        setAuthError(error.message || "Failed to sign in with Google.");
+      }
+    }
+  };
   const location = useLocation();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -171,7 +186,7 @@ export default function Navbar() {
                 </button>
               ) : (
                 <button
-                  onClick={() => signInWithGoogle()}
+                  onClick={handleSignIn}
                   className="flex items-center gap-2 px-4 py-2 rounded-full bg-accent text-primary hover:bg-accent-light text-[10px] xl:text-xs font-bold tracking-widest uppercase transition-all"
                 >
                   <LogIn className="h-3 w-3" />
@@ -297,7 +312,7 @@ export default function Navbar() {
                   </div>
                 ) : (
                   <button
-                    onClick={() => signInWithGoogle()}
+                    onClick={handleSignIn}
                     className="w-full flex items-center px-3 py-4 rounded-md text-base font-medium text-accent-light hover:bg-white/5"
                   >
                     <LogIn className="mr-3 h-5 w-5" />

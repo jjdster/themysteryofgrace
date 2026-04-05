@@ -1,30 +1,23 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, User } from 'firebase/auth';
-import { getFirestore, collection, addDoc, serverTimestamp, getDocs, query, orderBy, limit, onSnapshot, doc, getDocFromServer } from 'firebase/firestore';
-
-// Import the Firebase configuration
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut } from 'firebase/auth';
+import { getFirestore, collection, onSnapshot, query, where, orderBy, doc, getDocFromServer } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
-// Initialize Firebase SDK
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app, (firebaseConfig as any).firestoreDatabaseId);
+export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);
-export const googleProvider = new GoogleAuthProvider();
 
-// --- Auth Helpers ---
+export { collection, onSnapshot, query, where, orderBy, doc };
+
 export const signInWithGoogle = async () => {
-  try {
-    const result = await signInWithPopup(auth, googleProvider);
-    return result.user;
-  } catch (error) {
-    console.error("Auth Error:", error);
-    throw error;
-  }
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({
+    prompt: 'select_account'
+  });
+  return signInWithPopup(auth, provider);
 };
+export const signOut = () => firebaseSignOut(auth);
 
-export const signOut = () => auth.signOut();
-
-// --- Firestore Helpers ---
 export enum OperationType {
   CREATE = 'create',
   UPDATE = 'update',
@@ -76,7 +69,6 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   throw new Error(JSON.stringify(errInfo));
 }
 
-// Test connection
 async function testConnection() {
   try {
     await getDocFromServer(doc(db, 'test', 'connection'));

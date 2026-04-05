@@ -1,10 +1,37 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Book, Shield, Users, BookOpen } from 'lucide-react';
+import { ArrowRight, Book, Shield, Users, BookOpen, MessageSquare, Quote } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import ScriptureText from '../components/ScriptureText';
+import CommentModal from '../components/CommentModal';
+import { db, collection, onSnapshot, query, where, orderBy, handleFirestoreError, OperationType } from '../lib/firebase';
 
 // Force sync commit: show vs shew update
 export default function Home() {
+  const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
+  const [comments, setComments] = useState<any[]>([]);
+
+  useEffect(() => {
+    const path = 'comments';
+    const q = query(
+      collection(db, path),
+      where('status', '==', 'approved'),
+      orderBy('createdAt', 'desc')
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const newComments = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setComments(newComments);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, path);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -78,6 +105,13 @@ export default function Home() {
             >
               Study Center
             </Link>
+            <button
+              onClick={() => setIsCommentModalOpen(true)}
+              className="w-full sm:w-auto px-10 py-4 bg-white text-primary rounded-full font-bold hover:bg-white/90 transition-all flex items-center justify-center text-center shadow-lg"
+            >
+              <MessageSquare className="mr-2 h-5 w-5 text-accent" />
+              Comment
+            </button>
             <Link
               to="/library"
               className="w-full sm:w-auto px-10 py-4 bg-white/20 backdrop-blur-md border border-white/30 text-white rounded-full font-bold hover:bg-white/30 transition-all flex items-center justify-center text-center"
@@ -126,6 +160,42 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Community Contributions Section */}
+      {comments.length > 0 && (
+        <section className="py-24 bg-secondary/20">
+          <div className="max-w-5xl mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-serif text-primary mb-4">Community Contributions</h2>
+              <div className="h-1 w-24 bg-accent mx-auto rounded-full" />
+              <p className="mt-6 text-primary/70 italic">Thoughts and reactions from the Body of Christ</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {comments.map((c) => (
+                <motion.div
+                  key={c.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="bg-white p-8 rounded-3xl border border-primary/5 shadow-sm relative"
+                >
+                  <Quote className="absolute top-6 right-6 h-8 w-8 text-accent/10" />
+                  <p className="text-primary/80 mb-6 leading-relaxed italic">
+                    "{c.text}"
+                  </p>
+                  <div className="flex items-center justify-between pt-6 border-t border-primary/5">
+                    <span className="font-serif font-bold text-primary">{c.authorName}</span>
+                    <span className="text-xs text-primary/40">
+                      {new Date(c.createdAt?.toDate?.() || c.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Quote Section */}
       <section className="py-20 bg-primary text-secondary text-center">
         <div className="max-w-3xl mx-auto px-4">
@@ -135,6 +205,11 @@ export default function Home() {
           <cite className="block mt-6 text-accent-light font-medium not-italic">— <ScriptureText text="Romans 11:13" /></cite>
         </div>
       </section>
+
+      <CommentModal 
+        isOpen={isCommentModalOpen} 
+        onClose={() => setIsCommentModalOpen(false)} 
+      />
     </motion.div>
   );
 }

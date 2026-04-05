@@ -425,12 +425,25 @@ const Quiz = ({
 // --- Main Page ---
 
 export default function ProphecyMysteryStudy() {
-  const { user } = useAuth();
+  const { user, setAuthError } = useAuth();
   const navigate = useNavigate();
   const [currentModuleIdx, setCurrentModuleIdx] = useState(0);
   const [currentLessonIdx, setCurrentLessonIdx] = useState(0);
   const [sessionId, setSessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`);
   const [isLeaderMode, setIsLeaderMode] = useState(false);
+
+  const handleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error: any) {
+      console.error("Sign in error:", error);
+      if (error.code === 'auth/unauthorized-domain') {
+        setAuthError("This domain is not authorized for Google Sign-In. Please add it to your Firebase Console under Authentication -> Settings -> Authorized domains.");
+      } else if (error.code !== 'auth/popup-closed-by-user') {
+        setAuthError(error.message || "Failed to sign in with Google.");
+      }
+    }
+  };
   const [studyMode, setStudyMode] = useState<'solo' | 'group'>('solo');
   const [completedModules, setCompletedModules] = useState<string[]>([]);
   const [showQuiz, setShowQuiz] = useState(false);
@@ -633,7 +646,7 @@ export default function ProphecyMysteryStudy() {
                     
                     <div className="flex flex-wrap gap-3">
                       <button 
-                        onClick={() => signInWithGoogle()}
+                        onClick={handleSignIn}
                         className="px-6 py-2.5 bg-accent text-white rounded-xl text-xs font-bold hover:bg-accent-light transition-all shadow-lg shadow-accent/20 flex items-center gap-2"
                       >
                         <LogIn className="h-4 w-4" />

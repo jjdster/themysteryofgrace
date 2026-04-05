@@ -56,7 +56,7 @@ export default function AdminDashboard() {
       })) as StudyLog[];
       setLogs(newLogs);
     }, (err) => {
-      console.error("Logs fetch error:", err);
+      handleFirestoreError(err, OperationType.GET, logsPath);
     });
 
     const unsubscribeSessions = onSnapshot(sessionsQuery, (snapshot) => {
@@ -67,7 +67,7 @@ export default function AdminDashboard() {
       setSessions(newSessions);
       setLoading(false);
     }, (err) => {
-      console.error("Sessions fetch error:", err);
+      handleFirestoreError(err, OperationType.GET, sessionsPath);
       setLoading(false);
     });
 
