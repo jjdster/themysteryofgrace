@@ -60,16 +60,16 @@ export default function Home() {
             className="flex flex-col sm:flex-row justify-center items-center gap-4 md:gap-6"
           >
             <Link
-              to="/salvation"
+              to="/gospel"
               className="w-full sm:w-auto px-10 py-4 bg-accent text-white rounded-full font-bold hover:bg-accent-light transition-all text-center shadow-lg"
             >
-              First Things First — Are You Saved?
+              The Gospel of Grace
             </Link>
             <Link
-              to="/mystery"
+              to="/study-center"
               className="w-full sm:w-auto px-10 py-4 border-2 border-white text-white rounded-full font-bold hover:bg-white/10 transition-all text-center"
             >
-              Discover the Mystery
+              Study Center
             </Link>
             <Link
               to="/library"

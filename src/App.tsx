@@ -4,15 +4,12 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Mystery from './pages/Mystery';
 import Videos from './pages/Videos';
-import Salvation from './pages/Salvation';
-import Testimony from './pages/Testimony';
+import Gospel from './pages/Gospel';
 import BibleStudies from './pages/BibleStudies';
 import Library from './pages/Library';
-import Search from './pages/Search';
-import Asking from './pages/Asking';
+import StudyCenter from './pages/StudyCenter';
 import AdminDashboard from './pages/AdminDashboard';
 import Contact from './pages/Contact';
-import LiveStudy from './pages/LiveStudy';
 import Links from './pages/Links';
 import BaptismStudy from './pages/BaptismStudy';
 import ProphecyMysteryStudy from './pages/ProphecyMysteryStudy';
@@ -31,18 +28,20 @@ export default function App() {
             <AnimatePresence mode="wait">
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/salvation" element={<Salvation />} />
-                <Route path="/testimony" element={<Testimony />} />
+                <Route path="/gospel" element={<Gospel />} />
+                <Route path="/salvation" element={<Gospel />} />
+                <Route path="/testimony" element={<Gospel />} />
                 <Route path="/mystery" element={<Mystery />} />
                 <Route path="/videos" element={<Videos />} />
                 <Route path="/studies" element={<BibleStudies />} />
                 <Route path="/baptism-study" element={<BaptismStudy />} />
                 <Route path="/prophecy-mystery-study" element={<ProphecyMysteryStudy />} />
-                <Route path="/asking" element={<Asking />} />
+                <Route path="/study-center" element={<StudyCenter />} />
+                <Route path="/asking" element={<StudyCenter />} />
                 <Route path="/library" element={<Library />} />
-                <Route path="/search" element={<Search />} />
+                <Route path="/search" element={<StudyCenter />} />
                 <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/live-study" element={<LiveStudy />} />
+                <Route path="/live-study" element={<StudyCenter />} />
                 <Route path="/links" element={<Links />} />
                 <Route path="/contact" element={<Contact />} />
               </Routes>

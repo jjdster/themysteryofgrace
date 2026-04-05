@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
-import { Book, Download, ExternalLink, FileText, ChevronLeft, User, Loader2, Search, X, Lock } from 'lucide-react';
+import { Book, Download, ExternalLink, FileText, ChevronLeft, User, Loader2, Search, X, Lock, Shield, BookOpen } from 'lucide-react';
 import ScriptureText from '../components/ScriptureText';
 import { auth } from '../lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -162,12 +162,8 @@ export default function Library() {
 
   const hasBuilderAccess = currentUserEmail === ALLOWED_BUILDER_EMAIL;
 
-  const visibleAuthors = authors.filter(author => {
-    if (RESTRICTED_AUTHORS.includes(author.name)) {
-      return hasBuilderAccess;
-    }
-    return true;
-  });
+  const generalAuthors = authors.filter(author => !RESTRICTED_AUTHORS.includes(author.name));
+  const scholarlyAuthors = authors.filter(author => RESTRICTED_AUTHORS.includes(author.name));
 
   const filteredBooks = books.filter(book => {
     // Hide restricted books if not builder
@@ -235,40 +231,85 @@ export default function Library() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto"
+              className="space-y-16"
             >
-              {visibleAuthors.map((author) => (
-                <button
-                  key={author.name}
-                  onClick={() => setActiveAuthor(author.name)}
-                  className="group relative bg-white p-10 rounded-3xl border border-primary/10 shadow-md hover:shadow-2xl hover:border-accent/30 transition-all duration-500 text-left overflow-hidden"
-                >
-                  <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                    <User className="h-32 w-32 text-primary" />
-                  </div>
-                  
-                  <div className="relative z-10">
-                    <div className="w-12 h-12 bg-accent/10 rounded-2xl flex items-center justify-center mb-6 text-accent group-hover:bg-accent group-hover:text-white transition-all duration-300">
-                      <User className="h-6 w-6" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                {generalAuthors.map((author) => (
+                  <button
+                    key={author.name}
+                    onClick={() => setActiveAuthor(author.name)}
+                    className="group relative bg-white p-10 rounded-3xl border border-primary/10 shadow-md hover:shadow-2xl hover:border-accent/30 transition-all duration-500 text-left overflow-hidden"
+                  >
+                    <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+                      <User className="h-32 w-32 text-primary" />
                     </div>
-                    <h2 className="text-3xl font-serif font-bold text-primary mb-4 group-hover:text-accent transition-colors">
-                      {author.name}
-                    </h2>
-                    <p className="text-primary/60 font-light leading-relaxed mb-6">
-                      {author.description}
-                    </p>
-                    <div className="flex items-center text-accent font-medium">
-                      <span>View {author.count} Books</span>
-                      <motion.div
-                        animate={{ x: [0, 5, 0] }}
-                        transition={{ repeat: Infinity, duration: 1.5 }}
+                    
+                    <div className="relative z-10">
+                      <div className="w-12 h-12 bg-accent/10 rounded-2xl flex items-center justify-center mb-6 text-accent group-hover:bg-accent group-hover:text-white transition-all duration-300">
+                        <User className="h-6 w-6" />
+                      </div>
+                      <h2 className="text-3xl font-serif font-bold text-primary mb-4 group-hover:text-accent transition-colors">
+                        {author.name}
+                      </h2>
+                      <p className="text-primary/60 font-light leading-relaxed mb-6">
+                        {author.description}
+                      </p>
+                      <div className="flex items-center text-accent font-medium">
+                        <span>View {author.count} Books</span>
+                        <motion.div
+                          animate={{ x: [0, 5, 0] }}
+                          transition={{ repeat: Infinity, duration: 1.5 }}
+                        >
+                          <ChevronLeft className="h-5 w-5 ml-2 rotate-180" />
+                        </motion.div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {hasBuilderAccess && (
+                <div className="max-w-4xl mx-auto pt-12 border-t border-primary/5">
+                  <div className="text-center mb-10">
+                    <div className="inline-flex items-center justify-center space-x-3 mb-4">
+                      <div className="h-px w-12 bg-accent/30"></div>
+                      <Shield className="h-5 w-5 text-accent" />
+                      <div className="h-px w-12 bg-accent/30"></div>
+                    </div>
+                    <h2 className="text-2xl font-serif font-bold text-primary">Scholarly Resources</h2>
+                    <p className="text-primary/50 text-sm mt-2">Restricted access materials for authorized builders</p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {scholarlyAuthors.map((author) => (
+                      <button
+                        key={author.name}
+                        onClick={() => setActiveAuthor(author.name)}
+                        className="group relative bg-white/50 p-8 rounded-3xl border border-primary/10 shadow-sm hover:shadow-xl hover:border-accent/30 transition-all duration-500 text-left overflow-hidden"
                       >
-                        <ChevronLeft className="h-5 w-5 ml-2 rotate-180" />
-                      </motion.div>
-                    </div>
+                        <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                          <BookOpen className="h-24 w-24 text-primary" />
+                        </div>
+                        
+                        <div className="relative z-10">
+                          <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center mb-4 text-accent group-hover:bg-accent group-hover:text-white transition-all duration-300">
+                            <Shield className="h-5 w-5" />
+                          </div>
+                          <h3 className="text-2xl font-serif font-bold text-primary mb-2 group-hover:text-accent transition-colors">
+                            {author.name}
+                          </h3>
+                          <p className="text-primary/60 text-sm font-light leading-relaxed mb-4 line-clamp-2">
+                            {author.description}
+                          </p>
+                          <div className="flex items-center text-accent text-sm font-medium">
+                            Access Collection
+                            <ChevronLeft className="h-4 w-4 ml-2 rotate-180 group-hover:translate-x-1 transition-transform" />
+                          </div>
+                        </div>
+                      </button>
+                    ))}
                   </div>
-                </button>
-              ))}
+                </div>
+              )}
             </motion.div>
           ) : (
             <motion.div

@@ -16,8 +16,7 @@ export default function Navbar() {
 
   const navLinks = [
     { name: 'Home', path: '/', icon: Home },
-    { name: 'Are You Saved?', path: '/salvation', icon: Heart },
-    { name: 'Testimony', path: '/testimony', icon: User },
+    { name: 'The Gospel', path: '/gospel', icon: Heart },
     { 
       name: 'The Mystery', 
       path: '/mystery', 
@@ -39,18 +38,8 @@ export default function Navbar() {
         { name: 'Law vs. Grace (Rom 6:14)', path: '/studies' }
       ]
     },
-    { name: 'Just Asking', path: '/asking', icon: HelpCircle },
-    { 
-      name: 'Library', 
-      path: '/library', 
-      icon: BookOpen,
-      dropdown: [
-        { name: 'Books of Charles F. Baker', path: '/library?author=Charles F. Baker' },
-        { name: 'Books of Harry Bultema', path: '/library?author=Harry Bultema' }
-      ]
-    },
-    { name: 'Search', path: '/search', icon: SearchIcon },
-    { name: 'Live Study', path: '/live-study', icon: Video },
+    { name: 'Library', path: '/library', icon: BookOpen },
+    { name: 'Study Center', path: '/study-center', icon: SearchIcon },
     { 
       name: 'Links', 
       path: '/links', 
