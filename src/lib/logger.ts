@@ -60,6 +60,26 @@ export const studyLogger = {
   log: async (lessonTitle: string, interaction: { type: 'question' | 'quiz' | 'chat', data: any }) => {
     const user = auth.currentUser;
     const path = 'study_logs';
+
+    // Send to Google Docs Webhook if configured
+    const webhookUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+    if (webhookUrl) {
+      try {
+        fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            type: interaction.type,
+            timestamp: new Date().toISOString(),
+            userEmail: user?.email || 'Guest',
+            data: interaction.data
+          })
+        }).catch(e => console.error("Webhook error:", e));
+      } catch (e) {
+        console.error("Webhook error:", e);
+      }
+    }
+
     try {
       await addDoc(collection(db, path), {
         userId: user?.uid || null,
@@ -84,6 +104,25 @@ export const studyLogger = {
       ...interaction,
       timestamp: new Date().toISOString()
     };
+
+    // Send to Google Docs Webhook if configured
+    const webhookUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+    if (webhookUrl) {
+      try {
+        fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Use text/plain to avoid CORS preflight issues with GAS
+          body: JSON.stringify({
+            type: interaction.type,
+            timestamp: interactionEntry.timestamp,
+            userEmail: user?.email || 'Guest',
+            data: interaction.data
+          })
+        }).catch(e => console.error("Webhook error:", e));
+      } catch (e) {
+        console.error("Webhook error:", e);
+      }
+    }
 
     try {
       // Try to update first, if it fails (doesn't exist), create it
