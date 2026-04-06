@@ -8,7 +8,7 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail
 } from 'firebase/auth';
-import { getFirestore, collection, onSnapshot, query, where, orderBy, doc, getDocFromServer } from 'firebase/firestore';
+import { getFirestore, collection, onSnapshot, query, where, orderBy, doc, getDocFromServer, deleteDoc } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
@@ -22,6 +22,7 @@ export {
   where, 
   orderBy, 
   doc,
+  deleteDoc,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail

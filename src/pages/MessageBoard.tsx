@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { MessageSquare, Quote, Reply, PlusCircle } from 'lucide-react';
-import { db, collection, onSnapshot, query, orderBy, handleFirestoreError, OperationType } from '../lib/firebase';
+import { MessageSquare, Quote, Reply, PlusCircle, Trash2 } from 'lucide-react';
+import { db, collection, onSnapshot, query, orderBy, handleFirestoreError, OperationType, deleteDoc, doc } from '../lib/firebase';
 import CommentModal from '../components/CommentModal';
+import { useAuth } from '../lib/AuthProvider';
 
 export default function MessageBoard() {
+  const { user } = useAuth();
+  const isAdmin = user?.email === 'jjdster@gmail.com';
+
   const [comments, setComments] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [replyingTo, setReplyingTo] = useState<{id: string, name: string} | null>(null);
@@ -29,6 +33,16 @@ export default function MessageBoard() {
   const handleNewPost = () => {
     setReplyingTo(null);
     setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this comment?')) return;
+    try {
+      await deleteDoc(doc(db, 'comments', id));
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      alert("Failed to delete comment.");
+    }
   };
 
   return (
@@ -61,9 +75,18 @@ export default function MessageBoard() {
                 key={post.id} 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white p-6 sm:p-8 rounded-3xl border border-primary/5 shadow-sm"
+                className="bg-white p-6 sm:p-8 rounded-3xl border border-primary/5 shadow-sm relative"
               >
-                <div className="flex justify-between items-start mb-4">
+                {isAdmin && (
+                  <button 
+                    onClick={() => handleDelete(post.id)}
+                    className="absolute top-6 right-6 text-red-400 hover:text-red-600 transition-colors"
+                    title="Delete post"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                )}
+                <div className="flex justify-between items-start mb-4 pr-8">
                   <span className="font-serif font-bold text-primary text-lg">{post.authorName}</span>
                   <span className="text-xs text-primary/40">
                     {post.createdAt ? new Date(post.createdAt?.toDate?.() || post.createdAt).toLocaleDateString() : 'Just now'}
@@ -84,7 +107,16 @@ export default function MessageBoard() {
                   <div className="mt-6 pt-6 border-t border-primary/5 space-y-6 pl-4 sm:pl-8 border-l-2 border-accent/20">
                     {getReplies(post.id).map(reply => (
                       <div key={reply.id} className="bg-secondary-light/30 p-4 rounded-2xl relative">
-                        <div className="flex justify-between items-start mb-2">
+                        {isAdmin && (
+                          <button 
+                            onClick={() => handleDelete(reply.id)}
+                            className="absolute top-4 right-4 text-red-400 hover:text-red-600 transition-colors"
+                            title="Delete reply"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
+                        <div className="flex justify-between items-start mb-2 pr-6">
                           <span className="font-serif font-bold text-primary text-sm">{reply.authorName}</span>
                           <span className="text-xs text-primary/40">
                             {reply.createdAt ? new Date(reply.createdAt?.toDate?.() || reply.createdAt).toLocaleDateString() : 'Just now'}
