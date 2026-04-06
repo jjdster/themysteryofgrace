@@ -632,22 +632,22 @@ export default function BaptismStudy() {
             May these scriptural truths strengthen your walk in the dispensation of Grace.
           </p>
           
-          <div className="bg-secondary-light/50 p-8 rounded-3xl mb-12 text-left">
+          <Link to="/prophecy-mystery-study" className="block bg-secondary-light/50 p-8 rounded-3xl mb-12 text-left hover:bg-secondary-light transition-colors group">
             <h3 className="text-sm font-bold text-primary/40 uppercase tracking-widest mb-4">Suggested Next Lesson</h3>
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="text-xl font-serif font-bold text-primary">Prophecy vs. Mystery</h4>
+                <h4 className="text-xl font-serif font-bold text-primary group-hover:text-accent transition-colors">Prophecy vs. Mystery</h4>
                 <p className="text-sm text-primary/60">Learn to distinguish between God's earthly and heavenly programs.</p>
               </div>
-              <Link to="/prophecy-mystery-study" className="p-3 bg-primary text-secondary rounded-full hover:bg-accent transition-colors">
+              <div className="p-3 bg-primary text-secondary rounded-full group-hover:bg-accent transition-colors">
                 <ChevronRight className="h-6 w-6" />
-              </Link>
+              </div>
             </div>
-          </div>
+          </Link>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button 
-              onClick={() => navigate('/bible-studies')}
+              onClick={() => navigate('/studies')}
               className="px-10 py-4 bg-primary text-secondary rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-primary-light transition-all"
             >
               <Home className="h-5 w-5" />

@@ -67,6 +67,7 @@ export const studyLogger = {
       try {
         fetch(webhookUrl, {
           method: 'POST',
+          mode: 'no-cors',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
             type: interaction.type,
@@ -111,6 +112,7 @@ export const studyLogger = {
       try {
         fetch(webhookUrl, {
           method: 'POST',
+          mode: 'no-cors',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Use text/plain to avoid CORS preflight issues with GAS
           body: JSON.stringify({
             type: interaction.type,
