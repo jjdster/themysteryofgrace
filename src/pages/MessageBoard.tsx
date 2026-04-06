@@ -12,6 +12,8 @@ export default function MessageBoard() {
   const [comments, setComments] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [replyingTo, setReplyingTo] = useState<{id: string, name: string} | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     const q = query(collection(db, 'comments'), orderBy('createdAt', 'desc'));
@@ -36,17 +38,27 @@ export default function MessageBoard() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this comment?')) return;
     try {
+      setDeleteError(null);
       await deleteDoc(doc(db, 'comments', id));
+      setDeletingId(null);
     } catch (error) {
       console.error("Error deleting comment:", error);
-      alert("Failed to delete comment.");
+      setDeleteError("Failed to delete comment. Please try again.");
+      setTimeout(() => setDeleteError(null), 5000);
     }
   };
 
   return (
     <div className="min-h-screen bg-secondary-light py-24 px-4 sm:px-6 lg:px-8">
+      {deleteError && (
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-red-500 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-2">
+          <span className="text-sm font-bold">{deleteError}</span>
+          <button onClick={() => setDeleteError(null)} className="hover:opacity-70">
+            <PlusCircle className="h-4 w-4 rotate-45" />
+          </button>
+        </div>
+      )}
       <div className="max-w-4xl mx-auto">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12 gap-6">
           <div>
@@ -78,13 +90,33 @@ export default function MessageBoard() {
                 className="bg-white p-6 sm:p-8 rounded-3xl border border-primary/5 shadow-sm relative"
               >
                 {isAdmin && (
-                  <button 
-                    onClick={() => handleDelete(post.id)}
-                    className="absolute top-6 right-6 text-red-400 hover:text-red-600 transition-colors"
-                    title="Delete post"
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
+                  <div className="absolute top-6 right-6 flex items-center gap-2">
+                    {deletingId === post.id ? (
+                      <div className="flex items-center gap-2 bg-red-50 p-2 rounded-xl border border-red-100">
+                        <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">Confirm?</span>
+                        <button 
+                          onClick={() => handleDelete(post.id)}
+                          className="px-3 py-1 bg-red-500 text-white text-[10px] font-bold rounded-lg hover:bg-red-600 transition-colors"
+                        >
+                          Delete
+                        </button>
+                        <button 
+                          onClick={() => setDeletingId(null)}
+                          className="px-3 py-1 bg-gray-200 text-gray-600 text-[10px] font-bold rounded-lg hover:bg-gray-300 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button 
+                        onClick={() => setDeletingId(post.id)}
+                        className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                        title="Delete post"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    )}
+                  </div>
                 )}
                 <div className="flex justify-between items-start mb-4 pr-8">
                   <span className="font-serif font-bold text-primary text-lg">{post.authorName}</span>
@@ -108,13 +140,32 @@ export default function MessageBoard() {
                     {getReplies(post.id).map(reply => (
                       <div key={reply.id} className="bg-secondary-light/30 p-4 rounded-2xl relative">
                         {isAdmin && (
-                          <button 
-                            onClick={() => handleDelete(reply.id)}
-                            className="absolute top-4 right-4 text-red-400 hover:text-red-600 transition-colors"
-                            title="Delete reply"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
+                          <div className="absolute top-4 right-4 flex items-center gap-2">
+                            {deletingId === reply.id ? (
+                              <div className="flex items-center gap-2 bg-red-50 p-1.5 rounded-lg border border-red-100">
+                                <button 
+                                  onClick={() => handleDelete(reply.id)}
+                                  className="px-2 py-0.5 bg-red-500 text-white text-[9px] font-bold rounded hover:bg-red-600 transition-colors"
+                                >
+                                  Delete
+                                </button>
+                                <button 
+                                  onClick={() => setDeletingId(null)}
+                                  className="px-2 py-0.5 bg-gray-200 text-gray-600 text-[9px] font-bold rounded hover:bg-gray-300 transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            ) : (
+                              <button 
+                                onClick={() => setDeletingId(reply.id)}
+                                className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                title="Delete reply"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            )}
+                          </div>
                         )}
                         <div className="flex justify-between items-start mb-2 pr-6">
                           <span className="font-serif font-bold text-primary text-sm">{reply.authorName}</span>
