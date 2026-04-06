@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Lock, User, Loader2, Eye, EyeOff } from 'lucide-react';
-import { signInWithGoogle, signInWithEmailAndPassword, createUserWithEmailAndPassword, auth } from '../lib/firebase';
+import { signInWithGoogle, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, auth } from '../lib/firebase';
 import { useAuth } from '../lib/AuthProvider';
 
 interface AuthModalProps {
@@ -13,13 +13,28 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [resetMessage, setResetMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { setAuthError } = useAuth();
+  const { authError, setAuthError } = useAuth();
+
+  useEffect(() => {
+    if (isOpen) {
+      setAuthError(null);
+      setEmail('');
+      setPassword('');
+      setShowPassword(false);
+      setShowResetPassword(false);
+      setResetMessage(null);
+    }
+  }, [isOpen, setAuthError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setAuthError(null);
+    setResetMessage(null);
+    setShowResetPassword(false);
     try {
       // Try to create the user first
       await createUserWithEmailAndPassword(auth, email, password);
@@ -31,11 +46,34 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           await signInWithEmailAndPassword(auth, email, password);
           onClose();
         } catch (signInError: any) {
-          setAuthError(signInError.message);
+          if (signInError.code === 'auth/invalid-credential' || signInError.code === 'auth/wrong-password') {
+            setAuthError("Incorrect password for this email. Please try again or reset your password.");
+            setShowResetPassword(true);
+          } else {
+            setAuthError(signInError.message);
+          }
         }
       } else {
         setAuthError(error.message);
       }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!email) {
+      setAuthError("Please enter your email address to reset your password.");
+      return;
+    }
+    setIsLoading(true);
+    setAuthError(null);
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setResetMessage("Password reset email sent! Please check your inbox.");
+      setShowResetPassword(false);
+    } catch (error: any) {
+      setAuthError(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -76,6 +114,18 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               </button>
               <h2 className="text-2xl font-bold mb-6 text-gray-900">Sign In or Sign Up</h2>
               
+              {authError && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg">
+                  {authError}
+                </div>
+              )}
+              
+              {resetMessage && (
+                <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg">
+                  {resetMessage}
+                </div>
+              )}
+
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
@@ -113,6 +163,17 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 >
                   {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Continue'}
                 </button>
+                
+                {showResetPassword && (
+                  <button
+                    type="button"
+                    onClick={handleResetPassword}
+                    disabled={isLoading}
+                    className="w-full bg-secondary-light text-primary py-2.5 rounded-lg font-bold hover:bg-primary/5 transition-colors text-sm"
+                  >
+                    Reset Password
+                  </button>
+                )}
               </form>
 
               <div className="my-6 flex items-center gap-4">

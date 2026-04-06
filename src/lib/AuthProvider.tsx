@@ -35,7 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <AuthContext.Provider value={{ user, loading, authError, setAuthError }}>
       {authError && (
-        <div className="fixed top-4 right-4 z-50 bg-red-900/90 border border-red-500 text-white px-4 py-3 rounded-md shadow-lg flex items-start max-w-md">
+        <div className="fixed top-4 right-4 z-[100] bg-red-900/90 border border-red-500 text-white px-4 py-3 rounded-md shadow-lg flex items-start max-w-md">
           <XCircle className="h-5 w-5 text-red-400 mr-3 mt-0.5 flex-shrink-0" />
           <div className="flex-1">
             <h3 className="text-sm font-bold mb-1">Authentication Error</h3>
