@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, BookOpen, Mail, Home, Info, Youtube, Heart, User, Video, HelpCircle, ChevronDown, Search as SearchIcon, LogIn, LogOut, Shield } from 'lucide-react';
+import { Menu, X, BookOpen, Mail, Home, Info, Youtube, Heart, User, Video, HelpCircle, ChevronDown, Search as SearchIcon, LogIn, LogOut, Shield, MessageSquare } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../lib/AuthProvider';
