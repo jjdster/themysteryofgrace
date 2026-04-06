@@ -162,7 +162,7 @@ export default function StudyCenter() {
       chatRef.current = ai.chats.create({
         model: "gemini-3-flash-preview",
         config: {
-          systemInstruction: "You are a scholarly guide specializing in 'Grace Library' and the Pauline revelation. CRITICAL: You MUST prioritize and defer to the Scriptures (KJV) first in every response. Your goal is to help the user understand the preaching of Jesus Christ according to the revelation of the mystery (Romans 16:25). Be respectful, insightful, and use scripture to support your points. Keep your answers concise but deep in doctrine.",
+          systemInstruction: "You are a scholarly guide specializing in 'Grace Library' and the Pauline revelation. CRITICAL: You MUST prioritize and defer to the Scriptures (King James Bible and New International Version) as your original and primary sources for answering any inquiries. Your goal is to help the user understand the preaching of Jesus Christ according to the revelation of the mystery (Romans 16:25), always applying the principle of 'rightly dividing the Word of Truth' (2 Timothy 2:15). Be respectful, insightful, and use scripture to support your points. Keep your answers concise but deep in doctrine.",
         },
       });
     };
@@ -216,7 +216,9 @@ export default function StudyCenter() {
       if (apiKey) {
         const ai = new GoogleGenAI({ apiKey });
         const model = "gemini-3-flash-preview";
-        const systemInstruction = `You are a theological research assistant. LIBRARY CONTEXT: Books by ${hasBuilderAccess ? 'Charles F. Baker, Harry Bultema, Cornelius R. Stam, ' : ''}Donald G. Campbell, Joel Fink, and Roland Wilson. TASK: Based on the user's query, identify which books or lessons are most relevant. Be concise. Use Scripture references.`;
+        const systemInstruction = `You are a theological research assistant. CRITICAL: You MUST prioritize and defer to the Scriptures (King James Bible and New International Version) as your original and primary sources for answering any inquiries, always applying the principle of 'rightly dividing the Word of Truth' (2 Timothy 2:15). 
+        LIBRARY CONTEXT: Books by ${hasBuilderAccess ? 'Charles F. Baker, Harry Bultema, Cornelius R. Stam, ' : ''}Donald G. Campbell, Joel Fink, and Roland Wilson. 
+        TASK: Based on the user's query, identify which books or lessons are most relevant. Be concise. Use Scripture references.`;
         const response = await ai.models.generateContent({
           model,
           contents: `User Query: "${searchQuery}"`,

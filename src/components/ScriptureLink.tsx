@@ -31,7 +31,11 @@ export default function ScriptureLink({ reference, children }: ScriptureLinkProp
       const ai = new GoogleGenAI({ apiKey });
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: `Provide the full text of the following Bible verse(s) in the King James Version (KJV). CRITICAL: Only provide the verse text, no other commentary, no introduction, and no conclusion. If multiple verses are requested, provide them as a single block of text: ${reference}`,
+        contents: `Provide the full text of the following Bible verse(s) in both the King James Version (KJV) and the New International Version (NIV). 
+        CRITICAL: Format your response as follows:
+        KJV: [verse text]
+        NIV: [verse text]
+        Only provide the verse texts, no other commentary, no introduction, and no conclusion. If multiple verses are requested, provide them as a single block for each version: ${reference}`,
       });
       setVerseText(response.text || "Verse text not found.");
     } catch (error) {
@@ -61,7 +65,7 @@ export default function ScriptureLink({ reference, children }: ScriptureLinkProp
               <div className="flex items-center gap-2">
                 <BookOpen className="h-4 w-4 text-accent" />
                 <p className="text-[10px] font-bold uppercase tracking-widest text-accent">
-                  {reference} (KJV)
+                  {reference} (KJV & NIV)
                 </p>
               </div>
               <Popover.Close className="p-1 hover:bg-white/10 rounded-lg transition-colors text-secondary/40 hover:text-secondary">
@@ -76,7 +80,7 @@ export default function ScriptureLink({ reference, children }: ScriptureLinkProp
                   <span className="text-xs text-secondary/60 font-serif italic">Searching the scriptures...</span>
                 </div>
               ) : (
-                <p className="text-sm font-serif italic leading-relaxed text-secondary/90">
+                <p className="text-sm font-serif italic leading-relaxed text-secondary/90 whitespace-pre-wrap">
                   "{verseText}"
                 </p>
               )}

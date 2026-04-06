@@ -15,6 +15,9 @@ interface BookType {
 }
 
 const initialBooks: BookType[] = [
+  // Scripture
+  { id: 'kjv', title: 'King James Bible (1611)', filename: 'KJV.pdf', author: 'King James Bible', downloadUrl: 'https://raw.githubusercontent.com/jjdster/grace-library-assets/main/KJV.pdf' },
+
   // Charles F. Baker
   { id: 'b1', title: 'Real Baptism', filename: 'BakerI01RealBaptism.pdf', author: 'Charles F. Baker' },
   { id: 'b2', title: 'Bible Truth', filename: 'BakerI02BibleTruth.pdf', author: 'Charles F. Baker' },
@@ -85,6 +88,11 @@ const initialBooks: BookType[] = [
 ];
 
 const authors = [
+  { 
+    name: 'King James Bible', 
+    description: 'The Authorized Version of the Holy Bible (KJV).',
+    count: 1
+  },
   { 
     name: 'Charles F. Baker', 
     description: 'Founder of Grace Bible College and author of numerous dispensational works.',
