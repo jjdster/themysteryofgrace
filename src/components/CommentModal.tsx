@@ -8,9 +8,11 @@ import { addDoc, serverTimestamp } from 'firebase/firestore';
 interface CommentModalProps {
   isOpen: boolean;
   onClose: () => void;
+  parentId?: string | null;
+  replyToName?: string | null;
 }
 
-export default function CommentModal({ isOpen, onClose }: CommentModalProps) {
+export default function CommentModal({ isOpen, onClose, parentId, replyToName }: CommentModalProps) {
   const [name, setName] = useState('');
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,7 +28,7 @@ export default function CommentModal({ isOpen, onClose }: CommentModalProps) {
 
     try {
       // 1. Moderate with Gemini
-      const apiKey = (window as any).process?.env?.GEMINI_API_KEY || (import.meta as any).env?.VITE_GEMINI_API_KEY;
+      const apiKey = process.env.GEMINI_API_KEY;
       
       if (!apiKey) {
         throw new Error('Gemini API key is missing. Please check your environment configuration.');
@@ -70,10 +72,36 @@ export default function CommentModal({ isOpen, onClose }: CommentModalProps) {
         text: comment,
         status: moderation.status,
         attitude: moderation.attitude,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
+        parentId: parentId || null
       });
 
-      // 3. Send email via backend if flagged
+      // 3. Send to Google Docs Webhook if configured
+      const webhookUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+      if (webhookUrl) {
+        try {
+          fetch(webhookUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              type: 'comment',
+              timestamp: new Date().toISOString(),
+              userEmail: name || 'Anonymous',
+              data: {
+                comment: comment,
+                status: moderation.status,
+                attitude: moderation.attitude,
+                parentId: parentId || null
+              }
+            })
+          }).catch(e => console.error("Webhook error:", e));
+        } catch (e) {
+          console.error("Webhook error:", e);
+        }
+      }
+
+      // 4. Send email via backend if flagged
       if (moderation.status === 'flagged') {
         const emailResponse = await fetch('/api/email', {
           method: 'POST',
@@ -119,7 +147,9 @@ export default function CommentModal({ isOpen, onClose }: CommentModalProps) {
           <div className="bg-primary p-6 text-white flex justify-between items-center">
             <div className="flex items-center space-x-3">
               <MessageSquare className="h-6 w-6 text-accent" />
-              <h2 className="text-xl font-serif font-bold">Contribute Your Thoughts</h2>
+              <h2 className="text-xl font-serif font-bold">
+                {replyToName ? `Reply to ${replyToName}` : 'Contribute Your Thoughts'}
+              </h2>
             </div>
             <button onClick={onClose} className="hover:bg-white/10 p-2 rounded-full transition-colors">
               <X className="h-6 w-6" />

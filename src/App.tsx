@@ -11,6 +11,7 @@ import StudyCenter from './pages/StudyCenter';
 import AdminDashboard from './pages/AdminDashboard';
 import Contact from './pages/Contact';
 import Links from './pages/Links';
+import MessageBoard from './pages/MessageBoard';
 import BaptismStudy from './pages/BaptismStudy';
 import ProphecyMysteryStudy from './pages/ProphecyMysteryStudy';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -43,6 +44,7 @@ export default function App() {
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/live-study" element={<StudyCenter />} />
                 <Route path="/links" element={<Links />} />
+                <Route path="/community" element={<MessageBoard />} />
                 <Route path="/contact" element={<Contact />} />
               </Routes>
             </AnimatePresence>

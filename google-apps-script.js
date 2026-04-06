@@ -20,6 +20,9 @@ function doPost(e) {
     } else if (type === 'chat') {
       question = data.message || data.userMessage || "";
       answer = data.response || data.aiResponse || "";
+    } else if (type === 'comment') {
+      question = data.comment || "";
+      answer = "Status: " + data.status + " | Attitude: " + data.attitude;
     } else {
       question = JSON.stringify(data);
     }
@@ -35,6 +38,7 @@ function doPost(e) {
     if (type === 'question') categoryName = "Mystery Questions";
     else if (type === 'quiz') categoryName = "Mystery Quizzes";
     else if (type === 'chat') categoryName = "Mystery Chats";
+    else if (type === 'comment') categoryName = "Mystery Comments";
     
     const docName = categoryName + " - " + monthYear;
     

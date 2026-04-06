@@ -57,6 +57,7 @@ export default function Navbar() {
         { name: 'Les Feldick Ministries', path: 'https://www.lesfeldick.org/index.html', external: true }
       ]
     },
+    { name: 'Community', path: '/community', icon: MessageSquare },
     { name: 'Contact', path: '/contact', icon: Mail },
   ];
 
