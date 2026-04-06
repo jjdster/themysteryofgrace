@@ -10,7 +10,6 @@ interface AuthModalProps {
 }
 
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -22,14 +21,21 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setIsLoading(true);
     setAuthError(null);
     try {
-      if (mode === 'signin') {
-        await signInWithEmailAndPassword(auth, email, password);
-      } else {
-        await createUserWithEmailAndPassword(auth, email, password);
-      }
+      // Try to create the user first
+      await createUserWithEmailAndPassword(auth, email, password);
       onClose();
     } catch (error: any) {
-      setAuthError(error.message);
+      if (error.code === 'auth/email-already-in-use') {
+        // If user exists, try to sign them in
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          onClose();
+        } catch (signInError: any) {
+          setAuthError(signInError.message);
+        }
+      } else {
+        setAuthError(error.message);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -68,7 +74,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
                 <X className="h-5 w-5" />
               </button>
-              <h2 className="text-2xl font-bold mb-6 text-gray-900">{mode === 'signin' ? 'Sign In' : 'Create Account'}</h2>
+              <h2 className="text-2xl font-bold mb-6 text-gray-900">Sign In or Sign Up</h2>
               
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="relative">
@@ -105,7 +111,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   disabled={isLoading}
                   className="w-full bg-accent text-white py-2.5 rounded-lg font-bold hover:bg-accent-light transition-colors flex items-center justify-center gap-2"
                 >
-                  {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : (mode === 'signin' ? 'Sign In' : 'Sign Up')}
+                  {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Continue'}
                 </button>
               </form>
 
@@ -123,16 +129,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 <User className="h-5 w-5" />
                 Continue with Google
               </button>
-
-              <p className="mt-6 text-center text-sm text-gray-600">
-                {mode === 'signin' ? "Don't have an account? " : "Already have an account? "}
-                <button
-                  onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
-                  className="text-accent font-bold hover:underline"
-                >
-                  {mode === 'signin' ? 'Sign Up' : 'Sign In'}
-                </button>
-              </p>
             </div>
           </motion.div>
         </>
