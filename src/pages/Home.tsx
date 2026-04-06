@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Book, Shield, Users, BookOpen, MessageSquare, Quote } from 'lucide-react';
+import { ArrowRight, Book, Shield, Users, BookOpen, MessageSquare, Quote, Smartphone, Share, PlusSquare, Compass } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ScriptureText from '../components/ScriptureText';
 
@@ -128,6 +128,48 @@ export default function Home() {
                   jjdster@gmail.com
                 </a>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Add to Home Screen Instructions */}
+      <section className="py-16 bg-secondary/20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-serif font-bold text-primary mb-4">Access the Library Quickly</h2>
+            <p className="text-primary/60 max-w-2xl mx-auto">Add this website to your iPhone or iPad home screen for easy access, just like a mobile app.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-primary/5 flex flex-col items-center text-center">
+              <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center text-accent mb-4">
+                <Compass className="h-6 w-6" />
+              </div>
+              <h3 className="font-bold text-primary mb-2">1. Open Safari</h3>
+              <p className="text-sm text-primary/60 leading-relaxed">
+                Navigate to <span className="font-medium text-accent">www.themysteryofgrace.com</span> in your Safari browser.
+              </p>
+            </div>
+            
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-primary/5 flex flex-col items-center text-center">
+              <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center text-accent mb-4">
+                <Share className="h-6 w-6" />
+              </div>
+              <h3 className="font-bold text-primary mb-2">2. Tap Share</h3>
+              <p className="text-sm text-primary/60 leading-relaxed">
+                Tap the Share icon (square with upward arrow) at the bottom (iPhone) or top right (iPad).
+              </p>
+            </div>
+            
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-primary/5 flex flex-col items-center text-center">
+              <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center text-accent mb-4">
+                <PlusSquare className="h-6 w-6" />
+              </div>
+              <h3 className="font-bold text-primary mb-2">3. Add to Home Screen</h3>
+              <p className="text-sm text-primary/60 leading-relaxed">
+                Scroll down and select <span className="font-medium text-accent">"Add to Home Screen"</span> from the list.
+              </p>
             </div>
           </div>
         </div>

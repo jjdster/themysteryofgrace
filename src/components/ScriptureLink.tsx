@@ -56,9 +56,10 @@ export default function ScriptureLink({ reference, children }: ScriptureLinkProp
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content
-          className="z-[100] w-[90vw] max-w-sm bg-primary text-secondary p-6 rounded-[2rem] shadow-2xl border border-white/10 animate-in fade-in zoom-in duration-200 outline-none"
+          className="z-[9999] w-[90vw] max-w-sm bg-primary text-secondary p-6 rounded-[2rem] shadow-2xl border border-white/10 animate-in fade-in zoom-in duration-200 outline-none"
           sideOffset={8}
           align="center"
+          collisionPadding={100}
         >
           <div className="space-y-4">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
