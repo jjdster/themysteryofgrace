@@ -16,7 +16,7 @@ interface BookType {
 
 const initialBooks: BookType[] = [
   // Scripture
-  { id: 'kjv', title: 'King James Bible (1611)', filename: 'KJV_Bible.pdf', author: 'King James Bible', downloadUrl: 'https://raw.githubusercontent.com/jjdster/grace-library-assets/main/KJV_Bible.pdf' },
+  { id: 'kjv', title: 'King James Bible (1611)', filename: 'KJV_Bible.pdf', author: 'King James Bible', downloadUrl: 'https://cdn.jsdelivr.net/gh/jjdster/grace-library-assets@main/KJV_Bible.pdf' },
 
   // Charles F. Baker
   { id: 'b1', title: 'Real Baptism', filename: 'BakerI01RealBaptism.pdf', author: 'Charles F. Baker' },
