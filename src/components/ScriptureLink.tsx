@@ -7,9 +7,10 @@ import { getGeminiApiKey } from '../lib/api';
 interface ScriptureLinkProps {
   reference: string;
   children?: React.ReactNode;
+  className?: string;
 }
 
-export default function ScriptureLink({ reference, children }: ScriptureLinkProps) {
+export default function ScriptureLink({ reference, children, className }: ScriptureLinkProps) {
   const [verseText, setVerseText] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -49,7 +50,7 @@ export default function ScriptureLink({ reference, children }: ScriptureLinkProp
   return (
     <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
       <Popover.Trigger asChild>
-        <button className="text-accent hover:text-accent-light underline decoration-dotted cursor-pointer transition-colors inline-flex items-center gap-1 group">
+        <button className={className || "text-accent-light hover:text-accent underline decoration-dotted cursor-pointer transition-colors inline-flex items-center gap-1 group"}>
           <span className="font-medium">{children || reference}</span>
           <BookOpen className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
         </button>
@@ -81,7 +82,7 @@ export default function ScriptureLink({ reference, children }: ScriptureLinkProp
                   <span className="text-xs text-secondary/60 font-serif italic">Searching the scriptures...</span>
                 </div>
               ) : (
-                <p className="text-sm font-serif italic leading-relaxed text-secondary/90 whitespace-pre-wrap">
+                <p className="text-base font-serif italic leading-relaxed text-secondary/90 whitespace-pre-wrap">
                   "{verseText}"
                 </p>
               )}

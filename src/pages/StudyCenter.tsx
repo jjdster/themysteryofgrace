@@ -447,8 +447,11 @@ export default function StudyCenter() {
                       <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center border ${msg.role === 'user' ? 'bg-accent/10 border-accent/20 text-accent' : 'bg-zinc-800 border-white/5 text-secondary/60'}`}>
                         {msg.role === 'user' ? <User className="h-4 w-4" /> : <BookOpen className="h-4 w-4" />}
                       </div>
-                      <div className={`max-w-[80%] p-4 rounded-2xl font-serif text-sm ${msg.role === 'user' ? 'bg-accent text-white rounded-tr-none' : 'bg-white/5 text-secondary/80 rounded-tl-none italic'}`}>
-                        <ScriptureText text={msg.text} />
+                      <div className={`max-w-[80%] p-4 rounded-2xl font-serif text-base ${msg.role === 'user' ? 'bg-accent text-white rounded-tr-none' : 'bg-white/5 text-secondary/80 rounded-tl-none italic'}`}>
+                        <ScriptureText 
+                          text={msg.text} 
+                          linkClassName={msg.role === 'user' ? 'text-white underline font-bold' : 'text-accent-light hover:text-white underline decoration-dotted transition-colors'}
+                        />
                       </div>
                     </div>
                   ))}
@@ -462,7 +465,7 @@ export default function StudyCenter() {
                       value={dialogueInput}
                       onChange={(e) => setDialogueInput(e.target.value)}
                       placeholder="Ask about the Revelation of the Mystery..."
-                      className="w-full bg-zinc-800 border border-white/10 rounded-2xl px-6 py-4 pr-16 text-secondary focus:outline-none focus:border-accent/50 transition-colors font-serif italic"
+                      className="w-full bg-zinc-800 border border-white/10 rounded-2xl px-6 py-4 pr-16 text-secondary focus:outline-none focus:border-accent/50 transition-colors font-serif italic text-lg"
                     />
                     <button
                       type="submit"
@@ -497,7 +500,7 @@ export default function StudyCenter() {
                       <div className="flex items-start space-x-3">
                         <MessageSquare className="h-5 w-5 text-primary/30 mt-1 shrink-0" />
                         <div className="space-y-4">
-                          <p className="text-primary/70 leading-relaxed"><ScriptureText text={faq.answer} /></p>
+                          <p className="text-primary/70 leading-relaxed text-lg"><ScriptureText text={faq.answer} /></p>
                           {faq.videoUrl && (
                             <a href={faq.videoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-4 py-2 bg-accent text-white rounded-full text-sm font-medium hover:bg-accent-light transition-colors shadow-sm">
                               <PlayCircle className="mr-2 h-4 w-4" />View Video

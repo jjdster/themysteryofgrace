@@ -4,6 +4,7 @@ import ScriptureLink from './ScriptureLink';
 interface ScriptureTextProps {
   text: string;
   className?: string;
+  linkClassName?: string;
 }
 
 const BIBLE_BOOKS = [
@@ -22,7 +23,7 @@ const scriptureRegex = new RegExp(
   'g'
 );
 
-export default function ScriptureText({ text, className }: ScriptureTextProps) {
+export default function ScriptureText({ text, className, linkClassName }: ScriptureTextProps) {
   if (!text) return null;
 
   const parts = text.split(scriptureRegex);
@@ -38,7 +39,7 @@ export default function ScriptureText({ text, className }: ScriptureTextProps) {
         <React.Fragment key={i}>
           {part}
           {matches[i] && (
-            <ScriptureLink reference={matches[i]} />
+            <ScriptureLink reference={matches[i]} className={linkClassName} />
           )}
         </React.Fragment>
       ))}
