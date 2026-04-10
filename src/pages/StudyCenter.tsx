@@ -25,6 +25,7 @@ import { studyLogger } from '../lib/logger';
 import ScriptureText from '../components/ScriptureText';
 import { baptismStudyData } from '../data/baptismStudyData';
 import { prophecyMysteryData } from '../data/prophecyMysteryData';
+import { CUSTOM_STUDY_MATERIALS } from '../data/customStudyMaterials';
 import { DebugPanel } from '../components/DebugPanel';
 
 // Shared Data
@@ -141,6 +142,8 @@ export default function StudyCenter() {
   const [dialogueError, setDialogueError] = useState<string | null>(null);
   const [sessionId] = useState(() => `study_session_${Date.now()}`);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const dialogueSectionRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const chatRef = useRef<any>(null);
 
   useEffect(() => {
@@ -152,6 +155,8 @@ export default function StudyCenter() {
 
   const hasBuilderAccess = currentUserEmail === ALLOWED_BUILDER_EMAIL;
 
+  const customContext = CUSTOM_STUDY_MATERIALS.map(m => `TITLE: ${m.title}\nCONTENT: ${m.content}`).join('\n\n---\n\n');
+
   // Initialize Chat for Dialogue
   useEffect(() => {
     const initChat = async () => {
@@ -162,16 +167,31 @@ export default function StudyCenter() {
       chatRef.current = ai.chats.create({
         model: "gemini-3-flash-preview",
         config: {
-          systemInstruction: "You are a scholarly guide specializing in 'Grace Library' and the Pauline revelation. CRITICAL: You MUST prioritize and defer to the Scriptures (King James Bible and New International Version) as your original and primary sources for answering any inquiries. Your goal is to help the user understand the preaching of Jesus Christ according to the revelation of the mystery (Romans 16:25), always applying the principle of 'rightly dividing the Word of Truth' (2 Timothy 2:15). Be respectful, insightful, and use scripture to support your points. Keep your answers concise but deep in doctrine.",
+          systemInstruction: `You are a scholarly guide specializing in 'Grace Library' and the Pauline revelation. CRITICAL: You MUST prioritize and defer to the Scriptures (King James Bible and New International Version) as your original and primary sources. Your goal is to help the user understand the preaching of Jesus Christ according to the revelation of the mystery (Romans 16:25), applying 'rightly dividing the Word of Truth' (2 Timothy 2:15). 
+          Specifically, recognize the distinction between God's earthly program (Terrestrial) and His heavenly program for the Body of Christ (Mystery/Celestial). Understand that while current terrestrial bodies are corruptible, resurrected terrestrial bodies (for the earthly kingdom) are incorruptible yet remain terrestrial. Distinguish these from celestial bodies, which are 'from heaven' (2 Cor 5:2) and a present possession (2 Cor 5:1). Clarify that to 'rise' (1 Thess 4:16) refers to the resurrection—standing erect being clothed with this body from heaven. Recognize that the entire event occurs in an 'atomos' (1 Cor 15:52)—an indivisible moment—meaning that while there is a logical order, no earthly time is consumed in the transition. 
+          
+          ADDITIONAL RESOURCES: You also have access to the following custom study materials which you should research and refer to when relevant:
+          ${customContext}
+          
+          FORMATTING: When enumerating points or aspects of your response, you MUST start a new paragraph for each point to ensure clarity. Be respectful, insightful, and deep in doctrine.`,
         },
       });
     };
     initChat();
-  }, []);
+  }, [customContext]);
 
   useEffect(() => {
-    if (activeTab === 'dialogue') {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (activeTab === 'dialogue' && messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      
+      // If the AI just started responding or a new message was added
+      // Scroll the window to the top of the dialogue section
+      dialogueSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      
+      // Also scroll the internal chat container to the top as requested
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
   }, [messages, activeTab]);
 
@@ -216,7 +236,15 @@ export default function StudyCenter() {
       if (apiKey) {
         const ai = new GoogleGenAI({ apiKey });
         const model = "gemini-3-flash-preview";
-        const systemInstruction = `You are a theological research assistant. CRITICAL: You MUST prioritize and defer to the Scriptures (King James Bible and New International Version) as your original and primary sources for answering any inquiries, always applying the principle of 'rightly dividing the Word of Truth' (2 Timothy 2:15). 
+        const systemInstruction = `You are a theological research assistant. CRITICAL: You MUST prioritize and defer to the Scriptures (King James Bible and New International Version) as your original and primary sources, always applying the principle of 'rightly dividing the Word of Truth' (2 Timothy 2:15). 
+        Recognize the distinction between God's earthly program (Terrestrial) and His heavenly program for the Body of Christ (Celestial). 
+        Understand that while current terrestrial bodies are corruptible, resurrected terrestrial bodies are incorruptible. Distinguish these from the celestial body which is a present possession in the heavens (2 Cor 5:1).
+        Recognize that 'rising' in resurrection refers to standing erect in that new body, and that the entire event (resurrection and catching away) occurs in an 'atomos' (1 Cor 15:52)—an indivisible moment—consuming no earthly time.
+        
+        ADDITIONAL RESOURCES: You also have access to the following custom study materials which you should research and refer to when relevant:
+        ${customContext}
+        
+        FORMATTING: When enumerating points or aspects of your response, you MUST start a new paragraph for each point to ensure clarity.
         LIBRARY CONTEXT: Books by ${hasBuilderAccess ? 'Charles F. Baker, Harry Bultema, Cornelius R. Stam, ' : ''}Donald G. Campbell, Joel Fink, and Roland Wilson. 
         TASK: Based on the user's query, identify which books or lessons are most relevant. Be concise. Use Scripture references.`;
         const response = await ai.models.generateContent({
@@ -360,7 +388,7 @@ export default function StudyCenter() {
                         <Sparkles className="h-6 w-6 text-accent" />
                         <h2 className="text-xl font-serif font-bold text-primary">AI Library Insights</h2>
                       </div>
-                      <div className="prose prose-primary max-w-none text-primary/80 leading-relaxed">
+                      <div className="prose prose-primary max-w-none text-primary/80 leading-relaxed whitespace-pre-wrap">
                         <ScriptureText text={searchAiResponse} />
                       </div>
                     </div>
@@ -421,6 +449,7 @@ export default function StudyCenter() {
           {activeTab === 'dialogue' && (
             <motion.div
               key="dialogue-tab"
+              ref={dialogueSectionRef}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
@@ -434,7 +463,10 @@ export default function StudyCenter() {
                   </div>
                 </div>
 
-                <div className="flex-grow overflow-y-auto p-6 space-y-6">
+                <div 
+                  ref={chatContainerRef}
+                  className="flex-grow overflow-y-auto p-6 space-y-6"
+                >
                   {messages.length === 0 && (
                     <div className="h-full flex flex-col items-center justify-center text-center px-8">
                       <BookOpen className="h-12 w-12 text-secondary/10 mb-4" />
@@ -447,7 +479,7 @@ export default function StudyCenter() {
                       <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center border ${msg.role === 'user' ? 'bg-accent/10 border-accent/20 text-accent' : 'bg-zinc-800 border-white/5 text-secondary/60'}`}>
                         {msg.role === 'user' ? <User className="h-4 w-4" /> : <BookOpen className="h-4 w-4" />}
                       </div>
-                      <div className={`max-w-[80%] p-4 rounded-2xl font-serif text-base ${msg.role === 'user' ? 'bg-accent text-white rounded-tr-none' : 'bg-white/5 text-secondary/80 rounded-tl-none italic'}`}>
+                      <div className={`max-w-[80%] p-4 rounded-2xl font-serif text-lg whitespace-pre-wrap ${msg.role === 'user' ? 'bg-accent text-white rounded-tr-none' : 'bg-white/5 text-secondary/80 rounded-tl-none italic'}`}>
                         <ScriptureText 
                           text={msg.text} 
                           linkClassName={msg.role === 'user' ? 'text-white underline font-bold' : 'text-accent-light hover:text-white underline decoration-dotted transition-colors'}
