@@ -156,5 +156,158 @@ Believers are "complete in Him" (Col 2:10), baptized into His death, burial, and
 Note on "Hyper-Dispensationalism":
 Believing the Body of Christ began with Paul's ministry (Mid-Acts) is often labeled "hyper-dispensationalism," but this view simply recognizes the unique apostleship of Paul and the distinction between Israel's prophetic program and the mystery. Clarity on the "one baptism" is a natural result of rightly dividing the word of truth.
     `
+  },
+  {
+    title: "What Happens Immediately After the Rapture (The Resumption of Prophecy)",
+    content: `
+The Rapture does not merely remove the Body of Christ. It releases the prophetic program that has been paused since Acts 7. The moment the mystery program ends, the prophetic clock—frozen for nearly 2,000 years—starts ticking again.
+
+1. The Body of Christ Is Removed From Earth
+A. The Rapture ends the mystery program instantly: No transition, no overlap, no blending of programs. The removal of the Body ends Gentile priority, the gospel of grace, the "one new man," and the heavenly calling on earth.
+B. The Restrainer is removed (2 Thess. 2:6–7): The "he" that restrains is tied to the Body of Christ, the Spirit’s present ministry through the Body, and the mystery program itself. When the Body goes up, the restraint goes with it.
+
+2. Prophecy Resumes the Moment the Body Is Gone
+A. The prophetic program cannot operate until the mystery program ends. Once the Body is removed, Israel’s fall is no longer in effect, God resumes covenant dealings, and the stage is set for Daniel’s 70th week.
+B. The "pause" between the 69th and 70th week ends. The gap exists only because Israel fell and the mystery program intervened. Once the mystery ends, prophecy resumes exactly where it left off.
+
+3. Israel Becomes the Focus of God’s Dealings Again
+A. Israel’s blindness is lifted (Rom. 11:25–27): When the Body is removed, the "Gentile fullness" is complete, blindness is lifted, and God turns back to Israel.
+B. God begins preparing Israel for the kingdom: This includes judgment, refining, and purging of the remnant from the apostate nation (the purpose of the Tribulation).
+
+4. The Man of Sin Is Revealed
+A. He cannot be revealed until after the Rapture (2 Thess. 2:3–8): The departure comes first, the restrainer is removed, THEN the man of sin is revealed.
+B. His revelation marks the official resumption of prophecy: He confirms a covenant with Israel (Dan. 9:27), beginning the 70th week.
+
+5. The 70th Week of Daniel Begins
+A. The Tribulation is "Jacob’s trouble" (Jer. 30:7): It is not the Body's trouble, but Israel's trouble.
+B. The purpose of the 70th week: To finish Israel’s transgression, make an end of sins, bring in everlasting righteousness, seal up prophecy, and anoint the most holy (Dan. 9:24).
+C. The final countdown: The Tribulation purifies Israel, judges the nations, and leads directly to Christ’s return.
+
+Sequence of Events:
+1. Body of Christ removed (Ends mystery program)
+2. Restrainer removed (Allows prophetic events)
+3. Prophecy resumes (Pause ends)
+4. Israel becomes central again (Blindness lifted)
+5. Man of sin revealed (After the Rapture)
+6. Covenant confirmed (Start of 70th week)
+7. Tribulation begins (Jacob's trouble)
+    `
+  },
+  {
+    title: "New Creation in Christ and the Believer (2 Corinthians 5:17)",
+    content: `
+A careful examination of 2 Corinthians 5:17 reveals a significant translational and doctrinal nuance regarding the "new creation."
+
+1. The Greek Text and Editorial Additions
+The Greek text reads: "ὥστε εἴ τις ἐν Χριστῷ, καινὴ κτίσις." Literally: "Therefore if anyone in Christ — new creation." The phrase "he is" is not in the original manuscripts; it is an editorial addition. While Greek often omits the verb "to be," the absence here allows for a broader interpretation than just the individual's internal state.
+
+2. "New Creation" vs. "New Creature"
+The user's perspective is that "new creation" refers to the "new man" or the new redemptive order God has inaugurated in Christ, rather than the individual believer being made "new" in their flesh.
+• The believer, in the flesh, is certainly not made new; "old things" (the fallen nature) have not passed away in this life.
+• Romans 7:18: "For I know that in me (that is, in my flesh,) dwelleth no good thing."
+• Galatians 5:17: The conflict between flesh and Spirit continues.
+
+3. Participation in a New Reality
+The "new creation" refers to the corporate new humanity and the new order of reconciliation.
+• 2 Cor 5:18-19: The context is God reconciling the world to Himself and creating a new order through Christ.
+• Anyone in Christ participates in this new creation reality. They have a new standing and identity, even while still living in mortal, unredeemed flesh.
+• The "new man" (Eph 2:15, Col 3:10) refers to the corporate Body of Christ—the "one new man"—rather than an individual's self-improvement.
+
+Conclusion:
+The emphasis of 2 Corinthians 5:17 is not that the fleshly person becomes intrinsically new, but that union with Christ places the believer into God's new creation reality. The believer awaits the final "redemption of our body" (Rom 8:23) to fully realize this newness.
+    `
+  },
+  {
+    title: "Righteousness, Justification, and Sanctification",
+    content: `
+A believer is declared righteous through faith, not made inherently righteous in their flesh. This distinction protects the gospel and ensures the believer's security.
+
+1. Justification is a Legal Verdict
+Paul uses courtroom language (justify, impute, reckon, count). Justification is a verdict, not a moral transformation.
+• Romans 4:5: "God justifies the ungodly."
+• Romans 3:22: Righteousness is "by faith of Jesus Christ" and is credited to the believer's account (imputation).
+
+2. Justification vs. Sanctification
+Paul keeps these categories separate to ensure that standing before God is not tied to performance.
+• Justification: A once-for-all legal act (Romans 5:1). Righteousness is imputed (credited).
+• Sanctification: A present walk, growth, and struggle with sin (Romans 6). Righteousness is worked out in life (impartation).
+• Standing (Justification) is perfect and complete in Christ.
+• Condition (Sanctification) is still being worked out and is often imperfect (Romans 7).
+
+3. Why the Distinction Matters
+If righteousness were something you become in yourself, justification would be unstable. Because it is declared based on Christ, it is complete, secure, and not subject to fluctuation.
+    `
+  },
+  {
+    title: "Paul vs. James and the Judgment of Works",
+    content: `
+Understanding the relationship between faith and works requires distinguishing between justification before God and the demonstration of faith before men.
+
+1. Different Uses of "Justify"
+• Paul (Romans 3:28): Legal declaration before God, apart from works.
+• James (James 2:24): Demonstration or vindication of faith before men. Works prove faith is genuine.
+Paul opposes legalism (trying to earn standing); James opposes empty profession (dead faith).
+
+2. The Judgment Seat of Christ
+Paul teaches that while justification is by faith alone, there is a future judgment "according to works" (2 Cor 5:10; Rom 2:6).
+• Justification (Past): Settled, no condemnation (Rom 8:1).
+• Judgment of Works (Future): For believers, this is an evaluation of life and service for rewards or loss of reward (1 Cor 3:15). It is never about the loss of justification or salvation.
+• Basis of Justification: Faith alone.
+• Evidence at Judgment: Works.
+
+3. The Purpose of Works
+Works do not save, but real faith produces fruit. "Faith without works is dead" (James 2:26) means that if there is no fruit, the "faith" claimed is not real.
+    `
+  },
+  {
+    title: "Sovereignty of God and Human Volition",
+    content: `
+The Bible teaches both God's absolute sovereignty in election and real human responsibility.
+
+1. God's Sovereignty in Election
+Election is God's act, not a response to foreseen faith. Salvation depends on God's mercy (Romans 9).
+• Election is unconditional and grounded in God's will.
+• Fallen man's will is real but enslaved to sin; he does not possess "neutral" free will toward God.
+
+2. Free Volition vs. Neutral Free Will
+• Free Volition (Biblical): A person chooses what they want according to their nature and desires. People sin because they want to; they believe because they have been made willing by grace (John 6:44).
+• Neutral Free Will (Philosophical): The idea that the will is neutral and stands above nature or God. This is not found in Scripture, which describes man as "dead in sins" and "hostile to God."
+
+3. Grace and the Will
+Grace does not violate the will; it liberates it. God creates a new nature, and the will follows. Choices are real and accountability is just, but God gets all the glory for salvation.
+    `
+  },
+  {
+    title: "The Fabrication of a New Nature",
+    content: `
+The "old nature / new nature" framework is a theological fabrication, not a scriptural category. Scripture defines the believer's condition through identity in Christ and the indwelling Spirit, rather than internal moral principles.
+
+1. Critique of the "Two Nature" Model
+The idea that believers possess two internal natures (old and new) is a human construct.
+• No Scriptural Support: The Bible never uses the terms "old nature" or "new nature" to describe internal moral principles.
+• Risk of Self-Righteousness: Attributing righteousness to an internal "new nature" can lead to boasting and judgmental attitudes, as if the believer has an inherent moral capacity.
+• Diminishing God's Glory: If righteousness originates in a "new nature," it shifts the focus away from total dependence on Christ.
+
+2. Scriptural Terminology: Identity and Position
+Paul consistently defines the believer's newness relationally and positionally, not as an internal composition.
+• "In Christ": The believer's life is located in Christ, not generated from the flesh. (2 Cor 5:17, Col 3:3)
+• The "New Man": A sphere of existence or identity that one "puts on" (Eph 4:24, Col 3:10), rather than a second internal nature.
+• The "Old Man": Our former Adamic identity, which was crucified with Christ (Rom 6:6). It is not a continuing nature.
+
+3. The Reality of the Flesh
+The flesh remains sinful and incapable of righteousness even after salvation.
+• Romans 7:18: "In me (that is, in my flesh,) dwelleth no good thing."
+• Galatians 5:17: The conflict is between the fallen flesh and the indwelling Spirit, not between two internal natures.
+
+4. The Source of Life: Christ Himself
+The Christian life is not self-improvement or the development of a new human capacity; it is Christ Himself living through the believer.
+• Galatians 2:20: "I live; yet not I, but Christ liveth in me."
+• Colossians 3:4: "Christ, who is our life..."
+• Philippians 1:21: "For to me to live is Christ."
+• 2 Corinthians 4:10-11: The life of Jesus is manifested in our mortal flesh.
+
+Conclusion:
+The "two nature" model is a man-made explanation that can obscure our absolute dependence on God. The scriptural model is that the believer exists in the "new man" (Christ), while the flesh remains the arena of conflict. Righteousness and growth flow entirely from Christ through the Spirit, ensuring all glory belongs to God (1 Cor 1:31).
+    `
   }
 ];
