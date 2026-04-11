@@ -18,7 +18,6 @@ import {
   AlertCircle,
   Trophy,
   Home,
-  Bug,
   Loader2,
   Maximize2,
   X
@@ -26,7 +25,7 @@ import {
 import { GoogleGenAI } from "@google/genai";
 import { useNavigate, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { prophecyMysteryData } from '../data/prophecyMysteryData';
+import { lawGraceStudyData } from '../data/lawGraceStudyData';
 import { Module, Lesson, Question } from '../data/baptismStudyData';
 import ScriptureText from '../components/ScriptureText';
 import { DebugPanel } from '../components/DebugPanel';
@@ -68,7 +67,7 @@ const AIGuide = ({
   const [input, setInput] = useState('');
   const [isEnlarged, setIsEnlarged] = useState(false);
   const [messages, setMessages] = useState<{ role: 'user' | 'guide'; text: string }[]>([
-    { role: 'guide', text: `Hello! I'm your study guide for this lesson on "${lesson.title}". What questions do you have about the distinctions between Prophecy and the Mystery?` }
+    { role: 'guide', text: `Hello! I'm your study guide for this lesson on "${lesson.title}". What questions do you have about the distinctions between Law and Grace?` }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -89,7 +88,6 @@ const AIGuide = ({
     setInput('');
 
     try {
-      // Log the question immediately so we don't lose it if the AI fails or user navigates
       await studyLogger.logSessionInteraction(sessionId, lesson.title, {
         type: 'question',
         data: {
@@ -105,13 +103,12 @@ const AIGuide = ({
       }
       const ai = new GoogleGenAI({ apiKey });
       
-      // Build conversation history for context
       const history = messages.map(m => `${m.role === 'user' ? 'USER' : 'GUIDE'}: ${m.text}`).join('\n');
       
       const prompt = `
         You are an interactive, scripture-first study guide for a lesson titled "${lesson.title}".
         CRITICAL: You MUST prioritize and defer to the Scriptures (King James Bible and New International Version) as your original and primary sources for answering any inquiries.
-        Your goal is to help the user understand the biblical distinction between Prophecy (God's program for Israel) and the Mystery (God's program for the Body of Christ) based ONLY on the provided scriptures and source material, always applying the principle of 'rightly dividing the Word of Truth' (2 Timothy 2:15).
+        Your goal is to help the user understand the biblical distinction between Law (God's program for Israel) and Grace (God's program for the Body of Christ) based ONLY on the provided scriptures and source material, always applying the principle of 'rightly dividing the Word of Truth' (2 Timothy 2:15).
         
         SCRIPTURES:
         ${lesson.scripture.map(s => `${s.reference}: ${s.text}`).join('\n')}
@@ -128,7 +125,7 @@ const AIGuide = ({
         4. If a concept is not supported by the selected sources, say so clearly.
         5. Be educational, encouraging, and clear.
         6. ${isLeaderMode ? "You are in LEADER MODE. Provide additional facilitator notes and deeper theological insights for a small group setting." : "You are in SOLO MODE. Focus on helping the individual student grasp the core concepts."}
-        7. MAINTAIN CONTEXT. Refer back to previous parts of the conversation if relevant. Do not start every message with a generic welcome if the conversation is already underway.
+        7. MAINTAIN CONTEXT. Refer back to previous parts of the conversation if relevant.
         8. Always apply the principle of "rightly dividing the Word of Truth" (2 Timothy 2:15).
         
         CONVERSATION HISTORY:
@@ -145,7 +142,6 @@ const AIGuide = ({
       const guideResponse = response.text || "I'm sorry, I couldn't generate a response.";
       setMessages(prev => [...prev, { role: 'guide', text: guideResponse }]);
       
-      // Log the full interaction to the same session
       studyLogger.logSessionInteraction(sessionId, lesson.title, {
         type: 'question',
         data: {
@@ -258,16 +254,6 @@ const AIGuide = ({
               <ArrowRight className="h-5 w-5" />
             </button>
           </div>
-          {isEnlarged && (
-            <div className="mt-2 text-center">
-              <button 
-                onClick={() => setIsEnlarged(false)}
-                className="text-[10px] uppercase tracking-widest text-primary/40 hover:text-primary font-bold transition-colors"
-              >
-                Minimize Guide
-              </button>
-            </div>
-          )}
         </div>
       </motion.div>
     </div>
@@ -295,9 +281,9 @@ const Quiz = ({
 
   const getEncouragingRemark = (scorePercent: number) => {
     if (scorePercent === 100) return "Excellent work! You are rightly dividing the word of truth.";
-    if (scorePercent >= 80) return "Great job! You have a strong understanding of the distinctions.";
-    if (scorePercent >= 60) return "Good effort! Review the differences between Prophecy and Mystery to sharpen your understanding.";
-    return "Don't be discouraged! These are foundational truths that take time to grasp. Review the scriptures and try again.";
+    if (scorePercent >= 80) return "Great job! You have a strong understanding of Law and Grace.";
+    if (scorePercent >= 60) return "Good effort! Review the purpose of the Law to sharpen your understanding.";
+    return "Don't be discouraged! These are foundational truths. Review the scriptures and try again.";
   };
 
   const currentQuestion = questions[currentIdx];
@@ -308,7 +294,6 @@ const Quiz = ({
       setScore(s => s + 1);
     }
     
-    // Log individual question result
     studyLogger.logSessionInteraction(sessionId, lesson.title, {
       type: 'quiz',
       data: {
@@ -436,7 +421,7 @@ const Quiz = ({
 
 // --- Main Page ---
 
-export default function ProphecyMysteryStudy() {
+export default function LawGraceStudy() {
   const { user, setAuthError } = useAuth();
   const navigate = useNavigate();
   const [currentModuleIdx, setCurrentModuleIdx] = useState(0);
@@ -457,7 +442,7 @@ export default function ProphecyMysteryStudy() {
 
   const hasBuilderAccess = user?.email === ALLOWED_BUILDER_EMAIL;
 
-  const visibleStudyData = prophecyMysteryData.map(module => ({
+  const visibleStudyData = lawGraceStudyData.map(module => ({
     ...module,
     lessons: module.lessons.filter(lesson => 
       hasBuilderAccess || !RESTRICTED_AUTHORS.includes(lesson.sourceText.author)
@@ -477,7 +462,6 @@ export default function ProphecyMysteryStudy() {
   }, [currentModuleIdx, currentLessonIdx, showQuiz, isStudyComplete]);
 
   const nextLesson = () => {
-    // Reset session ID for new lesson
     setSessionId(`session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`);
     
     if (currentLessonIdx < currentModule.lessons.length - 1) {
@@ -530,16 +514,16 @@ export default function ProphecyMysteryStudy() {
           </div>
           <h1 className="text-4xl md:text-5xl font-serif font-bold text-primary mb-6">Study Complete!</h1>
           <p className="text-xl text-primary/60 mb-12 leading-relaxed">
-            You have successfully completed the study on <span className="text-accent font-bold">Prophecy vs. Mystery</span>. 
-            May these scriptural truths strengthen your walk in the dispensation of Grace.
+            You have successfully completed the study on <span className="text-accent font-bold">Law and Grace</span>. 
+            Understanding these distinctions is foundational to rightly dividing the word of truth.
           </p>
           
-          <Link to="/law-grace-study" className="block bg-secondary-light/50 p-8 rounded-3xl mb-12 text-left hover:bg-secondary-light transition-colors group">
+          <Link to="/baptism-study" className="block bg-secondary-light/50 p-8 rounded-3xl mb-12 text-left hover:bg-secondary-light transition-colors group">
             <h3 className="text-sm font-bold text-primary/40 uppercase tracking-widest mb-4">Suggested Next Lesson</h3>
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="text-xl font-serif font-bold text-primary group-hover:text-accent transition-colors">Law and Grace</h4>
-                <p className="text-sm text-primary/60">Understand the distinctions between God's program for Israel and the Body of Christ.</p>
+                <h4 className="text-xl font-serif font-bold text-primary group-hover:text-accent transition-colors">The Biblical View of Water Baptism</h4>
+                <p className="text-sm text-primary/60">Explore the meaning of baptism as identification in the Body of Christ.</p>
               </div>
               <div className="p-3 bg-primary text-secondary rounded-full group-hover:bg-accent transition-colors">
                 <ChevronRight className="h-6 w-6" />
@@ -572,7 +556,7 @@ export default function ProphecyMysteryStudy() {
               <span className="text-xs font-mono uppercase tracking-[0.2em] font-bold">Scripture-First Study</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-serif font-bold text-primary tracking-tight">
-              Prophecy vs. Mystery
+              Law and Grace
             </h1>
           </div>
           
@@ -676,7 +660,7 @@ export default function ProphecyMysteryStudy() {
                 <Lightbulb className="h-8 w-8 text-accent mb-4" />
                 <h4 className="font-serif font-bold mb-2">Study Tip</h4>
                 <p className="text-xs text-secondary/70 leading-relaxed font-light">
-                  Rightly dividing the word of truth is the key to understanding your Bible. Pay close attention to who is being addressed in each passage.
+                  The Law was a schoolmaster. Grace is the teacher. Understanding the transition is key to your spiritual freedom.
                 </p>
               </div>
               <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full -mr-16 -mt-16 blur-2xl" />
@@ -685,65 +669,6 @@ export default function ProphecyMysteryStudy() {
 
           {/* Main Content Area */}
           <div className="lg:col-span-6">
-            {!user && !dismissedAuthPrompt && (
-              <motion.div 
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                className="bg-white border-2 border-accent/20 p-6 rounded-[2rem] mb-8 shadow-xl shadow-accent/5 relative overflow-hidden"
-              >
-                <div className="absolute top-0 right-0 p-2">
-                  <button 
-                    onClick={() => setDismissedAuthPrompt(true)}
-                    className="p-1 hover:bg-secondary-light rounded-full text-primary/20 hover:text-primary/40 transition-colors"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-                
-                <div className="flex flex-col md:flex-row gap-6 items-start">
-                  <div className="p-4 bg-accent/10 rounded-2xl text-accent flex-shrink-0">
-                    <ShieldCheck className="h-8 w-8" />
-                  </div>
-                  
-                  <div className="flex-1">
-                    <h4 className="text-lg font-serif font-bold text-primary mb-2">Enhance Your Study Experience</h4>
-                    <p className="text-sm text-primary/60 leading-relaxed mb-4">
-                      While you're welcome to study as a guest, signing in offers several benefits:
-                    </p>
-                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6">
-                      {[
-                        "Save your quiz progress",
-                        "Sync across devices",
-                        "Get teacher feedback",
-                        "View your study history"
-                      ].map((benefit, i) => (
-                        <li key={i} className="flex items-center gap-2 text-xs text-primary/70 font-medium">
-                          <CheckCircle2 className="h-3 w-3 text-green-500" />
-                          {benefit}
-                        </li>
-                      ))}
-                    </ul>
-                    
-                    <div className="flex flex-wrap gap-3">
-                      <button 
-                        onClick={handleSignIn}
-                        className="px-6 py-2.5 bg-accent text-white rounded-xl text-xs font-bold hover:bg-accent-light transition-all shadow-lg shadow-accent/20 flex items-center gap-2"
-                      >
-                        <LogIn className="h-4 w-4" />
-                        Sign In with Google
-                      </button>
-                      <button 
-                        onClick={() => setDismissedAuthPrompt(true)}
-                        className="px-6 py-2.5 bg-secondary-light text-primary/60 rounded-xl text-xs font-bold hover:bg-primary/5 transition-all"
-                      >
-                        Continue as Guest
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
             <ProgressBar current={currentModuleIdx + 1} total={visibleStudyData.length} />
             
             <AnimatePresence mode="wait">
@@ -899,32 +824,10 @@ export default function ProphecyMysteryStudy() {
             </AnimatePresence>
           </div>
 
-          {/* AI Guide Area */}
+          {/* AI Guide Sidebar */}
           <div className="lg:col-span-3">
-            <div className="sticky top-24">
-              <AIGuide 
-                lesson={currentLesson} 
-                isLeaderMode={isLeaderMode} 
-                sessionId={sessionId}
-              />
-              
-              {isLeaderMode && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 p-6 bg-white rounded-3xl border border-accent/20 shadow-sm"
-                >
-                  <h5 className="text-accent font-bold text-xs uppercase tracking-widest mb-4 flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    Leader Notes
-                  </h5>
-                  <ul className="space-y-3 text-xs text-primary/60 leading-relaxed list-disc pl-4">
-                    <li>Ask the group if they can find the word "Mystery" in the Old Testament.</li>
-                    <li>Discuss the implications of a "secret" program vs. a "prophesied" one.</li>
-                    <li>Help the group see that Paul is our apostle for today.</li>
-                  </ul>
-                </motion.div>
-              )}
+            <div className="sticky top-8">
+              <AIGuide lesson={currentLesson} isLeaderMode={isLeaderMode} sessionId={sessionId} />
             </div>
           </div>
 

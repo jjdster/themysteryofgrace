@@ -22,6 +22,7 @@ import {
   Home,
   Loader2,
   Bug,
+  Maximize2,
   X
 } from 'lucide-react';
 import { GoogleGenAI, Type } from "@google/genai";
@@ -30,6 +31,7 @@ import ReactMarkdown from 'react-markdown';
 import { baptismStudyData, Module, Lesson, Question } from '../data/baptismStudyData';
 import ScriptureText from '../components/ScriptureText';
 import { DebugPanel } from '../components/DebugPanel';
+import { SpeakButton } from '../components/SpeakButton';
 import { studyLogger } from '../lib/logger';
 import { getGeminiApiKey } from '../lib/api';
 import { useAuth } from '../lib/AuthProvider';
@@ -194,7 +196,7 @@ const AIGuide = ({
         <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-4 bg-secondary-light/30">
           {messages.map((msg, i) => (
             <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed ${
+                  <div className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed relative group ${
                 msg.role === 'user' 
                   ? 'bg-accent text-white rounded-tr-none' 
                   : 'bg-white border border-primary/10 text-primary rounded-tl-none shadow-sm'
@@ -202,22 +204,25 @@ const AIGuide = ({
                 {msg.role === 'user' ? (
                   <ScriptureText text={msg.text} />
                 ) : (
-                  <div className="markdown-body">
-                    <ReactMarkdown
-                      components={{
-                        p: ({ children }) => <p className="mb-4 last:mb-0">{children}</p>,
-                        h1: ({ children }) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
-                        h2: ({ children }) => <h2 className="text-md font-bold mb-2">{children}</h2>,
-                        h3: ({ children }) => <h3 className="text-sm font-bold mb-1">{children}</h3>,
-                        ul: ({ children }) => <ul className="list-disc pl-4 mb-4">{children}</ul>,
-                        ol: ({ children }) => <ol className="list-decimal pl-4 mb-4">{children}</ol>,
-                        li: ({ children }) => <li className="mb-1">{children}</li>,
-                        blockquote: ({ children }) => <blockquote className="border-l-4 border-accent/20 pl-4 italic mb-4">{children}</blockquote>,
-                      }}
-                    >
-                      {msg.text}
-                    </ReactMarkdown>
-                  </div>
+                  <>
+                    <div className="markdown-body">
+                      <ReactMarkdown
+                        components={{
+                          p: ({ children }) => <p className="mb-4 last:mb-0">{children}</p>,
+                          h1: ({ children }) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
+                          h2: ({ children }) => <h2 className="text-md font-bold mb-2">{children}</h2>,
+                          h3: ({ children }) => <h3 className="text-sm font-bold mb-1">{children}</h3>,
+                          ul: ({ children }) => <ul className="list-disc pl-4 mb-4">{children}</ul>,
+                          ol: ({ children }) => <ol className="list-decimal pl-4 mb-4">{children}</ol>,
+                          li: ({ children }) => <li className="mb-1">{children}</li>,
+                          blockquote: ({ children }) => <blockquote className="border-l-4 border-accent/20 pl-4 italic mb-4">{children}</blockquote>,
+                        }}
+                      >
+                        {msg.text}
+                      </ReactMarkdown>
+                    </div>
+                    <SpeakButton text={msg.text} size="sm" className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </>
                 )}
               </div>
             </div>
@@ -276,11 +281,13 @@ const AIGuide = ({
 const Quiz = ({ 
   lesson,
   onComplete,
-  sessionId
+  sessionId,
+  isLastLesson
 }: { 
   lesson: Lesson; 
   onComplete: (score: number) => void;
   sessionId: string;
+  isLastLesson?: boolean;
 }) => {
   const [questions, setQuestions] = useState<Question[]>(lesson.questions);
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -433,7 +440,7 @@ const Quiz = ({
               onClick={() => onComplete(finalScore)}
               className="px-8 py-3 bg-primary text-secondary rounded-xl font-bold hover:bg-primary-light transition-colors"
             >
-              Continue
+              {isLastLesson ? 'Complete Study' : 'Continue'}
             </button>
           ) : (
             <button 
@@ -619,6 +626,18 @@ export default function BaptismStudy() {
     }
   };
 
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  };
+
   if (isStudyComplete) {
     return (
       <div className="min-h-screen bg-secondary-light flex items-center justify-center p-4">
@@ -717,6 +736,24 @@ export default function BaptismStudy() {
             >
               <ShieldCheck className="h-4 w-4" />
               Leader Mode
+            </button>
+
+            <button 
+              onClick={toggleFullscreen}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border border-primary/10 bg-white text-primary/40 hover:text-accent hover:border-accent/30 transition-all"
+              title="Toggle Fullscreen"
+            >
+              <Maximize2 className="h-4 w-4" />
+              Fullscreen
+            </button>
+
+            <button 
+              onClick={() => navigate('/studies')}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border border-primary/10 bg-white text-primary/40 hover:text-red-500 hover:border-red-200 transition-all"
+              title="Exit Study"
+            >
+              <X className="h-4 w-4" />
+              Exit
             </button>
           </div>
         </div>
@@ -884,13 +921,16 @@ export default function BaptismStudy() {
                       <Info className="h-4 w-4" />
                       Source Insight
                     </h3>
-                    <div className="bg-secondary-light/50 p-8 rounded-3xl border border-primary/10 italic">
+                    <div className="bg-secondary-light/50 p-8 rounded-3xl border border-primary/10 italic relative group">
                       <p className="text-primary/70 leading-relaxed mb-4 font-light">
                         "{currentLesson.sourceText.excerpt}"
                       </p>
-                      <div className="flex items-center justify-end gap-2 text-xs font-bold text-primary/40">
-                        <span>— {currentLesson.sourceText.author},</span>
-                        <span className="italic">{currentLesson.sourceText.book}</span>
+                      <div className="flex items-center justify-between">
+                        <SpeakButton text={currentLesson.sourceText.excerpt} size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="flex items-center gap-2 text-xs font-bold text-primary/40">
+                          <span>— {currentLesson.sourceText.author},</span>
+                          <span className="italic">{currentLesson.sourceText.book}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -901,7 +941,10 @@ export default function BaptismStudy() {
                       <FileText className="h-4 w-4" />
                       Comprehensive Summary
                     </h3>
-                    <div className="bg-white p-10 rounded-[2.5rem] border border-primary/5 shadow-xl shadow-primary/5">
+                    <div className="bg-white p-10 rounded-[2.5rem] border border-primary/5 shadow-xl shadow-primary/5 relative group">
+                      <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <SpeakButton text={currentLesson.summary} size="md" />
+                      </div>
                       <div className="prose prose-lg max-w-none">
                         {currentLesson.summary.split('\n\n').map((paragraph, idx) => (
                           <p key={idx} className="text-primary/80 leading-relaxed mb-6 font-light">
@@ -957,7 +1000,9 @@ export default function BaptismStudy() {
                         onClick={nextLesson}
                         className="px-10 py-4 bg-green-600 text-white rounded-2xl font-bold shadow-lg shadow-green-600/20 hover:bg-green-700 transition-all flex items-center gap-2"
                       >
-                        Next Lesson
+                        {currentModuleIdx === visibleStudyData.length - 1 && currentLessonIdx === currentModule.lessons.length - 1 
+                          ? 'Complete Study' 
+                          : 'Next Lesson'}
                         <ChevronRight className="h-5 w-5" />
                       </button>
                     )}
@@ -974,6 +1019,7 @@ export default function BaptismStudy() {
                     lesson={currentLesson} 
                     onComplete={handleQuizComplete}
                     sessionId={sessionId}
+                    isLastLesson={currentModuleIdx === visibleStudyData.length - 1 && currentLessonIdx === currentModule.lessons.length - 1}
                   />
                 </motion.div>
               )}

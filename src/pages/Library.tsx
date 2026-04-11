@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
-import { Book, Download, ExternalLink, FileText, ChevronLeft, User, Loader2, Search, X, Lock, Shield, BookOpen } from 'lucide-react';
+import { Book, Download, ExternalLink, FileText, ChevronLeft, User, Loader2, Search, X, Lock, Shield, BookOpen, Volume2 } from 'lucide-react';
 import ScriptureText from '../components/ScriptureText';
+import { SpeakButton } from '../components/SpeakButton';
 import { auth } from '../lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
@@ -359,8 +360,11 @@ export default function Library() {
                     >
                       <div className="p-8 h-full flex flex-col">
                         <div className="flex items-start justify-between mb-6">
-                          <div className="p-3 bg-accent/10 rounded-lg text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300">
-                            <Book className="h-6 w-6" />
+                          <div className="flex items-center gap-3">
+                            <div className="p-3 bg-accent/10 rounded-lg text-accent group-hover:bg-accent group-hover:text-white transition-colors duration-300">
+                              <Book className="h-6 w-6" />
+                            </div>
+                            <SpeakButton text={`${book.title} by ${book.author}`} size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity" />
                           </div>
                           <span className="text-xs font-mono text-primary/40 uppercase tracking-widest">
                             PDF Resource
@@ -427,7 +431,10 @@ export default function Library() {
           </div>
           
           <div className="relative z-10">
-            <FileText className="h-12 w-12 mx-auto mb-6 text-accent-light opacity-80" />
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <FileText className="h-12 w-12 text-accent-light opacity-80" />
+              <SpeakButton text='Study to show thyself approved unto God, a workman that needeth not to be ashamed, rightly dividing the word of truth. 2 Timothy 2:15' size="md" className="bg-white/10 rounded-full" />
+            </div>
             <h2 className="text-2xl font-serif font-bold mb-4">Study to Show Thyself Approved</h2>
             <p className="max-w-2xl mx-auto text-secondary/80 font-light leading-relaxed mb-8">
               <ScriptureText text='"Study to show thyself approved unto God, a workman that needeth not to be ashamed, rightly dividing the word of truth."' />

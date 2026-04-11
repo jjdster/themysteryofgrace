@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Play, FileText, Clock, ChevronRight, Book, Shield, Users } from 'lucide-react';
 import ScriptureText from '../components/ScriptureText';
 import { DebugPanel } from '../components/DebugPanel';
@@ -9,6 +9,7 @@ const ALLOWED_BUILDER_EMAIL = 'jjdster@gmail.com';
 
 export default function BibleStudies() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const hasBuilderAccess = user?.email === ALLOWED_BUILDER_EMAIL;
 
   const lessons = [
@@ -35,6 +36,7 @@ export default function BibleStudies() {
       duration: "50 mins",
       description: "Understanding why we are not under the law, but under grace, and what that means for our daily walk.",
       status: "Available",
+      path: "/law-grace-study"
     },
     {
       title: "The Dual Ministry of Christ",
@@ -51,6 +53,16 @@ export default function BibleStudies() {
       status: "Coming Soon",
     },
   ].filter(lesson => !lesson.restricted || hasBuilderAccess);
+
+  const handleStartStudy = (path: string) => {
+    // Attempt to enter fullscreen on user interaction
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(() => {
+        // Ignore errors, as some browsers/environments might block this
+      });
+    }
+    navigate(path);
+  };
 
   return (
     <motion.div 
@@ -103,10 +115,13 @@ export default function BibleStudies() {
               <div className="flex items-center justify-between mt-auto">
                 {lesson.status === "Available" ? (
                   lesson.path ? (
-                    <Link to={lesson.path} className="flex items-center text-primary font-bold hover:text-accent transition-colors">
+                    <button 
+                      onClick={() => handleStartStudy(lesson.path!)} 
+                      className="flex items-center text-primary font-bold hover:text-accent transition-colors"
+                    >
                       <Play className="h-5 w-5 mr-2 fill-current" />
                       Start Lesson
-                    </Link>
+                    </button>
                   ) : (
                     <button className="flex items-center text-primary font-bold hover:text-accent transition-colors">
                       <Play className="h-5 w-5 mr-2 fill-current" />

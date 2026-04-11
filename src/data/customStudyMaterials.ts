@@ -309,5 +309,34 @@ The Christian life is not self-improvement or the development of a new human cap
 Conclusion:
 The "two nature" model is a man-made explanation that can obscure our absolute dependence on God. The scriptural model is that the believer exists in the "new man" (Christ), while the flesh remains the arena of conflict. Righteousness and growth flow entirely from Christ through the Spirit, ensuring all glory belongs to God (1 Cor 1:31).
     `
+  },
+  {
+    title: "Law and Grace",
+    content: `
+Rightly dividing the Word of Truth requires a clear distinction between the Dispensation of Law (given to Israel) and the Dispensation of Grace (revealed to the Body of Christ).
+
+1. The Purpose of the Law
+The Law was not given to save, but to reveal sin and the need for a Savior.
+• Romans 3:20: "By the law is the knowledge of sin."
+• Romans 5:20: "The law entered, that the offence might abound."
+• Galatians 3:24-25: The Law was a "schoolmaster" to bring Israel to Christ, but now that faith has come, we are no longer under a schoolmaster.
+
+2. The Nature of the Law vs. Grace
+• Law: Demands righteousness from man. It is a "ministry of death" and "condemnation" (2 Cor 3:7-9) because no one can keep it perfectly.
+• Grace: Provides righteousness to man as a gift. It is the "ministry of the Spirit" and "righteousness" (2 Cor 3:8-9).
+
+3. Not Under Law, But Under Grace
+Paul's declaration is definitive for the believer today.
+• Romans 6:14: "For sin shall not have dominion over you: for ye are not under the law, but under grace."
+• Romans 10:4: "Christ is the end of the law for righteousness to every one that believeth."
+
+4. The Error of Legalism
+Legalism is the attempt to mix Law and Grace. Paul warns that if salvation or standing is by works, then grace is no more grace.
+• Romans 11:6: "And if by grace, then is it no more of works: otherwise grace is no more grace."
+• Galatians 5:4: "Christ is become of no effect unto you, whosoever of you are justified by the law; ye are fallen from grace." (Falling from grace means falling from the system of grace into the system of law).
+
+Conclusion:
+The Law was a temporary program for Israel to show them their helplessness. Grace is the current program for the Body of Christ, where God's favor is bestowed freely based on Christ's finished work. We do not look to the Law for our rule of life, but to the indwelling Spirit and the instructions given through the Apostle Paul.
+    `
   }
 ];

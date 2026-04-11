@@ -14,7 +14,8 @@ import {
   BookOpen, 
   Info,
   PlayCircle,
-  X
+  X,
+  Volume2
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { GoogleGenAI } from "@google/genai";
@@ -27,6 +28,7 @@ import { baptismStudyData } from '../data/baptismStudyData';
 import { prophecyMysteryData } from '../data/prophecyMysteryData';
 import { CUSTOM_STUDY_MATERIALS } from '../data/customStudyMaterials';
 import { DebugPanel } from '../components/DebugPanel';
+import { SpeakButton } from '../components/SpeakButton';
 
 // Shared Data
 const libraryBooks = [
@@ -140,6 +142,7 @@ export default function StudyCenter() {
   const [dialogueInput, setDialogueInput] = useState('');
   const [isDialogueLoading, setIsDialogueLoading] = useState(false);
   const [dialogueError, setDialogueError] = useState<string | null>(null);
+  const [fullScreenMessage, setFullScreenMessage] = useState<string | null>(null);
   const [sessionId] = useState(() => `study_session_${Date.now()}`);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const dialogueSectionRef = useRef<HTMLDivElement>(null);
@@ -285,6 +288,8 @@ export default function StudyCenter() {
         });
       }
 
+      setFullScreenMessage(fullText);
+
       studyLogger.logSessionInteraction(sessionId, "Study Center Dialogue", {
         type: 'chat',
         data: { userMessage, aiResponse: fullText }
@@ -384,9 +389,12 @@ export default function StudyCenter() {
                     </div>
                   ) : searchAiResponse ? (
                     <div className="bg-white p-8 rounded-3xl border border-accent/20 shadow-lg relative overflow-hidden">
-                      <div className="flex items-center space-x-3 mb-6">
-                        <Sparkles className="h-6 w-6 text-accent" />
-                        <h2 className="text-xl font-serif font-bold text-primary">AI Library Insights</h2>
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center space-x-3">
+                          <Sparkles className="h-6 w-6 text-accent" />
+                          <h2 className="text-xl font-serif font-bold text-primary">AI Library Insights</h2>
+                        </div>
+                        <SpeakButton text={searchAiResponse} size="md" />
                       </div>
                       <div className="prose prose-primary max-w-none text-primary/80 leading-relaxed whitespace-pre-wrap">
                         <ScriptureText text={searchAiResponse} />
@@ -479,11 +487,26 @@ export default function StudyCenter() {
                       <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center border ${msg.role === 'user' ? 'bg-accent/10 border-accent/20 text-accent' : 'bg-zinc-800 border-white/5 text-secondary/60'}`}>
                         {msg.role === 'user' ? <User className="h-4 w-4" /> : <BookOpen className="h-4 w-4" />}
                       </div>
-                      <div className={`max-w-[80%] p-4 rounded-2xl font-serif text-lg whitespace-pre-wrap ${msg.role === 'user' ? 'bg-accent text-white rounded-tr-none' : 'bg-white/5 text-secondary/80 rounded-tl-none italic'}`}>
+                      <div 
+                        onClick={() => msg.role === 'model' && setFullScreenMessage(msg.text)}
+                        className={`max-w-[80%] p-4 rounded-2xl font-serif text-lg whitespace-pre-wrap cursor-pointer transition-all ${
+                          msg.role === 'user' 
+                            ? 'bg-accent text-white rounded-tr-none' 
+                            : 'bg-white/5 text-secondary/80 rounded-tl-none italic hover:bg-white/10'
+                        }`}
+                      >
                         <ScriptureText 
                           text={msg.text} 
                           linkClassName={msg.role === 'user' ? 'text-white underline font-bold' : 'text-accent-light hover:text-white underline decoration-dotted transition-colors'}
                         />
+                        {msg.role === 'model' && (
+                          <div className="flex items-center justify-between mt-2">
+                          <div className="text-[10px] text-secondary/20 flex items-center gap-1">
+                            <Sparkles className="h-2 w-2" /> Click to expand full screen
+                          </div>
+                          <SpeakButton text={msg.text} size="sm" className="bg-white/5 rounded-lg p-1" />
+                        </div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -552,6 +575,49 @@ export default function StudyCenter() {
           )}
         </AnimatePresence>
       </div>
+      {/* Full Screen Dialogue Modal */}
+      <AnimatePresence>
+        {fullScreenMessage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/95 flex flex-col p-6 md:p-12 overflow-y-auto"
+          >
+            <div className="max-w-4xl mx-auto w-full">
+              <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
+                <div className="flex items-center gap-3">
+                  <BookOpen className="h-8 w-8 text-accent" />
+                  <h2 className="text-2xl md:text-3xl font-serif font-bold text-secondary">Scholarly Insight</h2>
+                </div>
+                <div className="flex items-center gap-4">
+                  <SpeakButton text={fullScreenMessage} size="lg" className="bg-white/10 rounded-full" />
+                  <button 
+                    onClick={() => setFullScreenMessage(null)}
+                    className="p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
+                  >
+                    <X className="h-8 w-8" />
+                  </button>
+                </div>
+              </div>
+              <div className="prose prose-invert max-w-none">
+                <div className="text-xl md:text-2xl font-serif text-secondary/90 leading-relaxed whitespace-pre-wrap">
+                  <ScriptureText text={fullScreenMessage} />
+                </div>
+              </div>
+              <div className="mt-12 flex justify-center">
+                <button 
+                  onClick={() => setFullScreenMessage(null)}
+                  className="px-8 py-4 bg-accent text-white rounded-2xl font-bold hover:bg-accent-light transition-all shadow-xl"
+                >
+                  Close Insight
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <DebugPanel />
     </motion.div>
   );
