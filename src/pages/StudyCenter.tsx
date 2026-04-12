@@ -26,6 +26,8 @@ import { studyLogger } from '../lib/logger';
 import ScriptureText from '../components/ScriptureText';
 import { baptismStudyData } from '../data/baptismStudyData';
 import { prophecyMysteryData } from '../data/prophecyMysteryData';
+import { sevenOnesData } from '../data/sevenOnesData';
+import { dualMinistryData } from '../data/dualMinistryData';
 import { CUSTOM_STUDY_MATERIALS } from '../data/customStudyMaterials';
 import { DebugPanel } from '../components/DebugPanel';
 import { SpeakButton } from '../components/SpeakButton';
@@ -215,16 +217,21 @@ export default function StudyCenter() {
       }
     });
 
-    const allStudies = [...baptismStudyData, ...prophecyMysteryData];
+    const allStudies = [...baptismStudyData, ...prophecyMysteryData, ...sevenOnesData, ...dualMinistryData];
     allStudies.forEach(module => {
       module.lessons.forEach(lesson => {
         if (lesson.title.toLowerCase().includes(lowerQuery) || lesson.summary.toLowerCase().includes(lowerQuery)) {
+          let link = '/baptism-study';
+          if (module.id.includes('prophecy')) link = '/prophecy-mystery-study';
+          if (module.id.includes('seven-ones')) link = '/seven-ones-study';
+          if (module.id.includes('dual')) link = '/dual-ministry-study';
+          
           localResults.push({
             type: 'lesson',
             title: lesson.title,
             subtitle: `${module.title} • ${lesson.sourceText.author}`,
             content: lesson.summary.substring(0, 100) + '...',
-            link: module.id.includes('prophecy') ? '/prophecy-mystery-study' : '/baptism-study'
+            link
           });
         }
       });

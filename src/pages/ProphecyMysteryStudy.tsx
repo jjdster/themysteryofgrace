@@ -36,6 +36,7 @@ import { getGeminiApiKey } from '../lib/api';
 import { useAuth } from '../lib/AuthProvider';
 import { signInWithGoogle } from '../lib/firebase';
 import { LogIn } from 'lucide-react';
+import AuthModal from '../components/AuthModal';
 
 const RESTRICTED_AUTHORS = ['Charles F. Baker', 'Harry Bultema', 'Cornelius R. Stam', 'C.R. Stam'];
 const ALLOWED_BUILDER_EMAIL = 'jjdster@gmail.com';
@@ -931,6 +932,7 @@ export default function ProphecyMysteryStudy() {
         </div>
       </div>
       <DebugPanel />
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>
   );
 }

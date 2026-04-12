@@ -15,13 +15,15 @@ import MessageBoard from './pages/MessageBoard';
 import BaptismStudy from './pages/BaptismStudy';
 import ProphecyMysteryStudy from './pages/ProphecyMysteryStudy';
 import LawGraceStudy from './pages/LawGraceStudy';
+import SevenOnesStudy from './pages/SevenOnesStudy';
+import DualMinistryStudy from './pages/DualMinistryStudy';
 import { motion, AnimatePresence } from 'framer-motion';
 import ErrorBoundary from './components/ErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
 
 function Layout() {
   const location = useLocation();
-  const isStudyPage = ['/baptism-study', '/prophecy-mystery-study', '/law-grace-study'].includes(location.pathname);
+  const isStudyPage = ['/baptism-study', '/prophecy-mystery-study', '/law-grace-study', '/seven-ones-study', '/dual-ministry-study'].includes(location.pathname);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -39,6 +41,8 @@ function Layout() {
             <Route path="/baptism-study" element={<BaptismStudy />} />
             <Route path="/prophecy-mystery-study" element={<ProphecyMysteryStudy />} />
             <Route path="/law-grace-study" element={<LawGraceStudy />} />
+            <Route path="/seven-ones-study" element={<SevenOnesStudy />} />
+            <Route path="/dual-ministry-study" element={<DualMinistryStudy />} />
             <Route path="/study-center" element={<StudyCenter />} />
             <Route path="/asking" element={<StudyCenter />} />
             <Route path="/library" element={<Library />} />

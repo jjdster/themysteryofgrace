@@ -1,8 +1,10 @@
-import { motion } from 'framer-motion';
-import { ExternalLink, Link as LinkIcon } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ExternalLink, Link as LinkIcon, X } from 'lucide-react';
 import ScriptureText from '../components/ScriptureText';
 
 export default function Links() {
+  const [showNavTip, setShowNavTip] = useState(false);
   const links = [
     {
       title: "Grace School of the Bible",
@@ -25,6 +27,16 @@ export default function Links() {
       description: "Teaching the Mystery that was kept secret since the world began."
     },
     {
+      title: "King James Bible (KJV)",
+      url: "https://www.bible.com/bible/1/GEN.1.KJV",
+      description: "The Authorized Version of the Holy Bible, our primary source for scripture study."
+    },
+    {
+      title: "New International Version (NIV)",
+      url: "https://www.bible.com/bible/111/GEN.1.NIV",
+      description: "A modern English translation of the Bible, used alongside the KJV in our studies."
+    },
+    {
       title: "Parsons Publishing Company",
       url: "https://www.parsonspublishingcompany.com",
       description: "Providing literature and resources dedicated to the preaching of Jesus Christ according to the revelation of the Mystery."
@@ -39,6 +51,28 @@ export default function Links() {
       className="bg-secondary min-h-screen pb-20"
     >
       <header className="bg-primary py-24 text-center">
+        <AnimatePresence>
+          {showNavTip && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="fixed top-24 left-1/2 -translate-x-1/2 z-[60] bg-accent text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 max-w-md border border-white/20"
+            >
+              <div className="p-2 bg-white/20 rounded-lg">
+                <ExternalLink className="h-5 w-5" />
+              </div>
+              <div className="flex-1 text-left">
+                <p className="text-sm font-bold">Opening External Link</p>
+                <p className="text-xs opacity-90">External sites cannot show our header. To return, simply close the new tab or click back to this tab.</p>
+              </div>
+              <button onClick={() => setShowNavTip(false)} className="p-1 hover:bg-white/10 rounded-full transition-colors">
+                <X className="h-4 w-4" />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -76,6 +110,10 @@ export default function Links() {
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => {
+                      setShowNavTip(true);
+                      setTimeout(() => setShowNavTip(false), 8000);
+                    }}
                     className="inline-flex items-center text-accent font-bold hover:text-accent-light transition-colors"
                   >
                     Visit Website

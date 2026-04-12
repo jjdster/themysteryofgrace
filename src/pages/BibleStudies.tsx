@@ -1,6 +1,7 @@
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { Play, FileText, Clock, ChevronRight, Book, Shield, Users } from 'lucide-react';
+import { Play, FileText, Clock, ChevronRight, Book, Shield, Users, ExternalLink, X } from 'lucide-react';
 import ScriptureText from '../components/ScriptureText';
 import { DebugPanel } from '../components/DebugPanel';
 import { useAuth } from '../lib/AuthProvider';
@@ -10,6 +11,7 @@ const ALLOWED_BUILDER_EMAIL = 'jjdster@gmail.com';
 export default function BibleStudies() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [showNavTip, setShowNavTip] = useState(false);
   const hasBuilderAccess = user?.email === ALLOWED_BUILDER_EMAIL;
 
   const lessons = [
@@ -43,14 +45,16 @@ export default function BibleStudies() {
       category: "Advanced",
       duration: "60 mins",
       description: "Exploring Christ's earthly ministry to the circumcision vs. His heavenly ministry to the uncircumcision.",
-      status: "Coming Soon",
+      status: "Available",
+      path: "/dual-ministry-study"
     },
     {
       title: "The Seven Ones of Ephesians",
       category: "Foundational",
       duration: "40 mins",
       description: "A deep dive into the unity of the Spirit in the bond of peace.",
-      status: "Coming Soon",
+      status: "Available",
+      path: "/seven-ones-study"
     },
   ].filter(lesson => !lesson.restricted || hasBuilderAccess);
 
@@ -72,6 +76,28 @@ export default function BibleStudies() {
       className="bg-secondary min-h-screen pb-20"
     >
       <header className="bg-primary py-24 text-center">
+        <AnimatePresence>
+          {showNavTip && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="fixed top-24 left-1/2 -translate-x-1/2 z-[60] bg-accent text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 max-w-md border border-white/20"
+            >
+              <div className="p-2 bg-white/20 rounded-lg">
+                <ExternalLink className="h-5 w-5" />
+              </div>
+              <div className="flex-1 text-left">
+                <p className="text-sm font-bold">Opening Bible in New Tab</p>
+                <p className="text-xs opacity-90">External sites like Bible.com cannot show our header. To return, simply close the new tab or click back to this tab.</p>
+              </div>
+              <button onClick={() => setShowNavTip(false)} className="p-1 hover:bg-white/10 rounded-full transition-colors">
+                <X className="h-4 w-4" />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -188,13 +214,26 @@ export default function BibleStudies() {
             <div className="w-16 h-1 bg-accent mx-auto mt-4"></div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {['Online Bible', 'Greek Lexicon', 'Pauline Timeline', 'Grace Library'].map((tool) => (
+            {[
+              { name: 'Online Bible (KJV)', url: 'https://www.bible.com/bible/1/GEN.1.KJV' },
+              { name: 'Online Bible (NIV)', url: 'https://www.bible.com/bible/111/GEN.1.NIV' },
+              { name: 'Greek Lexicon', url: 'https://www.blueletterbible.org/lang/lexicon/lexicon.cfm' },
+              { name: 'Grace Library', url: '/library' }
+            ].map((tool) => (
               <Link 
-                key={tool} 
-                to={tool === 'Grace Library' ? '/library' : '#'}
+                key={tool.name} 
+                to={tool.url.startsWith('/') ? tool.url : '#'}
+                onClick={(e) => {
+                  if (!tool.url.startsWith('/')) {
+                    e.preventDefault();
+                    setShowNavTip(true);
+                    setTimeout(() => setShowNavTip(false), 8000);
+                    window.open(tool.url, '_blank');
+                  }
+                }}
                 className="p-6 bg-primary text-secondary rounded-2xl flex items-center justify-between cursor-pointer hover:bg-accent transition-colors"
               >
-                <span className="font-medium tracking-wide">{tool}</span>
+                <span className="font-medium tracking-wide">{tool.name}</span>
                 <ChevronRight className="h-5 w-5" />
               </Link>
             ))}

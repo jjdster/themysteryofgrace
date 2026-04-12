@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSearchParams } from 'react-router-dom';
-import { Book, Download, ExternalLink, FileText, ChevronLeft, User, Loader2, Search, X, Lock, Shield, BookOpen, Volume2 } from 'lucide-react';
+import { useSearchParams, Link } from 'react-router-dom';
+import { Book, Download, ExternalLink, FileText, ChevronLeft, User, Loader2, Search, X, Lock, Shield, BookOpen, Volume2, ArrowLeft } from 'lucide-react';
 import ScriptureText from '../components/ScriptureText';
 import { SpeakButton } from '../components/SpeakButton';
 import { auth } from '../lib/firebase';
@@ -17,7 +17,8 @@ interface BookType {
 
 const initialBooks: BookType[] = [
   // Scripture
-  { id: 'kjv', title: 'King James Bible (1611)', filename: 'KJV_Bible.pdf', author: 'King James Bible', downloadUrl: 'https://cdn.jsdelivr.net/gh/jjdster/grace-library-assets@main/KJV_Bible.pdf' },
+  { id: 'kjv', title: 'King James Bible (1611)', filename: 'KJV_Bible.pdf', author: 'YouVersion (Bible.com)', downloadUrl: 'https://www.bible.com/bible/1/GEN.1.KJV' },
+  { id: 'niv', title: 'New International Version (NIV)', filename: 'NIV_Bible', author: 'YouVersion (Bible.com)', downloadUrl: 'https://www.bible.com/bible/111/GEN.1.NIV' },
 
   // Charles F. Baker
   { id: 'b1', title: 'Real Baptism', filename: 'BakerI01RealBaptism.pdf', author: 'Charles F. Baker' },
@@ -90,9 +91,9 @@ const initialBooks: BookType[] = [
 
 const authors = [
   { 
-    name: 'King James Bible', 
-    description: 'The Authorized Version of the Holy Bible (KJV).',
-    count: 1
+    name: 'YouVersion (Bible.com)', 
+    description: 'A clean, ad-free digital Bible platform providing both KJV and NIV translations.',
+    count: 2
   },
   { 
     name: 'Charles F. Baker', 
@@ -144,6 +145,7 @@ export default function Library() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+  const [showNavTip, setShowNavTip] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -202,6 +204,38 @@ export default function Library() {
       className="min-h-screen bg-secondary-light py-16 px-4 sm:px-6 lg:px-8"
     >
       <div className="max-w-7xl mx-auto">
+        <AnimatePresence>
+          {showNavTip && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="fixed top-24 left-1/2 -translate-x-1/2 z-[60] bg-accent text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 max-w-md border border-white/20"
+            >
+              <div className="p-2 bg-white/20 rounded-lg">
+                <ExternalLink className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold">Opening Bible in New Tab</p>
+                <p className="text-xs opacity-90">External sites like Bible.com cannot show our header. To return, simply close the new tab or click back to this tab.</p>
+              </div>
+              <button onClick={() => setShowNavTip(false)} className="p-1 hover:bg-white/10 rounded-full transition-colors">
+                <X className="h-4 w-4" />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="mb-8">
+          <Link 
+            to="/studies" 
+            className="inline-flex items-center text-primary/60 hover:text-accent transition-colors font-medium group"
+          >
+            <ArrowLeft className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform" />
+            Back to Bible Studies
+          </Link>
+        </div>
+
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-serif font-bold text-primary mb-4 tracking-tight">
             Grace Library
@@ -384,6 +418,13 @@ export default function Library() {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-primary text-secondary text-sm font-medium rounded-md hover:bg-primary-light transition-colors duration-200"
+                            onClick={() => {
+                              if (book.id === 'niv' || book.id === 'kjv') {
+                                setShowNavTip(true);
+                                // Auto-hide after 10 seconds
+                                setTimeout(() => setShowNavTip(false), 10000);
+                              }
+                            }}
                           >
                             <ExternalLink className="mr-2 h-4 w-4" />
                             Read Online
