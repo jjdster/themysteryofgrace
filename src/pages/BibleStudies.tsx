@@ -49,6 +49,14 @@ export default function BibleStudies() {
       path: "/dual-ministry-study"
     },
     {
+      title: "The New Body",
+      category: "Hope",
+      duration: "45 mins",
+      description: "Demonstrating the scriptural differences between our earthly body and the glorious heavenly body awaiting us.",
+      status: "Available",
+      path: "/new-body-study"
+    },
+    {
       title: "The Seven Ones of Ephesians",
       category: "Foundational",
       duration: "40 mins",

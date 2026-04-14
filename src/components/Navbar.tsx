@@ -39,6 +39,7 @@ export default function Navbar() {
       dropdown: [
         { name: 'Water Baptism Study (Acts 8:36-38)', path: '/baptism-study' },
         { name: 'Prophecy vs. Mystery (Rom 16:25)', path: '/prophecy-mystery-study' },
+        { name: 'The New Body (1 Cor 15:42-44)', path: '/new-body-study' },
         { name: 'Law vs. Grace (Rom 6:14)', path: '/studies' }
       ]
     },
