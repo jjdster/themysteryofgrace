@@ -11,7 +11,7 @@ export default function Mystery() {
       className="bg-secondary min-h-screen pb-20"
     >
       {/* Header */}
-      <header className="bg-primary py-24 text-center">
+      <header id="revealed" className="bg-primary py-24 text-center">
         <motion.h1
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -33,7 +33,7 @@ export default function Mystery() {
           <div className="prose prose-lg max-w-none text-primary/80 leading-relaxed">
             <div className="flex items-center space-x-4 mb-8">
               <Scroll className="h-8 w-8 text-accent shrink-0" />
-              <h2 className="text-2xl md:text-3xl font-serif text-primary m-0">What is "The Mystery"?</h2>
+              <h2 id="what-is-mystery" className="text-2xl md:text-3xl font-serif text-primary m-0">What is "The Mystery"?</h2>
             </div>
             
             <p className="mb-6">
@@ -46,7 +46,7 @@ export default function Mystery() {
             </div>
 
             {/* Interactive Timeline Section */}
-            <div className="my-16">
+            <div id="dispensation" className="my-16">
               <h3 className="text-2xl font-serif font-bold text-primary mb-8 text-center">The Timeline of God's Revelation</h3>
               <div className="relative">
                 {/* Vertical Line */}
@@ -224,7 +224,7 @@ export default function Mystery() {
               </div>
             </motion.div>
 
-            <h3 className="text-xl font-serif font-bold text-primary mt-12 mb-4">The Apostle of the Gentiles</h3>
+            <h3 id="apostle" className="text-xl font-serif font-bold text-primary mt-12 mb-4">The Apostle of the Gentiles</h3>
             
             <div className="bg-primary/5 p-6 rounded-xl border-l-4 border-accent mb-8 space-y-4 italic text-sm">
               <div>

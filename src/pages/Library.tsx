@@ -60,7 +60,7 @@ const initialBooks: BookType[] = [
   { id: 's15', title: 'Moses and Paul', filename: 'StamI15MosesandPaul.pdf', author: 'Cornelius R. Stam' },
   { id: 's16', title: 'Acts Volume 1', filename: 'StamI16ActsVolume1.pdf', author: 'Cornelius R. Stam' },
   { id: 's17', title: 'Acts Volume 2', filename: 'StamI17ActsVolume2.pdf', author: 'Cornelius R. Stam' },
-  { id: 's18', title: 'Acts Volume 3', filename: 'StamI18ActsVolume3.PDF', author: 'Cornelius R. Stam' },
+  { id: 's18', title: 'Acts Volume 3', filename: 'StamI18ActsVolume3.pdf', author: 'Cornelius R. Stam' },
   { id: 's19', title: 'Acts Volume 4', filename: 'StamI19ActsVolume4.pdf', author: 'Cornelius R. Stam' },
   { id: 's20', title: 'The Controversy', filename: 'StamI20TheControversy.pdf', author: 'Cornelius R. Stam' },
   { id: 's21', title: 'Satan in Derision', filename: 'StamI21SataninDerision.pdf', author: 'Cornelius R. Stam' },
@@ -86,8 +86,8 @@ const initialBooks: BookType[] = [
   { id: 'f4', title: 'Common Questions About the Grace Message', filename: 'FinckI04.pdf', author: 'Joel Fink' },
 
   // Wilson
-  { id: 'w1', title: 'So Run That You May Win', filename: 'WilsoI01-1.pdf', author: 'Roland Wilson', downloadUrl: 'https://github.com/jjdster/grace-library-assets' },
-  { id: 'w2', title: 'Thematic Preaching', filename: 'WilsoI02-1.pdf', author: 'Roland Wilson', downloadUrl: 'https://github.com/jjdster/grace-library-assets' },
+  { id: 'w1', title: 'So Run That You May Win', filename: 'WilsoI01-1.pdf', author: 'Roland Wilson', downloadUrl: 'https://cdn.jsdelivr.net/gh/jjdster/grace-library-assets@main/WilsoI01-1.pdf' },
+  { id: 'w2', title: 'Thematic Preaching', filename: 'WilsoI02-1.pdf', author: 'Roland Wilson', downloadUrl: 'https://cdn.jsdelivr.net/gh/jjdster/grace-library-assets@main/WilsoI02-1.pdf' },
 ];
 
 const authors = [

@@ -29,9 +29,9 @@ export default function Navbar() {
       path: '/mystery', 
       icon: Info,
       dropdown: [
-        { name: 'The Mystery Revealed (Rom 16:25)', path: '/mystery' },
-        { name: 'The Apostle of the Gentiles (Acts 9:15-16)', path: '/mystery' },
-        { name: 'The Dispensation of Grace (Eph 3:1-2)', path: '/mystery' }
+        { name: 'The Mystery Revealed (Rom 16:25)', path: '/mystery#revealed' },
+        { name: 'The Apostle of the Gentiles (Acts 9:15-16)', path: '/mystery#apostle' },
+        { name: 'The Dispensation of Grace (Eph 3:1-2)', path: '/mystery#dispensation' }
       ]
     },
     { name: 'Videos', path: '/videos', icon: Youtube },
@@ -43,7 +43,7 @@ export default function Navbar() {
         { name: 'Water Baptism Study (Acts 8:36-38)', path: '/baptism-study' },
         { name: 'Prophecy vs. Mystery (Rom 16:25)', path: '/prophecy-mystery-study' },
         { name: 'The New Body (1 Cor 15:42-44)', path: '/new-body-study' },
-        { name: 'Law vs. Grace (Rom 6:14)', path: '/studies' }
+        { name: 'Law vs. Grace (Rom 6:14)', path: '/law-grace-study' }
       ]
     },
     { name: 'Library', path: '/library', icon: BookOpen },
