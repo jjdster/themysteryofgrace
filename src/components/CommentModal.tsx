@@ -15,6 +15,7 @@ interface CommentModalProps {
 export default function CommentModal({ isOpen, onClose, parentId, replyToName }: CommentModalProps) {
   const [name, setName] = useState('');
   const [comment, setComment] = useState('');
+  const [category, setCategory] = useState('General');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,6 +71,7 @@ export default function CommentModal({ isOpen, onClose, parentId, replyToName }:
       await addDoc(collection(db, collectionName), {
         authorName: name || 'Anonymous',
         text: comment,
+        category: category,
         status: moderation.status,
         attitude: moderation.attitude,
         createdAt: serverTimestamp(),
@@ -182,6 +184,21 @@ export default function CommentModal({ isOpen, onClose, parentId, replyToName }:
                     placeholder="Anonymous"
                     className="w-full px-4 py-3 rounded-xl border border-primary/10 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-primary/70 mb-2 uppercase tracking-widest">
+                    Category
+                  </label>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-primary/10 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all bg-white"
+                  >
+                    {['General', 'Theology', 'Fellowship', 'Prayer', 'Questions'].map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div>

@@ -13,24 +13,25 @@ interface BookType {
   filename: string;
   author: string;
   downloadUrl?: string;
+  category?: string;
 }
 
 const initialBooks: BookType[] = [
   // Scripture
-  { id: 'kjv', title: 'King James Bible (1611)', filename: 'KJV_Bible.pdf', author: 'YouVersion (Bible.com)', downloadUrl: 'https://www.bible.com/bible/1/GEN.1.KJV' },
-  { id: 'niv', title: 'New International Version (NIV)', filename: 'NIV_Bible', author: 'YouVersion (Bible.com)', downloadUrl: 'https://www.bible.com/bible/111/GEN.1.NIV' },
+  { id: 'kjv', title: 'King James Bible (1611)', filename: 'KJV_Bible.pdf', author: 'YouVersion (Bible.com)', downloadUrl: 'https://www.bible.com/bible/1/GEN.1.KJV', category: 'Mystery' },
+  { id: 'niv', title: 'New International Version (NIV)', filename: 'NIV_Bible', author: 'YouVersion (Bible.com)', downloadUrl: 'https://www.bible.com/bible/111/GEN.1.NIV', category: 'Mystery' },
 
   // Charles F. Baker
-  { id: 'b1', title: 'Real Baptism', filename: 'BakerI01RealBaptism.pdf', author: 'Charles F. Baker' },
-  { id: 'b2', title: 'Bible Truth', filename: 'BakerI02BibleTruth.pdf', author: 'Charles F. Baker' },
-  { id: 'b3', title: 'Understanding the Book of Acts', filename: 'BakerI03UnderstandingActs.pdf', author: 'Charles F. Baker' },
-  { id: 'b4', title: 'Understanding the Gospels', filename: 'BakerI04UnderstandingGospels.pdf', author: 'Charles F. Baker' },
-  { id: 'b5', title: 'A Dispensational Theology', filename: 'BakerI05ADispensationalTheology.pdf', author: 'Charles F. Baker' },
-  { id: 'b6', title: 'Dispensational Synopsis of the New Testament', filename: 'BakerI06DispensationalSynopsisNT.pdf', author: 'Charles F. Baker' },
-  { id: 'b7', title: 'Dispensational Relationships', filename: 'BakerI07DispensationalRelationships.pdf', author: 'Charles F. Baker' },
-  { id: 'b8', title: 'Understanding Galatians and the Law', filename: 'BakerI08UnderstandingGalandtheLaw.pdf', author: 'Charles F. Baker' },
-  { id: 'b9', title: 'Understanding the Body of Christ', filename: 'BakerI09UnderstandingtheBodyofChrist.pdf', author: 'Charles F. Baker' },
-  { id: 'b10', title: "God's Clock of the Ages", filename: 'BakerI10GodsClockoftheAges.pdf', author: 'Charles F. Baker' },
+  { id: 'b1', title: 'Real Baptism', filename: 'BakerI01RealBaptism.pdf', author: 'Charles F. Baker', category: 'Theology' },
+  { id: 'b2', title: 'Bible Truth', filename: 'BakerI02BibleTruth.pdf', author: 'Charles F. Baker', category: 'Theology' },
+  { id: 'b3', title: 'Understanding the Book of Acts', filename: 'BakerI03UnderstandingActs.pdf', author: 'Charles F. Baker', category: 'Prophecy' },
+  { id: 'b4', title: 'Understanding the Gospels', filename: 'BakerI04UnderstandingGospels.pdf', author: 'Charles F. Baker', category: 'Prophecy' },
+  { id: 'b5', title: 'A Dispensational Theology', filename: 'BakerI05ADispensationalTheology.pdf', author: 'Charles F. Baker', category: 'Theology' },
+  { id: 'b6', title: 'Dispensational Synopsis of the New Testament', filename: 'BakerI06DispensationalSynopsisNT.pdf', author: 'Charles F. Baker', category: 'Scholarly' },
+  { id: 'b7', title: 'Dispensational Relationships', filename: 'BakerI07DispensationalRelationships.pdf', author: 'Charles F. Baker', category: 'Theology' },
+  { id: 'b8', title: 'Understanding Galatians and the Law', filename: 'BakerI08UnderstandingGalandtheLaw.pdf', author: 'Charles F. Baker', category: 'Mystery' },
+  { id: 'b9', title: 'Understanding the Body of Christ', filename: 'BakerI09UnderstandingtheBodyofChrist.pdf', author: 'Charles F. Baker', category: 'Mystery' },
+  { id: 'b10', title: "God's Clock of the Ages", filename: 'BakerI10GodsClockoftheAges.pdf', author: 'Charles F. Baker', category: 'Prophecy' },
   
   // Harry Bultema
   { id: 'bu1', title: 'Zechariah', filename: 'BulteI01Zechariah.pdf', author: 'Harry Bultema' },
@@ -141,6 +142,7 @@ export default function Library() {
   const initialAuthor = searchParams.get('author');
   const [activeAuthor, setActiveAuthor] = useState<string | null>(initialAuthor);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [books, setBooks] = useState<BookType[]>(initialBooks);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -185,7 +187,8 @@ export default function Library() {
     const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           book.author.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesAuthor = activeAuthor ? book.author === activeAuthor : true;
-    return matchesSearch && matchesAuthor;
+    const matchesCategory = selectedCategory === 'All' || book.category === selectedCategory;
+    return matchesSearch && matchesAuthor && matchesCategory;
   });
 
   if (loading && !activeAuthor) {
@@ -246,7 +249,7 @@ export default function Library() {
           </p>
         </div>
 
-        <div className="max-w-md mx-auto mb-12 relative">
+        <div className="max-w-md mx-auto mb-8 relative">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-primary/40" />
             <input
@@ -267,8 +270,25 @@ export default function Library() {
           </div>
         </div>
 
+        {/* Categories */}
+        <div className="flex flex-wrap justify-center gap-2 mb-12">
+          {['All', 'Mystery', 'Prophecy', 'Theology', 'Scholarly', 'Practical'].map(cat => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-6 py-2 rounded-full text-xs font-bold transition-all border ${
+                selectedCategory === cat 
+                  ? 'bg-primary text-secondary border-primary' 
+                  : 'bg-white text-primary/60 border-primary/10 hover:border-accent/30'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
         <AnimatePresence mode="wait">
-          {(!activeAuthor && !searchQuery) ? (
+          {(!activeAuthor && !searchQuery && selectedCategory === 'All') ? (
             <motion.div
               key="author-selection"
               initial={{ opacity: 0, y: 20 }}
@@ -366,15 +386,16 @@ export default function Library() {
                   onClick={() => {
                     setActiveAuthor(null);
                     setSearchQuery('');
+                    setSelectedCategory('All');
                   }}
                   className="flex items-center text-primary/60 hover:text-accent transition-colors group"
                 >
                   <ChevronLeft className="h-5 w-5 mr-1 group-hover:-translate-x-1 transition-transform" />
-                  {searchQuery && !activeAuthor ? 'Clear Search' : 'Back to Authors'}
+                  {searchQuery || selectedCategory !== 'All' ? 'Clear Filters' : 'Back to Authors'}
                 </button>
                 <div className="text-right">
                   <h2 className="text-2xl font-serif font-bold text-primary">
-                    {activeAuthor || (searchQuery ? 'Search Results' : '')}
+                    {activeAuthor || (searchQuery ? 'Search Results' : (selectedCategory !== 'All' ? `${selectedCategory} Resources` : ''))}
                   </h2>
                   <p className="text-sm text-primary/40 uppercase tracking-widest">
                     {filteredBooks.length} {filteredBooks.length === 1 ? 'Resource' : 'Resources'} Available

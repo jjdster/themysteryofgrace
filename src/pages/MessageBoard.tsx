@@ -10,10 +10,14 @@ export default function MessageBoard() {
   const isAdmin = user?.email === 'jjdster@gmail.com';
 
   const [comments, setComments] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [replyingTo, setReplyingTo] = useState<{id: string, name: string} | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const categories = ['All', 'General', 'Theology', 'Fellowship', 'Prayer', 'Questions'];
 
   useEffect(() => {
     const q = query(collection(db, 'comments'), orderBy('createdAt', 'desc'));
@@ -24,7 +28,14 @@ export default function MessageBoard() {
     return () => unsubscribe();
   }, []);
 
-  const topLevelComments = comments.filter(c => !c.parentId);
+  const filteredComments = comments.filter(c => {
+    const matchesSearch = c.text.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          c.authorName.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === 'All' || c.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const topLevelComments = filteredComments.filter(c => !c.parentId);
   const getReplies = (parentId: string) => comments.filter(c => c.parentId === parentId).reverse(); // chronological for replies
 
   const handleReply = (id: string, name: string) => {
@@ -65,13 +76,42 @@ export default function MessageBoard() {
             <h1 className="text-4xl font-serif font-bold text-primary mb-4">Community Board</h1>
             <p className="text-primary/70 italic">Fellowship and discuss with the Body of Christ.</p>
           </div>
-          <button 
-            onClick={handleNewPost} 
-            className="px-6 py-3 bg-accent text-white rounded-full font-bold hover:bg-accent-light transition-all flex items-center gap-2 shadow-md"
-          >
-            <PlusCircle className="h-5 w-5" />
-            New Topic
-          </button>
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <div className="relative">
+              <PlusCircle className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary/30" />
+              <input
+                type="text"
+                placeholder="Search discussions..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 pr-4 py-3 rounded-xl border border-primary/10 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none w-full sm:w-64 transition-all"
+              />
+            </div>
+            <button 
+              onClick={handleNewPost} 
+              className="px-6 py-3 bg-accent text-white rounded-xl font-bold hover:bg-accent-light transition-all flex items-center justify-center gap-2 shadow-md"
+            >
+              <PlusCircle className="h-5 w-5" />
+              New Topic
+            </button>
+          </div>
+        </div>
+
+        {/* Categories */}
+        <div className="flex flex-wrap gap-2 mb-12">
+          {categories.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-6 py-2 rounded-full text-xs font-bold transition-all border ${
+                selectedCategory === cat 
+                  ? 'bg-primary text-secondary border-primary' 
+                  : 'bg-white text-primary/60 border-primary/10 hover:border-accent/30'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
 
         <div className="space-y-8">
@@ -119,7 +159,12 @@ export default function MessageBoard() {
                   </div>
                 )}
                 <div className="flex justify-between items-start mb-4 pr-8">
-                  <span className="font-serif font-bold text-primary text-lg">{post.authorName}</span>
+                  <div className="flex flex-col">
+                    <span className="font-serif font-bold text-primary text-lg">{post.authorName}</span>
+                    {post.category && (
+                      <span className="text-[10px] uppercase tracking-widest font-bold text-accent mt-1">{post.category}</span>
+                    )}
+                  </div>
                   <span className="text-xs text-primary/40">
                     {post.createdAt ? new Date(post.createdAt?.toDate?.() || post.createdAt).toLocaleDateString() : 'Just now'}
                   </span>

@@ -60,12 +60,34 @@
         }
       },
       "required": ["lessonTitle", "startTime", "lastUpdateTime", "interactions"]
+    },
+    "UserProgress": {
+      "title": "UserProgress",
+      "description": "Tracks a user's progress through various studies.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "completedLessons": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "quizScores": {
+          "type": "object",
+          "description": "Map of lessonTitle to highest score."
+        },
+        "bookmarks": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "lastAccessed": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "completedLessons", "quizScores"]
     }
   },
   "firestore": {
     "comments": {
       "schema": "Comment",
-      "description": "Publicly visible approved comments."
+      "description": "Publicly visible approved comments with optional categories."
     },
     "flagged_comments": {
       "schema": "Comment",
@@ -78,6 +100,10 @@
     "study_sessions": {
       "schema": "StudySession",
       "description": "Grouped study sessions."
+    },
+    "user_progress": {
+      "schema": "UserProgress",
+      "description": "Individual user study progress."
     }
   }
 }

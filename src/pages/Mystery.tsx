@@ -45,6 +45,70 @@ export default function Mystery() {
               <span className="block mt-2 font-bold not-italic text-sm">— <ScriptureText text="Romans 16:25" /></span>
             </div>
 
+            {/* Interactive Timeline Section */}
+            <div className="my-16">
+              <h3 className="text-2xl font-serif font-bold text-primary mb-8 text-center">The Timeline of God's Revelation</h3>
+              <div className="relative">
+                {/* Vertical Line */}
+                <div className="absolute left-1/2 -translate-x-1/2 h-full w-1 bg-primary/10 rounded-full"></div>
+                
+                <div className="space-y-12">
+                  {[
+                    {
+                      period: "Prophecy",
+                      title: "The Old Testament & Gospels",
+                      description: "Spoken by the mouth of all his holy prophets since the world began (Acts 3:21). Focus on Israel and the earthly kingdom.",
+                      verse: "Luke 1:70",
+                      align: "left"
+                    },
+                    {
+                      period: "Transition",
+                      title: "The Ministry of the Twelve",
+                      description: "Preaching the Gospel of the Kingdom to Israel. The offer of the kingdom is rejected by the nation.",
+                      verse: "Acts 3:19-21",
+                      align: "right"
+                    },
+                    {
+                      period: "Mystery",
+                      title: "The Revelation to Paul",
+                      description: "Kept secret since the world began (Rom 16:25). A new dispensation of Grace for all nations, forming the Body of Christ.",
+                      verse: "Ephesians 3:1-9",
+                      align: "left",
+                      highlight: true
+                    },
+                    {
+                      period: "Future",
+                      title: "The Fulness of Times",
+                      description: "When God will gather together in one all things in Christ, both which are in heaven, and which are on earth.",
+                      verse: "Ephesians 1:10",
+                      align: "right"
+                    }
+                  ].map((item, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, x: item.align === 'left' ? -50 : 50 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      className={`relative flex items-center justify-between w-full ${item.align === 'left' ? 'flex-row-reverse' : ''}`}
+                    >
+                      <div className="w-[45%]"></div>
+                      <div className="absolute left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-accent border-4 border-white shadow-md z-10"></div>
+                      <div className={`w-[45%] p-6 rounded-2xl border ${item.highlight ? 'bg-primary text-secondary border-accent' : 'bg-white border-primary/10 shadow-sm'}`}>
+                        <span className={`text-[10px] font-bold uppercase tracking-widest mb-2 block ${item.highlight ? 'text-accent-light' : 'text-accent'}`}>
+                          {item.period}
+                        </span>
+                        <h4 className="text-lg font-serif font-bold mb-2">{item.title}</h4>
+                        <p className={`text-sm mb-4 ${item.highlight ? 'text-secondary/80' : 'text-primary/70'}`}>{item.description}</p>
+                        <div className={`text-xs font-bold ${item.highlight ? 'text-accent-light' : 'text-primary'}`}>
+                          — <ScriptureText text={item.verse} />
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             {/* Deep Dive Section */}
             <motion.div 
               id="grammar-deep-dive"

@@ -60,6 +60,25 @@ export default function Home() {
             </p>
           </motion.div>
 
+          {/* Grace Nugget - Daily Verse */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3 }}
+            className="mb-12 inline-block"
+          >
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 max-w-md mx-auto relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                <Quote className="h-12 w-12 text-accent" />
+              </div>
+              <span className="block text-[10px] uppercase tracking-[0.2em] text-accent-light font-bold mb-2">Grace Nugget of the Day</span>
+              <p className="text-white text-lg font-serif italic mb-3">
+                "For by grace are ye saved through faith; and that not of yourselves: it is the gift of God."
+              </p>
+              <span className="text-xs font-bold text-white/60 uppercase tracking-widest">— <ScriptureText text="Ephesians 2:8" /></span>
+            </div>
+          </motion.div>
+
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}

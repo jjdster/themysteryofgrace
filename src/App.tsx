@@ -18,9 +18,12 @@ import LawGraceStudy from './pages/LawGraceStudy';
 import SevenOnesStudy from './pages/SevenOnesStudy';
 import DualMinistryStudy from './pages/DualMinistryStudy';
 import NewBodyStudy from './pages/NewBodyStudy';
+import Search from './pages/Search';
 import { motion, AnimatePresence } from 'framer-motion';
 import ErrorBoundary from './components/ErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
+import { SearchProvider } from './lib/SearchProvider';
+import { AuthProvider } from './lib/AuthProvider';
 
 function Layout() {
   const location = useLocation();
@@ -48,7 +51,7 @@ function Layout() {
             <Route path="/study-center" element={<StudyCenter />} />
             <Route path="/asking" element={<StudyCenter />} />
             <Route path="/library" element={<Library />} />
-            <Route path="/search" element={<StudyCenter />} />
+            <Route path="/search" element={<Search />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/live-study" element={<StudyCenter />} />
             <Route path="/links" element={<Links />} />
@@ -65,10 +68,14 @@ function Layout() {
 export default function App() {
   return (
     <ErrorBoundary>
-      <Router>
-        <ScrollToTop />
-        <Layout />
-      </Router>
+      <AuthProvider>
+        <Router>
+          <SearchProvider>
+            <ScrollToTop />
+            <Layout />
+          </SearchProvider>
+        </Router>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }

@@ -4,13 +4,16 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../lib/AuthProvider';
 import { signOut } from '../lib/firebase';
+import { useSearch } from '../lib/SearchProvider';
 import AuthModal from './AuthModal';
 
 export default function Navbar() {
   const { user, setAuthError } = useAuth();
+  const { performSearch } = useSearch();
   const [isOpen, setIsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const location = useLocation();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -81,6 +84,15 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      performSearch(searchQuery);
+      setSearchQuery('');
+      setIsOpen(false);
+    }
+  };
+
   return (
     <nav className="sticky top-0 z-50 bg-primary text-secondary shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -90,6 +102,21 @@ export default function Navbar() {
               The Mystery of Grace
             </span>
           </Link>
+
+          {/* Search Bar */}
+          <div className="w-full max-w-md px-4">
+            <form onSubmit={handleSearch} className="relative group">
+              <input
+                type="text"
+                placeholder="Search Bible studies, books, videos..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-white/10 border border-white/20 rounded-full py-2 pl-10 pr-4 text-sm text-secondary placeholder-secondary/50 focus:outline-none focus:bg-white/20 focus:border-accent transition-all"
+              />
+              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-secondary/50 group-focus-within:text-accent transition-colors" />
+              <button type="submit" className="hidden">Search</button>
+            </form>
+          </div>
 
           {/* Desktop Links */}
           <div className="hidden lg:flex items-center lg:space-x-4 xl:space-x-8">

@@ -37,5 +37,10 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow create, update: if true; // Anyone can update their session
     }
+
+    // User progress (only the owner can read/write)
+    match /user_progress/{userId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
   }
 }
