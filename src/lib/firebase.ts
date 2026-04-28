@@ -75,7 +75,12 @@ export interface FirestoreErrorInfo {
   }
 }
 
-export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+export function handleFirestoreError(error: any, operationType: OperationType, path: string | null) {
+  // Silence offline errors to prevent user confusion
+  if (error?.message?.includes('offline') || error?.message?.includes('unreachable')) {
+    console.warn(`Firestore is currently offline or unreachable for ${operationType} on ${path}. This is expected in some environments.`);
+    return;
+  }
   const errInfo: FirestoreErrorInfo = {
     error: error instanceof Error ? error.message : String(error),
     authInfo: {
@@ -98,14 +103,6 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   throw new Error(JSON.stringify(errInfo));
 }
 
-async function testConnection() {
-  try {
-    // Attempt a simple read to check connection
-    const testDoc = doc(db, 'test', 'connection');
-    await getDoc(testDoc);
-    console.log("Firebase/Firestore initialized successfully.");
-  } catch (error) {
-    console.warn("Firestore connectivity test noticed an issue (it might be starting up):", error);
-  }
-}
-testConnection();
+// --- Initialization ---
+// The app will function in offline/local mode if Firebase is unreachable.
+// No active connection test to avoid intentional "offline" errors in restricted environments.
