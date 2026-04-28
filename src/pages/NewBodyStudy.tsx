@@ -136,7 +136,7 @@ const AIGuide = ({
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-1.5-flash",
         contents: prompt,
       });
 
@@ -201,13 +201,31 @@ const AIGuide = ({
                     <div className="markdown-body">
                       <ReactMarkdown
                         components={{
-                          p: ({ children }) => <p className="mb-4 last:mb-0">{children}</p>,
+                          p: ({ children }) => (
+                            <p className="mb-4 last:mb-0">
+                              {React.Children.map(children, child => {
+                                if (typeof child === 'string') {
+                                  return <ScriptureText text={child} />;
+                                }
+                                return child;
+                              })}
+                            </p>
+                          ),
                           h1: ({ children }) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
                           h2: ({ children }) => <h2 className="text-md font-bold mb-2">{children}</h2>,
                           h3: ({ children }) => <h3 className="text-sm font-bold mb-1">{children}</h3>,
                           ul: ({ children }) => <ul className="list-disc pl-4 mb-4">{children}</ul>,
                           ol: ({ children }) => <ol className="list-decimal pl-4 mb-4">{children}</ol>,
-                          li: ({ children }) => <li className="mb-1">{children}</li>,
+                          li: ({ children }) => (
+                            <li className="mb-1">
+                              {React.Children.map(children, child => {
+                                if (typeof child === 'string') {
+                                  return <ScriptureText text={child} />;
+                                }
+                                return child;
+                              })}
+                            </li>
+                          ),
                           blockquote: ({ children }) => <blockquote className="border-l-4 border-accent/20 pl-4 italic mb-4">{children}</blockquote>,
                         }}
                       >

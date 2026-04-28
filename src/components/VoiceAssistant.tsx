@@ -3,7 +3,7 @@ import { GoogleGenAI, Modality, LiveServerMessage } from "@google/genai";
 import { Mic, MicOff, Volume2, VolumeX, Loader2, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const MODEL = "gemini-3.1-flash-live-preview";
+const MODEL = "gemini-2.0-flash-exp";
 
 export default function VoiceAssistant() {
   const [isActive, setIsActive] = useState(false);
@@ -318,7 +318,7 @@ export default function VoiceAssistant() {
       
       {!isActive && (
         <p className="text-center text-primary/40 text-[10px] mt-4 uppercase tracking-tighter">
-          Powered by Gemini 3.1 Flash Live • Pauline Revelation Context
+          Powered by Gemini 2.0 Flash Experimental • Pauline Revelation Context
         </p>
       )}
     </div>

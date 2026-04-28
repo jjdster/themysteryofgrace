@@ -4,6 +4,7 @@ import { X, MessageSquare, Send, Heart, AlertCircle, CheckCircle2 } from 'lucide
 import { GoogleGenAI, Type } from "@google/genai";
 import { db, collection } from '../lib/firebase';
 import { addDoc, serverTimestamp } from 'firebase/firestore';
+import { getGeminiApiKey } from '../lib/api';
 
 interface CommentModalProps {
   isOpen: boolean;
@@ -29,7 +30,7 @@ export default function CommentModal({ isOpen, onClose, parentId, replyToName }:
 
     try {
       // 1. Moderate with Gemini
-      const apiKey = process.env.GEMINI_API_KEY;
+      const apiKey = getGeminiApiKey();
       
       if (!apiKey) {
         throw new Error('Gemini API key is missing. Please check your environment configuration.');
@@ -37,7 +38,7 @@ export default function CommentModal({ isOpen, onClose, parentId, replyToName }:
 
       const ai = new GoogleGenAI({ apiKey });
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-1.5-flash",
         contents: `Analyze the following comment for its attitude. 
         The standard is: "expressed in an attitude of love and concern rather than berating and condemning".
         Comment: "${comment}"
