@@ -11,10 +11,11 @@ import {
 import { getFirestore, collection, onSnapshot, query, where, orderBy, doc, getDoc, getDocFromServer, deleteDoc } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
-const app = initializeApp(firebaseConfig);
-console.log("Firebase initialized with project:", firebaseConfig.projectId);
-console.log("Using Firestore database:", firebaseConfig.firestoreDatabaseId || "(default)");
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+const config = firebaseConfig as any;
+const app = initializeApp(config);
+console.log("Firebase initialized with project:", config.projectId);
+console.log("Using Firestore database:", config.firestoreDatabaseId || "(default)");
+export const db = getFirestore(app, config.firestoreDatabaseId);
 export const auth = getAuth(app);
 
 export { 

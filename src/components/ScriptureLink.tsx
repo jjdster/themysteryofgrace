@@ -3,6 +3,7 @@ import * as Popover from '@radix-ui/react-popover';
 import { GoogleGenAI } from "@google/genai";
 import { Loader2, X, BookOpen } from 'lucide-react';
 import { getGeminiApiKey } from '../lib/api';
+import { SpeakButton } from './SpeakButton';
 
 interface ScriptureLinkProps {
   reference: string;
@@ -70,9 +71,14 @@ export default function ScriptureLink({ reference, children, className }: Script
                   {reference} (KJV & NIV)
                 </p>
               </div>
-              <Popover.Close className="p-1 hover:bg-white/10 rounded-lg transition-colors text-secondary/40 hover:text-secondary">
-                <X className="h-4 w-4" />
-              </Popover.Close>
+              <div className="flex items-center gap-2">
+                {verseText && !isLoading && (
+                  <SpeakButton text={`${reference}. ${verseText}`} size="sm" />
+                )}
+                <Popover.Close className="p-1 hover:bg-white/10 rounded-lg transition-colors text-secondary/40 hover:text-secondary">
+                  <X className="h-4 w-4" />
+                </Popover.Close>
+              </div>
             </div>
             
             <div className="min-h-[60px] flex flex-col justify-center">
@@ -88,8 +94,8 @@ export default function ScriptureLink({ reference, children, className }: Script
               )}
             </div>
             
-            <div className="pt-2 text-center">
-              <p className="text-[9px] text-secondary/20 uppercase tracking-widest">Scripture-First Study Guide</p>
+            <div className="pt-2 text-center text-secondary/20">
+              <p className="text-[9px] uppercase tracking-widest">Scripture-First Study Guide</p>
             </div>
           </div>
           <Popover.Arrow className="fill-primary" />

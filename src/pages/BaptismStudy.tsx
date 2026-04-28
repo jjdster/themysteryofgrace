@@ -23,6 +23,7 @@ import {
   Loader2,
   Bug,
   Maximize2,
+  Menu,
   X
 } from 'lucide-react';
 import { GoogleGenAI, Type } from "@google/genai";
@@ -576,9 +577,10 @@ export default function BaptismStudy() {
   })).filter(module => module.lessons.length > 0);
 
   const currentModule = visibleStudyData[currentModuleIdx];
-  const currentLesson = currentModule?.lessons[currentLessonIdx];
+  const currentLesson = currentModule?.lessons?.[currentLessonIdx];
 
   useLayoutEffect(() => {
+    if (!currentLesson) return;
     const scrollToTop = () => {
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       document.documentElement.scrollTo({ top: 0, left: 0, behavior: 'instant' });
@@ -633,7 +635,7 @@ export default function BaptismStudy() {
     }
   };
 
-  if (isStudyComplete) {
+  if (isStudyComplete || visibleStudyData.length === 0) {
     return (
       <div className="min-h-screen bg-secondary-light flex items-center justify-center p-4">
         <motion.div 
@@ -644,24 +646,30 @@ export default function BaptismStudy() {
           <div className="w-24 h-24 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-8">
             <Trophy className="h-12 w-12 text-accent" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-primary mb-6">Congratulations!</h1>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-primary mb-6">
+            {visibleStudyData.length === 0 ? "Coming Soon" : "Congratulations!"}
+          </h1>
           <p className="text-xl text-primary/60 mb-12 leading-relaxed">
-            You have successfully completed the interactive study on <span className="text-accent font-bold">The Biblical View of Water Baptism</span>. 
-            May these scriptural truths strengthen your walk in the dispensation of Grace.
+            {visibleStudyData.length === 0 
+              ? "This study is currently being updated for public release. Please check back later or contact us for builder access."
+              : `You have successfully completed the interactive study on The Biblical View of Water Baptism. 
+                 May these scriptural truths strengthen your walk in the dispensation of Grace.`}
           </p>
           
-          <Link to="/prophecy-mystery-study" className="block bg-secondary-light/50 p-8 rounded-3xl mb-12 text-left hover:bg-secondary-light transition-colors group">
-            <h3 className="text-sm font-bold text-primary/40 uppercase tracking-widest mb-4">Suggested Next Lesson</h3>
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="text-xl font-serif font-bold text-primary group-hover:text-accent transition-colors">Prophecy vs. Mystery</h4>
-                <p className="text-sm text-primary/60">Learn to distinguish between God's earthly and heavenly programs.</p>
+          {visibleStudyData.length > 0 && (
+            <Link to="/prophecy-mystery-study" className="block bg-secondary-light/50 p-8 rounded-3xl mb-12 text-left hover:bg-secondary-light transition-colors group">
+              <h3 className="text-sm font-bold text-primary/40 uppercase tracking-widest mb-4">Suggested Next Lesson</h3>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-xl font-serif font-bold text-primary group-hover:text-accent transition-colors">Prophecy vs. Mystery</h4>
+                  <p className="text-sm text-primary/60">Learn to distinguish between God's earthly and heavenly programs.</p>
+                </div>
+                <div className="p-3 bg-primary text-secondary rounded-full group-hover:bg-accent transition-colors">
+                  <ChevronRight className="h-6 w-6" />
+                </div>
               </div>
-              <div className="p-3 bg-primary text-secondary rounded-full group-hover:bg-accent transition-colors">
-                <ChevronRight className="h-6 w-6" />
-              </div>
-            </div>
-          </Link>
+            </Link>
+          )}
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button 
@@ -671,18 +679,22 @@ export default function BaptismStudy() {
               <Home className="h-5 w-5" />
               Back to Bible Studies
             </button>
-            <button 
-              onClick={() => studyLogger.download()}
-              className="px-10 py-4 border-2 border-primary/10 text-primary rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-primary/5 transition-all"
-            >
-              <Download className="h-5 w-5" />
-              Download Study Logs
-            </button>
+            {visibleStudyData.length > 0 && (
+              <button 
+                onClick={() => studyLogger.download()}
+                className="px-10 py-4 border-2 border-primary/10 text-primary rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-primary/5 transition-all"
+              >
+                <Download className="h-5 w-5" />
+                Download Study Logs
+              </button>
+            )}
           </div>
         </motion.div>
       </div>
     );
   }
+
+  if (!currentLesson) return null;
 
   return (
     <div className="min-h-screen bg-secondary-light">
@@ -1057,6 +1069,7 @@ export default function BaptismStudy() {
           <div className="lg:col-span-3">
             <div className="sticky top-24">
               <AIGuide 
+                key={sessionId}
                 lesson={currentLesson} 
                 isLeaderMode={isLeaderMode} 
                 sessionId={sessionId}

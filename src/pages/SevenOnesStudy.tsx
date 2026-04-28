@@ -433,7 +433,7 @@ export default function SevenOnesStudy() {
           </div>
 
           <div className="lg:col-span-3">
-            <AIGuide lesson={currentLesson} isLeaderMode={false} sessionId={sessionId} />
+            <AIGuide key={sessionId} lesson={currentLesson} isLeaderMode={false} sessionId={sessionId} />
           </div>
         </div>
       </div>
