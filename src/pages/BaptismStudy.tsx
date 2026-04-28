@@ -564,6 +564,7 @@ export default function BaptismStudy() {
   const [isMastered, setIsMastered] = useState(false);
   const [isStudyComplete, setIsStudyComplete] = useState(false);
   const [dismissedAuthPrompt, setDismissedAuthPrompt] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const hasBuilderAccess = user?.email === ALLOWED_BUILDER_EMAIL;
 
@@ -685,8 +686,32 @@ export default function BaptismStudy() {
 
   return (
     <div className="min-h-screen bg-secondary-light">
-      {/* Header */}
-      <div className="bg-white border-b border-primary/10 py-8 px-4 sm:px-6 lg:px-8">
+      {/* Sticky Mobile Header */}
+      <div className="lg:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-primary/10 px-4 py-3 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-2">
+          <BookOpen className="h-5 w-5 text-accent" />
+          <span className="text-sm font-serif font-bold text-primary truncate max-w-[200px]">
+            {currentLesson.title}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => setIsOpen(!isOpen)}
+            className="p-2 bg-secondary-light rounded-lg text-primary/60"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+          <button 
+            onClick={() => navigate('/studies')}
+            className="p-2 bg-red-50 rounded-lg text-red-500"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Header (Desktop) */}
+      <div className="hidden lg:block bg-white border-b border-primary/10 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <div className="flex items-center gap-2 text-accent mb-2">
@@ -757,7 +782,15 @@ export default function BaptismStudy() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           
           {/* Sidebar Navigation */}
-          <div className="lg:col-span-3 space-y-8">
+          <div className={`${isOpen ? 'fixed inset-0 z-50 bg-secondary px-6 py-20 overflow-y-auto lg:relative lg:inset-auto lg:p-0 lg:bg-transparent lg:block' : 'hidden lg:block'} lg:col-span-3 space-y-8`}>
+            {isOpen && (
+              <button 
+                onClick={() => setIsOpen(false)}
+                className="lg:hidden absolute top-6 right-6 p-2 bg-white rounded-full shadow-lg"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            )}
             <div>
               <h3 className="text-[10px] uppercase tracking-widest font-bold text-primary/40 mb-6">Study Modules</h3>
               <div className="space-y-2">

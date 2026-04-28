@@ -32,7 +32,7 @@ function Layout() {
   return (
     <div className="flex flex-col min-h-screen">
       {!isStudyPage && <Navbar />}
-      <main className="flex-grow">
+      <main className="flex-grow pb-24 lg:pb-0">
         <AnimatePresence mode="wait">
           <Routes>
             <Route path="/" element={<Home />} />

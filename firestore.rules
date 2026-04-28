@@ -42,5 +42,10 @@ service cloud.firestore {
     match /user_progress/{userId} {
       allow read, write: if isAuthenticated() && request.auth.uid == userId;
     }
+
+    // Test connection path
+    match /test/connection {
+      allow read: if true;
+    }
   }
 }

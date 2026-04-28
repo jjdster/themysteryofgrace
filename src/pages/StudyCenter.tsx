@@ -366,15 +366,15 @@ export default function StudyCenter() {
                   <SearchIcon className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-primary/30" />
                   <input
                     type="text"
-                    placeholder="Search for topics, books, or authors..."
+                    placeholder="Search topics..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-16 pr-24 py-6 bg-white rounded-3xl border border-primary/10 shadow-xl focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all text-xl text-primary"
+                    className="w-full pl-12 pr-28 md:pl-16 md:pr-32 py-4 md:py-6 bg-white rounded-2xl md:rounded-3xl border border-primary/10 shadow-xl focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all text-lg md:text-xl text-primary"
                   />
                   <button
                     type="submit"
                     disabled={isSearching || !searchQuery.trim()}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 px-6 py-3 bg-primary text-secondary rounded-2xl font-bold hover:bg-primary-light transition-colors disabled:opacity-50"
+                    className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 px-4 md:px-6 py-2 md:py-3 bg-primary text-secondary rounded-xl md:rounded-2xl font-bold hover:bg-primary-light transition-colors disabled:opacity-50 text-sm md:text-base"
                   >
                     {isSearching ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Search'}
                   </button>
