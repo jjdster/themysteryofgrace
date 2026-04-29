@@ -2,8 +2,9 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { GoogleGenAI, Modality, LiveServerMessage } from "@google/genai";
 import { Mic, MicOff, Volume2, VolumeX, Loader2, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getGeminiApiKey } from '../lib/api';
 
-const MODEL = "gemini-2.0-flash-exp";
+const MODEL = "gemini-3.1-flash-live-preview";
 
 export default function VoiceAssistant() {
   const [isActive, setIsActive] = useState(false);
@@ -23,6 +24,10 @@ export default function VoiceAssistant() {
     You are a scholarly Bible assistant focused on the "Preaching of Jesus Christ according to the Revelation of the Mystery" (Romans 16:25).
     CRITICAL: You MUST prioritize and defer to the Scriptures (King James Bible and New International Version) as your original and primary sources for answering any inquiries. 
     Your purpose is to answer questions not with tradition or denomination bias, but with the Scriptures rightly divided (2 Timothy 2:15).
+    
+    CLARIFICATION ON DOCTRINE:
+    Understand that the 'New Testament' (as a book division) contains both the program for Israel and the revelation of the mystery. 
+    CRITICAL: Do NOT say that the New Testament reveals spiritual baptism. Instead, recognize that spiritual baptism (placing the believer into a heavenly/celestial position) is strictly revealed in the REVELATION OF THE MYSTERY as preached by the apostle Paul.
     
     Key principles for your responses:
     1. DEFER TO SCRIPTURE FIRST. Use the King James Bible and the New International Version as the ultimate authority.
@@ -101,7 +106,11 @@ export default function VoiceAssistant() {
       streamRef.current = stream;
 
       // 3. Initialize AI
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const apiKey = getGeminiApiKey();
+      if (!apiKey) {
+        throw new Error("Gemini API key is missing.");
+      }
+      const ai = new GoogleGenAI({ apiKey });
       
       const sessionPromise = ai.live.connect({
         model: MODEL,
@@ -276,7 +285,7 @@ export default function VoiceAssistant() {
               {isSpeaking && (
                 <motion.p 
                   key="speaking"
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 1, y: 0 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   className={`text-accent font-medium uppercase tracking-widest flex items-center justify-center ${isActive ? 'text-sm' : 'text-xs'}`}
@@ -318,7 +327,7 @@ export default function VoiceAssistant() {
       
       {!isActive && (
         <p className="text-center text-primary/40 text-[10px] mt-4 uppercase tracking-tighter">
-          Powered by Gemini 2.0 Flash Experimental • Pauline Revelation Context
+          Powered by Gemini 3.1 Flash Live • Pauline Revelation Context
         </p>
       )}
     </div>

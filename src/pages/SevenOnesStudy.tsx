@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   BookOpen, 
@@ -71,11 +71,69 @@ const AIGuide = ({
 }) => {
   const [input, setInput] = useState('');
   const [isEnlarged, setIsEnlarged] = useState(false);
-  const [messages, setMessages] = useState<{ role: 'user' | 'guide'; text: string }[]>([
-    { role: 'guide', text: `Hello! I'm your study guide for this lesson on "${lesson.title}". What questions do you have about the seven-fold unity in Ephesians?` }
-  ]);
+  const [messages, setMessages] = useState<{ role: 'user' | 'model'; text: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const chatSessionRef = useRef<any>(null);
+
+  // Initialize chat session
+  useEffect(() => {
+    const initChat = async () => {
+      try {
+        const apiKey = getGeminiApiKey();
+        if (!apiKey) {
+          setMessages([{ role: 'model', text: "I'm sorry, I couldn't find an API key. Please check your environment settings." }]);
+          return;
+        }
+        
+        const ai = new GoogleGenAI({ apiKey });
+        const systemInstruction = `
+          You are an interactive, scripture-first study guide for a lesson titled "${lesson.title}".
+          CRITICAL: You MUST prioritize and defer to the Scriptures (King James Bible and New International Version) as your original and primary sources for answering any inquiries. 
+          Your goal is to help the user understand the biblical view of the "Seven Ones" of Ephesians 4:4-6 based ONLY on the provided scriptures and source material, always applying the principle of 'rightly dividing the Word of Truth' (2 Timothy 2:15).
+          
+          CLARIFICATION ON DOCTRINE:
+          Understand that the 'New Testament' (as a book division) contains both the program for Israel and the revelation of the mystery. 
+          CRITICAL: Do NOT say that the New Testament reveals spiritual baptism. Instead, recognize that spiritual baptism (placing the believer into a heavenly/celestial position) is strictly revealed in the REVELATION OF THE MYSTERY as preached by the apostle Paul.
+          
+          SCRIPTURES:
+          ${lesson.scripture.map(s => `${s.reference}: ${s.text}`).join('\n')}
+          
+          SOURCE MATERIAL:
+          Book: ${lesson.sourceText.book} by ${lesson.sourceText.author}
+          Excerpt: ${lesson.sourceText.excerpt}
+          Summary: ${lesson.summary}
+          
+          GUIDELINES:
+          1. DEFER TO SCRIPTURE FIRST. Use the King James Bible and the New International Version as the ultimate authority.
+          2. Stay tightly scoped to the chosen source material and scriptures.
+          3. Do not answer from general AI memory if the source text or scripture provides an answer.
+          4. If a concept is not supported by the selected sources, say so clearly.
+          5. Be educational, encouraging, and clear.
+          6. ${isLeaderMode ? "You are in LEADER MODE. Provide additional facilitator notes and deeper theological insights for a small group setting." : "You are in SOLO MODE. Focus on helping the individual student grasp the core concepts."}
+          7. Always apply the principle of "rightly dividing the Word of Truth" (2 Timothy 2:15).
+        `;
+
+        chatSessionRef.current = ai.chats.create({
+          model: "gemini-3-flash-preview",
+          config: {
+            systemInstruction,
+          },
+        });
+
+        // Add initial greeting
+        setMessages([{ 
+          role: 'model', 
+          text: `Hello! I'm your study guide for this lesson on "${lesson.title}". What questions do you have about the seven-fold unity in Ephesians?` 
+        }]);
+      } catch (error) {
+        console.error("Chat Init Error:", error);
+        setMessages([{ role: 'model', text: "I'm having trouble connecting to the study guide. Please try refreshing the page." }]);
+      }
+    };
+
+    initChat();
+  }, [lesson.id, isLeaderMode]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -84,7 +142,7 @@ const AIGuide = ({
   }, [messages, isEnlarged]);
 
   const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || !chatSessionRef.current) return;
 
     const userMessage = input.trim();
     setInput('');
@@ -92,6 +150,7 @@ const AIGuide = ({
     setIsLoading(true);
 
     try {
+      // Log the question
       await studyLogger.logSessionInteraction(sessionId, lesson.title, {
         type: 'question',
         data: {
@@ -100,59 +159,43 @@ const AIGuide = ({
         }
       });
 
-      const apiKey = getGeminiApiKey();
-      if (!apiKey) {
-        setMessages(prev => [...prev, { role: 'guide', text: "API key is missing. Please check your environment variables." }]);
-        return;
+      // Create a placeholder for the model response
+      setMessages(prev => [...prev, { role: 'model', text: '' }]);
+      
+      const result = await chatSessionRef.current.sendMessageStream({ message: userMessage });
+      
+      let fullResponse = '';
+      for await (const chunk of result) {
+        const chunkText = chunk.text;
+        fullResponse += chunkText;
+        setMessages(prev => {
+          const newMessages = [...prev];
+          newMessages[newMessages.length - 1] = { role: 'model', text: fullResponse };
+          return newMessages;
+        });
       }
-      const ai = new GoogleGenAI({ apiKey });
-      
-      const history = messages.map(m => `${m.role === 'user' ? 'USER' : 'GUIDE'}: ${m.text}`).join('\n');
-      
-      const prompt = `
-        You are an interactive, scripture-first study guide for a lesson titled "${lesson.title}".
-        Your goal is to help the user understand the "Seven Ones" of Ephesians 4:4-6 based ONLY on the provided scriptures and source material.
-        
-        SCRIPTURES:
-        ${lesson.scripture.map(s => `${s.reference}: ${s.text}`).join('\n')}
-        
-        SOURCE MATERIAL:
-        Book: ${lesson.sourceText.book} by ${lesson.sourceText.author}
-        Excerpt: ${lesson.sourceText.excerpt}
-        Summary: ${lesson.summary}
-        
-        GUIDELINES:
-        1. DEFER TO SCRIPTURE FIRST. Use the King James Bible as the ultimate authority.
-        2. Stay tightly scoped to the chosen source material and scriptures.
-        3. Be educational, encouraging, and clear.
-        4. ${isLeaderMode ? "You are in LEADER MODE. Provide additional facilitator notes." : "You are in SOLO MODE."}
-        5. Always apply the principle of "rightly dividing the Word of Truth" (2 Timothy 2:15).
-        
-        CONVERSATION HISTORY:
-        ${history}
-        
-        USER QUESTION: ${userMessage}
-      `;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-1.5-flash",
-        contents: prompt,
-      });
-
-      const guideResponse = response.text || "I'm sorry, I couldn't generate a response.";
-      setMessages(prev => [...prev, { role: 'guide', text: guideResponse }]);
-      
+      // Log the full interaction
       studyLogger.logSessionInteraction(sessionId, lesson.title, {
         type: 'question',
         data: {
           userQuestion: userMessage,
-          aiResponse: guideResponse,
+          aiResponse: fullResponse,
           status: 'completed'
         }
       });
     } catch (error) {
       console.error("AI Error:", error);
-      setMessages(prev => [...prev, { role: 'guide', text: "I'm having trouble connecting right now." }]);
+      setMessages(prev => {
+        const newMessages = [...prev];
+        const lastMsg = newMessages[newMessages.length - 1];
+        if (lastMsg && lastMsg.role === 'model' && lastMsg.text === '') {
+          newMessages[newMessages.length - 1] = { role: 'model', text: "I'm having trouble connecting right now. Please check your internet or try again in a moment." };
+        } else {
+          newMessages.push({ role: 'model', text: "I encountered an error while responding. Please try again." });
+        }
+        return newMessages;
+      });
     } finally {
       setIsLoading(false);
     }
@@ -192,15 +235,53 @@ const AIGuide = ({
                 ) : (
                   <>
                     <div className="markdown-body">
-                      <ReactMarkdown>{msg.text}</ReactMarkdown>
+                      {msg.text ? (
+                        <ReactMarkdown
+                          components={{
+                            p: ({ children }) => (
+                              <p className="mb-4 last:mb-0">
+                                {React.Children.map(children, child => {
+                                  if (typeof child === 'string') {
+                                    return <ScriptureText text={child} />;
+                                  }
+                                  return child;
+                                })}
+                              </p>
+                            ),
+                            h1: ({ children }) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
+                            h2: ({ children }) => <h2 className="text-md font-bold mb-2">{children}</h2>,
+                            h3: ({ children }) => <h3 className="text-sm font-bold mb-1">{children}</h3>,
+                            ul: ({ children }) => <ul className="list-disc pl-4 mb-4">{children}</ul>,
+                            ol: ({ children }) => <ol className="list-decimal pl-4 mb-4">{children}</ol>,
+                            li: ({ children }) => (
+                              <li className="mb-1">
+                                {React.Children.map(children, child => {
+                                  if (typeof child === 'string') {
+                                    return <ScriptureText text={child} />;
+                                  }
+                                  return child;
+                                })}
+                              </li>
+                            ),
+                          }}
+                        >
+                          {msg.text}
+                        </ReactMarkdown>
+                      ) : (
+                        <div className="flex gap-1 py-2">
+                          <div className="w-1.5 h-1.5 bg-accent/20 rounded-full animate-pulse" />
+                          <div className="w-1.5 h-1.5 bg-accent/20 rounded-full animate-pulse [animation-delay:0.2s]" />
+                          <div className="w-1.5 h-1.5 bg-accent/20 rounded-full animate-pulse [animation-delay:0.4s]" />
+                        </div>
+                      )}
                     </div>
-                    <SpeakButton text={msg.text} size="sm" className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    {msg.text && <SpeakButton text={msg.text} size="sm" className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity" />}
                   </>
                 )}
               </div>
             </div>
           ))}
-          {isLoading && (
+          {isLoading && !messages[messages.length - 1]?.text && (
             <div className="flex justify-start">
               <div className="bg-white border border-primary/10 p-4 rounded-2xl rounded-tl-none shadow-sm">
                 <div className="flex gap-1">

@@ -32,7 +32,7 @@ export default function ScriptureLink({ reference, children, className }: Script
       }
       const ai = new GoogleGenAI({ apiKey });
       const response = await ai.models.generateContent({
-        model: "gemini-1.5-flash",
+        model: "gemini-3-flash-preview",
         contents: `Provide the full text of the following Bible verse(s) in both the King James Version (KJV) and the New International Version (NIV). 
         CRITICAL: Format your response as follows:
         KJV: [verse text]
@@ -42,7 +42,7 @@ export default function ScriptureLink({ reference, children, className }: Script
       setVerseText(response.text || "Verse text not found.");
     } catch (error) {
       console.error("Error fetching verse:", error);
-      setVerseText("Error loading verse text. Please ensure your API key is valid and has access to Gemini 1.5 Flash.");
+      setVerseText("Error loading verse text. Please ensure your API key is valid.");
     } finally {
       setIsLoading(false);
     }

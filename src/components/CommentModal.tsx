@@ -38,7 +38,7 @@ export default function CommentModal({ isOpen, onClose, parentId, replyToName }:
 
       const ai = new GoogleGenAI({ apiKey });
       const response = await ai.models.generateContent({
-        model: "gemini-1.5-flash",
+        model: "gemini-3-flash-preview",
         contents: `Analyze the following comment for its attitude. 
         The standard is: "expressed in an attitude of love and concern rather than berating and condemning".
         Comment: "${comment}"
