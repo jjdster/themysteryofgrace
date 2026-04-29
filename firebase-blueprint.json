@@ -61,6 +61,23 @@
       },
       "required": ["lessonTitle", "startTime", "lastUpdateTime", "interactions"]
     },
+    "DialogueThread": {
+      "title": "DialogueThread",
+      "description": "A conversation thread in the Scholarly Dialogue.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "title": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "lastMessageAt": { "type": "string", "format": "date-time" },
+        "messages": {
+          "type": "array",
+          "items": { "type": "object" }
+        }
+      },
+      "required": ["userId", "title", "createdAt", "lastMessageAt", "messages"]
+    },
     "UserProgress": {
       "title": "UserProgress",
       "description": "Tracks a user's progress through various studies.",
@@ -104,6 +121,10 @@
     "user_progress": {
       "schema": "UserProgress",
       "description": "Individual user study progress."
+    },
+    "dialogue_threads": {
+      "schema": "DialogueThread",
+      "description": "Stored conversations from the Scholarly Dialogue."
     }
   }
 }

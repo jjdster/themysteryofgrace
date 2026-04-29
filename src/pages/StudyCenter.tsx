@@ -15,12 +15,15 @@ import {
   Info,
   PlayCircle,
   X,
-  Volume2
+  Volume2,
+  History,
+  Plus
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { GoogleGenAI } from "@google/genai";
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../lib/firebase';
+import { auth, db, handleFirestoreError, OperationType } from '../lib/firebase';
+import { collection, query, where, orderBy, onSnapshot, doc, addDoc, serverTimestamp, updateDoc, arrayUnion, getDocs } from 'firebase/firestore';
 import { getGeminiApiKey } from '../lib/api';
 import { studyLogger } from '../lib/logger';
 import ScriptureText from '../components/ScriptureText';
@@ -130,7 +133,7 @@ interface Message {
 
 export default function StudyCenter() {
   const [activeTab, setActiveTab] = useState<'search' | 'dialogue' | 'faq'>('search');
-  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
@@ -144,8 +147,12 @@ export default function StudyCenter() {
   const [dialogueInput, setDialogueInput] = useState('');
   const [isDialogueLoading, setIsDialogueLoading] = useState(false);
   const [dialogueError, setDialogueError] = useState<string | null>(null);
+  const [isInitializing, setIsInitializing] = useState(false);
   const [fullScreenMessage, setFullScreenMessage] = useState<string | null>(null);
-  const [sessionId] = useState(() => `study_session_${Date.now()}`);
+  const [sessionId, setSessionId] = useState(() => `study_session_${Date.now()}`);
+  const [dialogueThreads, setDialogueThreads] = useState<any[]>([]);
+  const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
+  const [isThreadsLoading, setIsThreadsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const dialogueSectionRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -153,24 +160,36 @@ export default function StudyCenter() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUserEmail(user?.email || null);
+      setCurrentUser(user);
     });
     return () => unsubscribe();
   }, []);
 
-  const hasBuilderAccess = currentUserEmail === ALLOWED_BUILDER_EMAIL;
+  const hasBuilderAccess = currentUser?.email === ALLOWED_BUILDER_EMAIL;
 
   const customContext = CUSTOM_STUDY_MATERIALS.map(m => `TITLE: ${m.title}\nCONTENT: ${m.content}`).join('\n\n---\n\n');
 
-  // Initialize Chat for Dialogue
-  useEffect(() => {
-    const initChat = async () => {
-      const apiKey = getGeminiApiKey();
-      if (!apiKey) return;
+  const initChat = async (history: Message[] = []) => {
+    if (chatRef.current) return true;
+    if (isInitializing) return false;
+    
+    const apiKey = getGeminiApiKey();
+    if (!apiKey) {
+      setDialogueError("Gemini API key is missing. Please check your environment settings.");
+      return false;
+    }
 
+    try {
+      setIsInitializing(true);
       const ai = new GoogleGenAI({ apiKey });
+      const geminiHistory = history.map(m => ({
+        role: m.role === 'user' ? 'user' : 'model',
+        parts: [{ text: m.text }]
+      }));
+
       chatRef.current = ai.chats.create({
         model: "gemini-3-flash-preview",
+        history: geminiHistory,
         config: {
           systemInstruction: `You are a scholarly guide specializing in 'Grace Library' and the Pauline revelation. CRITICAL: You MUST prioritize and defer to the Scriptures (King James Bible and New International Version) as your original and primary sources. Your goal is to help the user understand the preaching of Jesus Christ according to the revelation of the mystery (Romans 16:25), applying 'rightly dividing the Word of Truth' (2 Timothy 2:15). 
           
@@ -185,8 +204,19 @@ export default function StudyCenter() {
           FORMATTING: When enumerating points or aspects of your response, you MUST start a new paragraph for each point to ensure clarity. Be respectful, insightful, and deep in doctrine.`,
         },
       });
-    };
-    initChat();
+      return true;
+    } catch (err) {
+      console.error("Chat Init Error:", err);
+      setDialogueError("Failed to initialize study guide. Please try again.");
+      return false;
+    } finally {
+      setIsInitializing(false);
+    }
+  };
+
+  // Initialize Chat for Dialogue
+  useEffect(() => {
+    initChat(messages);
   }, [customContext]);
 
   useEffect(() => {
@@ -203,6 +233,58 @@ export default function StudyCenter() {
       }
     }
   }, [messages, activeTab]);
+
+  // Fetch threads for logged in user
+  useEffect(() => {
+    if (!currentUser) {
+      setDialogueThreads([]);
+      setActiveThreadId(null);
+      setMessages([]);
+      return;
+    }
+
+    setIsThreadsLoading(true);
+    const q = query(
+      collection(db, 'dialogue_threads'),
+      where('userId', '==', currentUser.uid),
+      orderBy('lastMessageAt', 'desc')
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const threads = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setDialogueThreads(threads);
+      setIsThreadsLoading(false);
+    }, (error) => {
+      console.error("Fetch threads error:", error);
+      setIsThreadsLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [currentUser]);
+
+  // Load messages when active thread changes
+  useEffect(() => {
+    if (!activeThreadId) return;
+    const thread = dialogueThreads.find(t => t.id === activeThreadId);
+    if (thread) {
+      setMessages(thread.messages || []);
+    }
+  }, [activeThreadId, dialogueThreads]);
+
+  const startNewThread = () => {
+    setActiveThreadId(null);
+    setMessages([]);
+    chatRef.current = null;
+    setSessionId(`study_session_${Date.now()}`);
+  };
+
+  const selectThread = (threadId: string) => {
+    setActiveThreadId(threadId);
+    chatRef.current = null; // Re-initializes chat with history when next message is sent
+  };
 
   const handleSearch = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -282,29 +364,69 @@ export default function StudyCenter() {
 
   const handleDialogueSend = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!dialogueInput.trim() || isDialogueLoading || !chatRef.current) return;
+    if (!dialogueInput.trim() || isDialogueLoading) return;
+
+    // Ensure chat is initialized with history if it's the first message of a loaded thread
+    if (!chatRef.current) {
+      const success = await initChat(messages);
+      if (!success) return;
+    }
 
     const userMessage = dialogueInput.trim();
     setDialogueInput('');
-    setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
+    const newUserMessage: Message = { role: 'user', text: userMessage };
+    setMessages(prev => [...prev, newUserMessage]);
     setIsDialogueLoading(true);
     setDialogueError(null);
 
     try {
       const result = await chatRef.current.sendMessageStream({ message: userMessage });
       let fullText = '';
-      setMessages(prev => [...prev, { role: 'model', text: '' }]);
+      const newModelMessage: Message = { role: 'model', text: '' };
+      setMessages(prev => [...prev, newModelMessage]);
 
       for await (const chunk of result) {
-        fullText += chunk.text;
-        setMessages(prev => {
-          const newMessages = [...prev];
-          newMessages[newMessages.length - 1] = { role: 'model', text: fullText };
-          return newMessages;
-        });
+        if (chunk.text) {
+          fullText += chunk.text;
+          setMessages(prev => {
+            const newMessages = [...prev];
+            newMessages[newMessages.length - 1] = { role: 'model', text: fullText };
+            return newMessages;
+          });
+        }
       }
 
       setFullScreenMessage(fullText);
+
+      // Persist to Firestore if user is logged in
+      if (currentUser) {
+        try {
+          if (!activeThreadId) {
+            // Create new thread
+            const newThread = {
+              userId: currentUser.uid,
+              userEmail: currentUser.email,
+              title: userMessage.substring(0, 40) + (userMessage.length > 40 ? '...' : ''),
+              createdAt: serverTimestamp(),
+              lastMessageAt: serverTimestamp(),
+              messages: [...messages, newUserMessage, { role: 'model', text: fullText }]
+            };
+            const path = 'dialogue_threads';
+            const docRef = await addDoc(collection(db, path), newThread);
+            setActiveThreadId(docRef.id);
+          } else {
+            // Update existing thread
+            const threadRef = doc(db, 'dialogue_threads', activeThreadId);
+            await updateDoc(threadRef, {
+              lastMessageAt: serverTimestamp(),
+              messages: arrayUnion(newUserMessage, { role: 'model', text: fullText })
+            });
+          }
+        } catch (err) {
+          // Non-blocking but logged
+          console.error("Firestore persistence error:", err);
+        }
+      }
 
       studyLogger.logSessionInteraction(sessionId, "Study Center Dialogue", {
         type: 'chat',
@@ -477,76 +599,140 @@ export default function StudyCenter() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="max-w-4xl mx-auto"
+              className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6"
             >
-              <div className="bg-zinc-900/50 rounded-3xl border border-white/5 overflow-hidden flex flex-col h-[60vh] shadow-2xl">
-                <div className="px-6 py-4 border-b border-white/5 bg-black/20 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <MessageSquare className="h-5 w-5 text-accent" />
-                    <h2 className="text-secondary font-serif font-bold">Scholarly Dialogue</h2>
+              {/* History Sidebar */}
+              <div className="lg:col-span-1 space-y-4">
+                <button
+                  onClick={startNewThread}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-accent text-white rounded-xl font-bold hover:bg-accent-light transition-all shadow-lg"
+                >
+                  <Plus className="h-4 w-4" />
+                  New Dialogue
+                </button>
+                
+                <div className="bg-zinc-900/40 rounded-2xl border border-white/5 p-4 backdrop-blur-sm overflow-hidden flex flex-col max-h-[50vh] lg:max-h-[60vh]">
+                  <div className="flex items-center gap-2 mb-4 px-2">
+                    <History className="h-4 w-4 text-accent" />
+                    <h3 className="text-secondary/60 text-sm font-serif uppercase tracking-wider">Previous Sessions</h3>
+                  </div>
+                  
+                  <div className="space-y-2 overflow-y-auto pr-2 custom-scrollbar">
+                    {isThreadsLoading ? (
+                      <div className="flex justify-center p-8">
+                        <Loader2 className="h-6 w-6 text-accent animate-spin" />
+                      </div>
+                    ) : dialogueThreads.length > 0 ? (
+                      dialogueThreads.map((thread) => (
+                        <button
+                          key={thread.id}
+                          onClick={() => selectThread(thread.id)}
+                          className={`w-full text-left p-3 rounded-xl transition-all group ${
+                            activeThreadId === thread.id 
+                              ? 'bg-accent/20 border border-accent/30 text-secondary' 
+                              : 'hover:bg-white/5 border border-transparent text-secondary/40'
+                          }`}
+                        >
+                          <p className="text-sm font-medium line-clamp-1 group-hover:text-secondary transition-colors">
+                            {thread.title}
+                          </p>
+                          <p className="text-[10px] opacity-40 mt-1">
+                            {new Date(thread.lastMessageAt?.seconds * 1000 || Date.now()).toLocaleDateString()}
+                          </p>
+                        </button>
+                      ))
+                    ) : (
+                      <div className="text-center py-8 px-4 border border-dashed border-white/5 rounded-xl">
+                        <p className="text-secondary/20 text-xs italic">No previous dialogues found.</p>
+                      </div>
+                    )}
                   </div>
                 </div>
+                
+                {!currentUser && (
+                  <div className="p-4 bg-accent/10 border border-accent/20 rounded-xl">
+                    <p className="text-accent text-xs text-center font-medium">Log in to save your study history permanently.</p>
+                  </div>
+                )}
+              </div>
 
-                <div 
-                  ref={chatContainerRef}
-                  className="flex-grow overflow-y-auto p-6 space-y-6"
-                >
-                  {messages.length === 0 && (
-                    <div className="h-full flex flex-col items-center justify-center text-center px-8">
-                      <BookOpen className="h-12 w-12 text-secondary/10 mb-4" />
-                      <h3 className="text-secondary/60 font-serif text-xl mb-2">Begin Your Study</h3>
-                      <p className="text-secondary/30 text-sm max-w-xs">Ask a question about the Dispensation of Grace or the Pauline revelation.</p>
+              {/* Main Chat Area */}
+              <div className="lg:col-span-3">
+                <div className="bg-zinc-900/50 rounded-3xl border border-white/5 overflow-hidden flex flex-col h-[60vh] shadow-2xl relative">
+                  <div className="px-6 py-4 border-b border-white/5 bg-black/20 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <MessageSquare className="h-5 w-5 text-accent" />
+                      <h2 className="text-secondary font-serif font-bold">
+                        {activeThreadId 
+                          ? dialogueThreads.find(t => t.id === activeThreadId)?.title || 'Scholarly Dialogue'
+                          : 'New Scholarly Dialogue'
+                        }
+                      </h2>
                     </div>
-                  )}
-                  {messages.map((msg, i) => (
-                    <div key={i} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center border ${msg.role === 'user' ? 'bg-accent/10 border-accent/20 text-accent' : 'bg-zinc-800 border-white/5 text-secondary/60'}`}>
-                        {msg.role === 'user' ? <User className="h-4 w-4" /> : <BookOpen className="h-4 w-4" />}
+                  </div>
+
+                  <div 
+                    ref={chatContainerRef}
+                    className="flex-grow overflow-y-auto p-6 space-y-6"
+                  >
+                    {messages.length === 0 && (
+                      <div className="h-full flex flex-col items-center justify-center text-center px-8">
+                        <BookOpen className="h-12 w-12 text-secondary/10 mb-4" />
+                        <h3 className="text-secondary/60 font-serif text-xl mb-2">Begin Your Study</h3>
+                        <p className="text-secondary/30 text-sm max-w-xs">Ask a question about the Dispensation of Grace or the Pauline revelation.</p>
                       </div>
-                      <div 
-                        onClick={() => msg.role === 'model' && setFullScreenMessage(msg.text)}
-                        className={`max-w-[80%] p-4 rounded-2xl font-serif text-lg whitespace-pre-wrap cursor-pointer transition-all ${
-                          msg.role === 'user' 
-                            ? 'bg-accent text-white rounded-tr-none' 
-                            : 'bg-white/5 text-secondary/80 rounded-tl-none italic hover:bg-white/10'
-                        }`}
-                      >
-                        <ScriptureText 
-                          text={msg.text} 
-                          linkClassName={msg.role === 'user' ? 'text-white underline font-bold' : 'text-accent-light hover:text-white underline decoration-dotted transition-colors'}
-                        />
-                        {msg.role === 'model' && (
-                          <div className="flex items-center justify-between mt-2">
-                          <div className="text-[10px] text-secondary/20 flex items-center gap-1">
-                            <Sparkles className="h-2 w-2" /> Click to expand full screen
-                          </div>
-                          <SpeakButton text={msg.text} size="sm" className="bg-white/5 rounded-lg p-1" />
+                    )}
+                    {messages.map((msg, i) => (
+                      <div key={i} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                        <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center border ${msg.role === 'user' ? 'bg-accent/10 border-accent/20 text-accent' : 'bg-zinc-800 border-white/5 text-secondary/60'}`}>
+                          {msg.role === 'user' ? <User className="h-4 w-4" /> : <BookOpen className="h-4 w-4" />}
                         </div>
-                        )}
+                        <div 
+                          onClick={() => msg.role === 'model' && setFullScreenMessage(msg.text)}
+                          className={`max-w-[80%] p-4 rounded-2xl font-serif text-lg whitespace-pre-wrap cursor-pointer transition-all ${
+                            msg.role === 'user' 
+                              ? 'bg-accent text-white rounded-tr-none' 
+                              : 'bg-white/5 text-secondary/80 rounded-tl-none italic hover:bg-white/10'
+                          }`}
+                        >
+                          <ScriptureText 
+                            text={msg.text} 
+                            linkClassName={msg.role === 'user' ? 'text-white underline font-bold' : 'text-accent-light hover:text-white underline decoration-dotted transition-colors'}
+                          />
+                          {msg.role === 'model' && (
+                            <div className="flex items-center justify-between mt-2">
+                            <div className="text-[10px] text-secondary/20 flex items-center gap-1">
+                              <Sparkles className="h-2 w-2" /> Click to expand full screen
+                            </div>
+                            <SpeakButton text={msg.text} size="sm" className="bg-white/5 rounded-lg p-1" />
+                          </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                  <div ref={messagesEndRef} />
-                </div>
+                    ))}
+                    <div ref={messagesEndRef} />
+                  </div>
 
-                <div className="p-6 bg-black/20 border-t border-white/5">
-                  <form onSubmit={handleDialogueSend} className="relative">
-                    <input
-                      type="text"
-                      value={dialogueInput}
-                      onChange={(e) => setDialogueInput(e.target.value)}
-                      placeholder="Ask about the Revelation of the Mystery..."
-                      className="w-full bg-zinc-800 border border-white/10 rounded-2xl px-6 py-4 pr-16 text-secondary focus:outline-none focus:border-accent/50 transition-colors font-serif italic text-lg"
-                    />
-                    <button
-                      type="submit"
-                      disabled={isDialogueLoading || !dialogueInput.trim()}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-3 bg-accent text-white rounded-xl hover:bg-accent-light transition-all disabled:opacity-50"
-                    >
-                      {isDialogueLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
-                    </button>
-                  </form>
-                  {dialogueError && <p className="mt-2 text-red-400 text-xs text-center">{dialogueError}</p>}
+                  <div className="p-6 bg-black/20 border-t border-white/5">
+                    <form onSubmit={handleDialogueSend} className="relative">
+                      <input
+                        type="text"
+                        value={dialogueInput}
+                        onChange={(e) => setDialogueInput(e.target.value)}
+                        placeholder="Ask about the Revelation of the Mystery..."
+                        disabled={isDialogueLoading || isInitializing}
+                        className="w-full bg-zinc-800 border border-white/10 rounded-2xl px-6 py-4 pr-16 text-secondary focus:outline-none focus:border-accent/50 transition-colors font-serif italic text-lg disabled:opacity-50"
+                      />
+                      <button
+                        type="submit"
+                        disabled={isDialogueLoading || isInitializing || !dialogueInput.trim()}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-3 bg-accent text-white rounded-xl hover:bg-accent-light transition-all disabled:opacity-50"
+                      >
+                        {isDialogueLoading || isInitializing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                      </button>
+                    </form>
+                    {dialogueError && <p className="mt-2 text-red-400 text-xs text-center">{dialogueError}</p>}
+                  </div>
                 </div>
               </div>
             </motion.div>

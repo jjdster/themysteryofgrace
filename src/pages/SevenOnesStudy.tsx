@@ -166,13 +166,15 @@ const AIGuide = ({
       
       let fullResponse = '';
       for await (const chunk of result) {
-        const chunkText = chunk.text;
-        fullResponse += chunkText;
-        setMessages(prev => {
-          const newMessages = [...prev];
-          newMessages[newMessages.length - 1] = { role: 'model', text: fullResponse };
-          return newMessages;
-        });
+        if (chunk.text) {
+          const chunkText = chunk.text;
+          fullResponse += chunkText;
+          setMessages(prev => {
+            const newMessages = [...prev];
+            newMessages[newMessages.length - 1] = { role: 'model', text: fullResponse };
+            return newMessages;
+          });
+        }
       }
 
       // Log the full interaction
