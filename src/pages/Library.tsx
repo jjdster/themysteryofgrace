@@ -86,8 +86,8 @@ const initialBooks: BookType[] = [
   { id: 'f4', title: 'Common Questions About the Grace Message', filename: 'FinckI04.pdf', author: 'Joel Fink' },
 
   // Wilson
-  { id: 'w1', title: 'So Run That You May Win', filename: 'WilsoI01-1.pdf', author: 'Roland Wilson', downloadUrl: 'https://cdn.jsdelivr.net/gh/jjdster/grace-library-assets@main/WilsoI01-1.pdf' },
-  { id: 'w2', title: 'Thematic Preaching', filename: 'WilsoI02-1.pdf', author: 'Roland Wilson', downloadUrl: 'https://cdn.jsdelivr.net/gh/jjdster/grace-library-assets@main/WilsoI02-1.pdf' },
+  { id: 'w1', title: 'So Run That You May Win', filename: 'WilsoI01-1.pdf', author: 'Roland Wilson', downloadUrl: 'https://raw.githubusercontent.com/jjdster/grace-library-assets/main/WilsoI01-1.pdf' },
+  { id: 'w2', title: 'Thematic Preaching', filename: 'WilsoI02-1.pdf', author: 'Roland Wilson', downloadUrl: 'https://raw.githubusercontent.com/jjdster/grace-library-assets/main/WilsoI02-1.pdf' },
 ];
 
 const authors = [
