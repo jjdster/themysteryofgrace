@@ -192,21 +192,7 @@ export default function Navbar() {
                 <SearchIcon className="h-4 w-4" />
               </button>
               
-              {user ? (
-                <button
-                  onClick={() => signOut()}
-                  className="px-6 py-2.5 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 text-[10px] font-bold tracking-widest uppercase transition-all"
-                >
-                  Sign Out
-                </button>
-              ) : (
-                <button
-                  onClick={() => setIsAuthModalOpen(true)}
-                  className="px-6 py-2.5 rounded-full bg-accent text-primary hover:bg-accent-light text-[10px] font-bold tracking-widest uppercase transition-all shadow-lg"
-                >
-                  Sign In
-                </button>
-              )}
+
             </div>
           </div>
 
@@ -313,23 +299,7 @@ export default function Navbar() {
               ))}
 
               <div className="pt-8 mt-8 border-t border-white/10">
-                {user ? (
-                  <button
-                    onClick={() => signOut()}
-                    className="w-full flex items-center p-4 rounded-2xl text-lg font-bold text-red-400 bg-red-400/5 hover:bg-red-400/10"
-                  >
-                    <LogOut className="mr-4 h-6 w-6" />
-                    Sign Out
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => setIsAuthModalOpen(true)}
-                    className="w-full flex items-center p-5 rounded-2xl text-lg font-bold text-primary bg-accent hover:bg-accent-light shadow-xl"
-                  >
-                    <LogIn className="mr-4 h-6 w-6" />
-                    Sign In
-                  </button>
-                )}
+
               </div>
             </div>
           </motion.div>

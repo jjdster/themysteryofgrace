@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase';
-import { XCircle } from 'lucide-react';
+import { XCircle, ShieldAlert } from 'lucide-react';
 
 interface AuthContextType {
   user: User | null;
@@ -26,6 +26,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
   const [isSuspended, setIsSuspended] = useState(false);
+  const [dismissedSuspension, setDismissedSuspension] = useState(false);
 
   const clearAuthState = () => {
     localStorage.clear();
@@ -44,9 +45,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     }, (error) => {
       console.error("Auth state change error:", error);
-      if (error.message?.includes('suspended')) {
+      if (error.message?.includes('suspended') || error.message?.includes('permission-denied')) {
         setIsSuspended(true);
-        setAuthError("The technical connection to the database has been restricted (suspended). Please contact support or try again later.");
+        // Silently fail authentication so the user is just logged out and doesn't get flooded with errors
+      } else {
+        setAuthError(error.message || "Authentication error occurred");
       }
       setLoading(false);
     });
@@ -55,28 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <AuthContext.Provider value={{ user, loading, authError, setAuthError, clearAuthState }}>
-      {isSuspended && (
-        <div className="fixed inset-0 z-[200] bg-primary flex items-center justify-center p-6 text-center">
-          <div className="max-w-md bg-white p-10 rounded-3xl shadow-2xl border-2 border-accent/20">
-            <XCircle className="h-16 w-16 text-accent mx-auto mb-6" />
-            <h2 className="text-2xl font-serif font-bold text-primary mb-4">Connection Restricted</h2>
-            <p className="text-primary/60 mb-8 leading-relaxed italic">
-              "To make all men see what is the fellowship of the mystery..."
-            </p>
-            <p className="text-sm text-primary/80 mb-8">
-              We are experiencing a temporary restriction with the database connection (API Key Suspended). 
-              This is an infrastructure issue currently being addressed.
-            </p>
-            <button 
-              onClick={clearAuthState}
-              className="w-full py-4 bg-primary text-secondary rounded-2xl font-bold uppercase tracking-widest hover:bg-primary-light transition-all shadow-xl"
-            >
-              Reset App Connection
-            </button>
-          </div>
-        </div>
-      )}
-      {authError && !isSuspended && (
+      {authError && (
         <div className="fixed top-4 right-4 z-[100] bg-red-900/90 border border-red-500 text-white px-4 py-3 rounded-md shadow-lg flex items-start max-w-md">
           <XCircle className="h-5 w-5 text-red-400 mr-3 mt-0.5 flex-shrink-0" />
           <div className="flex-1">
