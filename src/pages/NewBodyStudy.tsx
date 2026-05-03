@@ -37,7 +37,7 @@ import { signInWithGoogle } from '../lib/firebase';
 import { LogIn } from 'lucide-react';
 import AuthModal from '../components/AuthModal';
 
-const RESTRICTED_AUTHORS = ['Charles F. Baker', 'Harry Bultema', 'Cornelius R. Stam', 'C.R. Stam'];
+const RESTRICTED_AUTHORS: string[] = [];
 const ALLOWED_BUILDER_EMAIL = 'jjdster@gmail.com';
 
 // --- Components ---
@@ -111,7 +111,7 @@ const AIGuide = ({
         `;
 
         chatSessionRef.current = ai.chats.create({
-          model: "gemini-3-flash-preview",
+          model: "gemini-1.5-flash",
           config: {
             systemInstruction,
           },

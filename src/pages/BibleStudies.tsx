@@ -34,8 +34,8 @@ export default function BibleStudies() {
     },
     {
       title: "Law vs. Grace",
-      category: "Doctrine",
-      duration: "50 mins",
+      category: "Interactive",
+      duration: "Self-Paced",
       description: "Understanding why we are not under the law, but under grace, and what that means for our daily walk.",
       status: "Available",
       path: "/law-grace-study"
@@ -52,7 +52,7 @@ export default function BibleStudies() {
       title: "The New Body",
       category: "Hope",
       duration: "45 mins",
-      description: "Demonstrating the scriptural differences between our earthly body and the glorious heavenly body awaiting us.",
+      description: "Demonstrating the scriptural differences between our earthly body and the glorious heavenly body awaiting us and contrasting its origin and makeup of the eternal earthly bodies.",
       status: "Available",
       path: "/new-body-study"
     },

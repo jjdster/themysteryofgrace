@@ -82,6 +82,13 @@ export function handleFirestoreError(error: any, operationType: OperationType, p
     console.warn(`Firestore is currently offline or unreachable for ${operationType} on ${path}. This is expected in some environments.`);
     return;
   }
+
+  // Handle suspended project
+  if (error?.message?.includes('suspended')) {
+    console.error("CRITICAL: Firebase API Key suspended. Authentication and Database operations are restricted.");
+    // We don't throw here to avoid crashing the whole app, but we log the specific issue.
+  }
+
   const errInfo: FirestoreErrorInfo = {
     error: error instanceof Error ? error.message : String(error),
     authInfo: {

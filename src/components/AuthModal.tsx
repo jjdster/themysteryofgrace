@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Lock, User, Loader2, Eye, EyeOff } from 'lucide-react';
+import { X, Mail, Lock, User, Loader2, Eye, EyeOff, Sparkles, ShieldCheck, Info } from 'lucide-react';
 import { signInWithGoogle, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, auth } from '../lib/firebase';
 import { useAuth } from '../lib/AuthProvider';
 
@@ -36,18 +36,16 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setResetMessage(null);
     setShowResetPassword(false);
     try {
-      // Try to create the user first
       await createUserWithEmailAndPassword(auth, email, password);
       onClose();
     } catch (error: any) {
       if (error.code === 'auth/email-already-in-use') {
-        // If user exists, try to sign them in
         try {
           await signInWithEmailAndPassword(auth, email, password);
           onClose();
         } catch (signInError: any) {
           if (signInError.code === 'auth/invalid-credential' || signInError.code === 'auth/wrong-password') {
-            setAuthError("Incorrect password for this email. Please try again or reset your password.");
+            setAuthError("Incorrect password for this email.");
             setShowResetPassword(true);
           } else {
             setAuthError(signInError.message);
@@ -63,14 +61,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   const handleResetPassword = async () => {
     if (!email) {
-      setAuthError("Please enter your email address to reset your password.");
+      setAuthError("Please enter your email to reset password.");
       return;
     }
     setIsLoading(true);
-    setAuthError(null);
     try {
       await sendPasswordResetEmail(auth, email);
-      setResetMessage("Password reset email sent! Please check your inbox.");
+      setResetMessage("Verification sent. Check your inbox.");
       setShowResetPassword(false);
     } catch (error: any) {
       setAuthError(error.message);
@@ -85,7 +82,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       await signInWithGoogle();
       onClose();
     } catch (error: any) {
-      setAuthError(error.message);
+      if (error.message?.includes('suspended')) {
+        setAuthError("This application's database connection is temporarily suspended. We are working to resolve this. Use the 'Reset Connection' button if you are stuck.");
+      } else {
+        setAuthError(error.message);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -94,105 +95,152 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/50 z-50 backdrop-blur-sm"
+            className="absolute inset-0 bg-primary/60 backdrop-blur-md"
           />
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            className="w-full max-w-lg bg-white rounded-[2.5rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] overflow-hidden relative border border-white/20"
           >
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative border border-gray-100">
-              <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                <X className="h-5 w-5" />
-              </button>
-              <h2 className="text-2xl font-bold mb-6 text-gray-900">Sign In or Sign Up</h2>
+            {/* Header Ornament */}
+            <div className="h-2 bg-gradient-to-r from-accent via-accent-light to-accent"></div>
+            
+            <button 
+              onClick={onClose} 
+              className="absolute top-8 right-8 p-3 rounded-full bg-secondary hover:bg-secondary-light transition-colors text-primary/40"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className="p-12">
+              <div className="flex flex-col items-center mb-12">
+                <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center text-accent mb-6 shadow-inner">
+                  <ShieldCheck className="h-8 w-8" />
+                </div>
+                <h2 className="text-4xl font-serif font-bold text-primary mb-2">Grace Student Portal</h2>
+                <p className="text-primary/40 text-sm font-serif italic">Access the fellowship of the mystery</p>
+              </div>
               
               {authError && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg">
+                <motion.div 
+                  initial={{ x: -10, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  className="mb-8 p-6 bg-red-400/5 border border-red-400/20 text-red-600 text-xs font-bold tracking-wider uppercase rounded-2xl flex items-center gap-3"
+                >
+                  <Info className="h-4 w-4" />
                   {authError}
-                </div>
+                </motion.div>
               )}
               
               {resetMessage && (
-                <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg">
+                <motion.div 
+                  initial={{ y: -10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  className="mb-8 p-6 bg-accent/5 border border-accent/20 text-accent font-bold text-xs tracking-wider uppercase rounded-2xl flex items-center gap-3"
+                >
+                  <Sparkles className="h-4 w-4" />
                   {resetMessage}
-                </div>
+                </motion.div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="relative group">
+                  <Mail className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-primary/20 group-focus-within:text-accent transition-colors" />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="email@provider.com"
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent outline-none text-gray-900"
+                    placeholder="Ecclesia@faith.com"
+                    className="w-full pl-16 pr-6 py-5 bg-secondary border border-transparent focus:bg-white focus:border-accent/10 rounded-2xl text-primary font-medium outline-none transition-all"
                     required
                   />
                 </div>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                <div className="relative group">
+                  <Lock className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-primary/20 group-focus-within:text-accent transition-colors" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="password"
-                    className="w-full pl-10 pr-12 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent outline-none text-gray-900"
+                    placeholder="Enter Credential"
+                    className="w-full pl-16 pr-16 py-5 bg-secondary border border-transparent focus:bg-white focus:border-accent/10 rounded-2xl text-primary font-medium outline-none transition-all"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                    className="absolute right-6 top-1/2 -translate-y-1/2 text-primary/20 hover:text-accent"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-accent text-white py-2.5 rounded-lg font-bold hover:bg-accent-light transition-colors flex items-center justify-center gap-2"
-                >
-                  {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Continue'}
-                </button>
+
+                <div className="pt-4">
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full bg-primary text-secondary py-5 rounded-2xl font-bold tracking-[0.2em] uppercase text-xs hover:bg-primary-light transition-all shadow-xl shadow-primary/20 active:scale-[0.98] flex items-center justify-center gap-3"
+                  >
+                    {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Enter Portal'}
+                  </button>
+                </div>
                 
                 {showResetPassword && (
                   <button
                     type="button"
                     onClick={handleResetPassword}
-                    disabled={isLoading}
-                    className="w-full bg-secondary-light text-primary py-2.5 rounded-lg font-bold hover:bg-primary/5 transition-colors text-sm"
+                    className="w-full text-accent font-bold tracking-widest uppercase text-[10px] py-2 hover:underline"
                   >
-                    Reset Password
+                    Request Password Reset
                   </button>
                 )}
               </form>
 
-              <div className="my-6 flex items-center gap-4">
-                <div className="flex-1 h-px bg-gray-200" />
-                <span className="text-gray-400 text-sm">OR</span>
-                <div className="flex-1 h-px bg-gray-200" />
+              <div className="my-12 flex items-center gap-6">
+                <div className="flex-1 h-px bg-primary/5" />
+                <span className="text-primary/20 text-[10px] font-bold tracking-[0.3em]">SECURE PORTAL</span>
+                <div className="flex-1 h-px bg-primary/5" />
               </div>
 
               <button
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
-                className="w-full border border-gray-300 py-2.5 rounded-lg font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 text-gray-700"
+                className="w-full bg-white border border-primary/5 py-5 rounded-2xl font-bold tracking-[0.2em] uppercase text-[10px] text-primary hover:bg-secondary transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-4"
               >
-                <User className="h-5 w-5" />
-                Continue with Google
+                <div className="w-5 h-5 bg-accent/10 rounded flex items-center justify-center text-accent">
+                   <User className="h-4 w-4" />
+                </div>
+                Sign in with Google
               </button>
+
+              <div className="mt-8 text-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    window.location.reload();
+                  }}
+                  className="text-[9px] text-primary/30 uppercase tracking-[0.2em] hover:text-accent font-bold transition-colors"
+                >
+                  Stuck in a loop? Click here to Reset Connection
+                </button>
+              </div>
+            </div>
+            
+            <div className="bg-primary p-6 text-center">
+              <p className="text-secondary/30 text-[10px] font-bold tracking-widest uppercase">
+                Rightly Dividing the Word of Truth
+              </p>
             </div>
           </motion.div>
-        </>
+        </div>
       )}
     </AnimatePresence>
   );

@@ -21,6 +21,7 @@ import {
   Loader2,
   Maximize2,
   Menu,
+  Download,
   X
 } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
@@ -38,7 +39,7 @@ import { signInWithGoogle } from '../lib/firebase';
 import { LogIn } from 'lucide-react';
 import AuthModal from '../components/AuthModal';
 
-const RESTRICTED_AUTHORS = ['Charles F. Baker', 'Harry Bultema', 'Cornelius R. Stam', 'C.R. Stam'];
+const RESTRICTED_AUTHORS: string[] = [];
 const ALLOWED_BUILDER_EMAIL = 'jjdster@gmail.com';
 
 // --- Components ---
@@ -112,7 +113,7 @@ const AIGuide = ({
         `;
 
         chatSessionRef.current = ai.chats.create({
-          model: "gemini-3-flash-preview",
+          model: "gemini-1.5-flash",
           config: {
             systemInstruction,
           },
@@ -495,6 +496,7 @@ export default function LawGraceStudy() {
   const [currentLessonIdx, setCurrentLessonIdx] = useState(0);
   const [sessionId, setSessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`);
   const [isLeaderMode, setIsLeaderMode] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const handleSignIn = () => {
@@ -605,15 +607,24 @@ export default function LawGraceStudy() {
             </Link>
           )}
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <button 
+            onClick={() => navigate('/studies')}
+            className="px-10 py-4 bg-primary text-secondary rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-primary-light transition-all"
+          >
+            <Home className="h-5 w-5" />
+            Back to Bible Studies
+          </button>
+          {visibleStudyData.length > 0 && (
             <button 
-              onClick={() => navigate('/studies')}
-              className="px-10 py-4 bg-primary text-secondary rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-primary-light transition-all"
+              onClick={() => studyLogger.download()}
+              className="px-10 py-4 border-2 border-primary/10 text-primary rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-primary/5 transition-all"
             >
-              <Home className="h-5 w-5" />
-              Back to Bible Studies
+              <Download className="h-5 w-5" />
+              Download Study Logs
             </button>
-          </div>
+          )}
+        </div>
         </motion.div>
       </div>
     );
@@ -623,8 +634,92 @@ export default function LawGraceStudy() {
 
   return (
     <div className="min-h-screen bg-secondary-light">
-      {/* Header */}
-      <div className="bg-white border-b border-primary/10 py-8 px-4 sm:px-6 lg:px-8">
+      {/* Mobile Navigation Overlay */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 lg:hidden"
+          >
+            <div className="absolute inset-0 bg-primary/20 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
+            <motion.div 
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              className="absolute inset-y-0 left-0 w-80 bg-white shadow-2xl p-6 overflow-y-auto"
+            >
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5 text-accent" />
+                  <span className="font-serif font-bold text-primary">Study Content</span>
+                </div>
+                <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-secondary-light rounded-xl transition-colors">
+                  <X className="h-5 w-5 text-primary/40" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-[10px] uppercase tracking-widest font-bold text-primary/40 mb-4">Modules</h3>
+                  <div className="space-y-1">
+                    {visibleStudyData.map((mod, idx) => (
+                      <button
+                        key={mod.id}
+                        onClick={() => {
+                          setCurrentModuleIdx(idx);
+                          setCurrentLessonIdx(0);
+                          setIsOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
+                          idx === currentModuleIdx 
+                            ? 'bg-primary text-secondary' 
+                            : 'hover:bg-secondary-light text-primary/60'
+                        }`}
+                      >
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold ${
+                          idx === currentModuleIdx ? 'bg-accent text-white' : 'bg-primary/10'
+                        }`}>
+                          {idx + 1}
+                        </div>
+                        <span className="text-sm font-medium">{mod.title}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Sticky Mobile Header */}
+      <div className="lg:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-primary/10 px-4 py-3 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-2">
+          <BookOpen className="h-5 w-5 text-accent" />
+          <span className="text-sm font-serif font-bold text-primary truncate max-w-[200px]">
+            {currentLesson.title}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => setIsOpen(!isOpen)}
+            className="p-2 bg-secondary-light rounded-lg text-primary/60"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+          <button 
+            onClick={() => navigate('/studies')}
+            className="p-2 bg-red-50 rounded-lg text-red-500"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Header (Desktop) */}
+      <div className="hidden lg:block bg-white border-b border-primary/10 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <div className="flex items-center gap-2 text-accent mb-2">

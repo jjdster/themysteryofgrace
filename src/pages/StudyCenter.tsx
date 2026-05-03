@@ -17,13 +17,17 @@ import {
   X,
   Volume2,
   History,
-  Plus
+  Plus,
+  ArrowRight,
+  Shield,
+  Lightbulb,
+  ArrowLeft
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { GoogleGenAI } from "@google/genai";
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth, db, handleFirestoreError, OperationType } from '../lib/firebase';
-import { collection, query, where, orderBy, onSnapshot, doc, addDoc, serverTimestamp, updateDoc, arrayUnion, getDocs } from 'firebase/firestore';
+import { auth, db } from '../lib/firebase';
+import { collection, query, where, orderBy, onSnapshot, doc, addDoc, serverTimestamp, updateDoc, arrayUnion } from 'firebase/firestore';
 import { getGeminiApiKey } from '../lib/api';
 import { studyLogger } from '../lib/logger';
 import ScriptureText from '../components/ScriptureText';
@@ -32,7 +36,6 @@ import { prophecyMysteryData } from '../data/prophecyMysteryData';
 import { sevenOnesData } from '../data/sevenOnesData';
 import { dualMinistryData } from '../data/dualMinistryData';
 import { CUSTOM_STUDY_MATERIALS } from '../data/customStudyMaterials';
-import { DebugPanel } from '../components/DebugPanel';
 import { SpeakButton } from '../components/SpeakButton';
 
 // Shared Data
@@ -95,10 +98,10 @@ const libraryBooks = [
   { id: 'w2', title: 'Thematic Preaching', author: 'Roland Wilson' },
 ];
 
-const RESTRICTED_AUTHORS = ['Charles F. Baker', 'Harry Bultema', 'Cornelius R. Stam', 'C.R. Stam'];
+const RESTRICTED_AUTHORS: string[] = [];
 const ALLOWED_BUILDER_EMAIL = 'jjdster@gmail.com';
 
-const faqs = [
+const faqsList = [
   {
     question: "What does it mean to 'rightly divide' the Word of Truth?",
     answer: "Rightly dividing the Word of Truth (2 Timothy 2:15) means recognizing the distinctions in God's dealings with mankind throughout history. Specifically, it involves distinguishing between God's program for the nation of Israel (Prophecy) and His current program for the Body of Christ (the Mystery revealed to Paul)."
@@ -153,8 +156,6 @@ export default function StudyCenter() {
   const [dialogueThreads, setDialogueThreads] = useState<any[]>([]);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [isThreadsLoading, setIsThreadsLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const dialogueSectionRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const chatRef = useRef<any>(null);
 
@@ -188,51 +189,27 @@ export default function StudyCenter() {
       }));
 
       chatRef.current = ai.chats.create({
-        model: "gemini-3-flash-preview",
+        model: "gemini-1.5-flash",
         history: geminiHistory,
         config: {
           systemInstruction: `You are a scholarly guide specializing in 'Grace Library' and the Pauline revelation. CRITICAL: You MUST prioritize and defer to the Scriptures (King James Bible and New International Version) as your original and primary sources. Your goal is to help the user understand the preaching of Jesus Christ according to the revelation of the mystery (Romans 16:25), applying 'rightly dividing the Word of Truth' (2 Timothy 2:15). 
           
-          CLARIFICATION ON DOCTRINE:
-          Understand that the 'New Testament' (as a book division) contains both the program for Israel and the revelation of the mystery. 
-          CRITICAL: Do NOT say that the New Testament reveals spiritual baptism. Instead, recognize that spiritual baptism (placing the believer into a heavenly/celestial position) is strictly revealed in the REVELATION OF THE MYSTERY as preached by the apostle Paul.
-          Specifically, recognize the distinction between God's earthly program (Terrestrial) and His heavenly program for the Body of Christ (Mystery/Celestial). Understand that while current terrestrial bodies are corruptible, resurrected terrestrial bodies (for the earthly kingdom) are incorruptible yet remain terrestrial. Distinguish these from celestial bodies, which are 'from heaven' (2 Cor 5:2) and a present possession (2 Cor 5:1). Clarify that to 'rise' (1 Thess 4:16) refers to the resurrection—standing erect being clothed with this body from heaven. Recognize that the entire event occurs in an 'atomos' (1 Cor 15:52)—an indivisible moment—meaning that while there is a logical order, no earthly time is consumed in the transition. 
-          
-          ADDITIONAL RESOURCES: You also have access to the following custom study materials which you should research and refer to when relevant:
-          ${customContext}
-          
-          FORMATTING: When enumerating points or aspects of your response, you MUST start a new paragraph for each point to ensure clarity. Be respectful, insightful, and deep in doctrine.`,
+          FORMATTING: When enumerating points or aspects of your response, you MUST start a new paragraph for each point. Be respectful, insightful, and deep in doctrine.`,
         },
       });
       return true;
     } catch (err) {
       console.error("Chat Init Error:", err);
-      setDialogueError("Failed to initialize study guide. Please try again.");
+      setDialogueError("Failed to initialize study guide.");
       return false;
     } finally {
       setIsInitializing(false);
     }
   };
 
-  // Initialize Chat for Dialogue
   useEffect(() => {
     initChat(messages);
   }, [customContext]);
-
-  useEffect(() => {
-    if (activeTab === 'dialogue' && messages.length > 0) {
-      const lastMessage = messages[messages.length - 1];
-      
-      // If the AI just started responding or a new message was added
-      // Scroll the window to the top of the dialogue section
-      dialogueSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      
-      // Also scroll the internal chat container to the top as requested
-      if (chatContainerRef.current) {
-        chatContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    }
-  }, [messages, activeTab]);
 
   // Fetch threads for logged in user
   useEffect(() => {
@@ -265,7 +242,6 @@ export default function StudyCenter() {
     return () => unsubscribe();
   }, [currentUser]);
 
-  // Load messages when active thread changes
   useEffect(() => {
     if (!activeThreadId) return;
     const thread = dialogueThreads.find(t => t.id === activeThreadId);
@@ -273,18 +249,6 @@ export default function StudyCenter() {
       setMessages(thread.messages || []);
     }
   }, [activeThreadId, dialogueThreads]);
-
-  const startNewThread = () => {
-    setActiveThreadId(null);
-    setMessages([]);
-    chatRef.current = null;
-    setSessionId(`study_session_${Date.now()}`);
-  };
-
-  const selectThread = (threadId: string) => {
-    setActiveThreadId(threadId);
-    chatRef.current = null; // Re-initializes chat with history when next message is sent
-  };
 
   const handleSearch = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -331,23 +295,8 @@ export default function StudyCenter() {
       const apiKey = getGeminiApiKey();
       if (apiKey) {
         const ai = new GoogleGenAI({ apiKey });
-        const model = "gemini-3-flash-preview";
-        const systemInstruction = `You are a theological research assistant. CRITICAL: You MUST prioritize and defer to the Scriptures (King James Bible and New International Version) as your original and primary sources, always applying the principle of 'rightly dividing the Word of Truth' (2 Timothy 2:15). 
-        
-        CLARIFICATION ON DOCTRINE:
-        Understand that the 'New Testament' (as a book division) contains both the program for Israel and the revelation of the mystery. 
-        CRITICAL: Do NOT say that the New Testament reveals spiritual baptism. Instead, recognize that spiritual baptism (placing the believer into a heavenly/celestial position) is strictly revealed in the REVELATION OF THE MYSTERY as preached by the apostle Paul.
-
-        Recognize the distinction between God's earthly program (Terrestrial) and His heavenly program for the Body of Christ (Celestial). 
-        Understand that while current terrestrial bodies are corruptible, resurrected terrestrial bodies are incorruptible. Distinguish these from the celestial body which is a present possession in the heavens (2 Cor 5:1).
-        Recognize that 'rising' in resurrection refers to standing erect in that new body, and that the entire event (resurrection and catching away) occurs in an 'atomos' (1 Cor 15:52)—an indivisible moment—consuming no earthly time.
-        
-        ADDITIONAL RESOURCES: You also have access to the following custom study materials which you should research and refer to when relevant:
-        ${customContext}
-        
-        FORMATTING: When enumerating points or aspects of your response, you MUST start a new paragraph for each point to ensure clarity.
-        LIBRARY CONTEXT: Books by ${hasBuilderAccess ? 'Charles F. Baker, Harry Bultema, Cornelius R. Stam, ' : ''}Donald G. Campbell, Joel Fink, and Roland Wilson. 
-        TASK: Based on the user's query, identify which books or lessons are most relevant. Be concise. Use Scripture references.`;
+        const model = "gemini-1.5-flash";
+        const systemInstruction = `You are a theological research assistant specializing in the Dispensation of the Grace of God. Identify relevant resources from the Grace Library for the query.`;
         const response = await ai.models.generateContent({
           model,
           contents: `User Query: "${searchQuery}"`,
@@ -366,7 +315,6 @@ export default function StudyCenter() {
     e?.preventDefault();
     if (!dialogueInput.trim() || isDialogueLoading) return;
 
-    // Ensure chat is initialized with history if it's the first message of a loaded thread
     if (!chatRef.current) {
       const success = await initChat(messages);
       if (!success) return;
@@ -377,7 +325,6 @@ export default function StudyCenter() {
     const newUserMessage: Message = { role: 'user', text: userMessage };
     setMessages(prev => [...prev, newUserMessage]);
     setIsDialogueLoading(true);
-    setDialogueError(null);
 
     try {
       const result = await chatRef.current.sendMessageStream({ message: userMessage });
@@ -398,43 +345,29 @@ export default function StudyCenter() {
 
       setFullScreenMessage(fullText);
 
-      // Persist to Firestore if user is logged in
       if (currentUser) {
-        try {
-          if (!activeThreadId) {
-            // Create new thread
-            const newThread = {
-              userId: currentUser.uid,
-              userEmail: currentUser.email,
-              title: userMessage.substring(0, 40) + (userMessage.length > 40 ? '...' : ''),
-              createdAt: serverTimestamp(),
-              lastMessageAt: serverTimestamp(),
-              messages: [...messages, newUserMessage, { role: 'model', text: fullText }]
-            };
-            const path = 'dialogue_threads';
-            const docRef = await addDoc(collection(db, path), newThread);
-            setActiveThreadId(docRef.id);
-          } else {
-            // Update existing thread
-            const threadRef = doc(db, 'dialogue_threads', activeThreadId);
-            await updateDoc(threadRef, {
-              lastMessageAt: serverTimestamp(),
-              messages: arrayUnion(newUserMessage, { role: 'model', text: fullText })
-            });
-          }
-        } catch (err) {
-          // Non-blocking but logged
-          console.error("Firestore persistence error:", err);
+        if (!activeThreadId) {
+          const newThread = {
+            userId: currentUser.uid,
+            userEmail: currentUser.email,
+            title: userMessage.substring(0, 40) + (userMessage.length > 40 ? '...' : ''),
+            createdAt: serverTimestamp(),
+            lastMessageAt: serverTimestamp(),
+            messages: [...messages, newUserMessage, { role: 'model', text: fullText }]
+          };
+          const docRef = await addDoc(collection(db, 'dialogue_threads'), newThread);
+          setActiveThreadId(docRef.id);
+        } else {
+          const threadRef = doc(db, 'dialogue_threads', activeThreadId);
+          await updateDoc(threadRef, {
+            lastMessageAt: serverTimestamp(),
+            messages: arrayUnion(newUserMessage, { role: 'model', text: fullText })
+          });
         }
       }
-
-      studyLogger.logSessionInteraction(sessionId, "Study Center Dialogue", {
-        type: 'chat',
-        data: { userMessage, aiResponse: fullText }
-      });
     } catch (err) {
       console.error("Dialogue error:", err);
-      setDialogueError("Failed to send message. Please try again.");
+      setDialogueError("Failed to send message.");
     } finally {
       setIsDialogueLoading(false);
     }
@@ -444,40 +377,38 @@ export default function StudyCenter() {
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="bg-secondary min-h-screen pb-20"
+      className="bg-secondary-light min-h-screen pb-20"
     >
-      <header className="bg-primary py-24 text-center px-4">
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-4xl md:text-6xl font-serif text-secondary mb-4"
-        >
-          Study Center
-        </motion.h1>
-        <p className="text-accent-light tracking-[0.2em] uppercase text-sm font-medium">
-          Search • Dialogue • Understanding
-        </p>
+      <header className="relative bg-primary pt-32 pb-48 overflow-hidden">
+        <div className="absolute inset-0 opacity-10 pointer-events-none">
+          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-accent/20 rounded-full blur-[160px] translate-x-1/2 -translate-y-1/2"></div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 relative z-10 text-center">
+          <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6">AI Study <span className="text-accent-light italic">Center</span></h1>
+          <p className="text-secondary/50 text-xl font-serif italic tracking-wide max-w-2xl mx-auto">
+            Interactive research, scholarly dialogue, and foundational understanding.
+          </p>
+        </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 -mt-8 relative z-20">
-        {/* Tab Navigation */}
-        <div className="flex flex-wrap justify-center gap-2 mb-12">
+      <div className="max-w-6xl mx-auto px-4 -mt-24 relative z-20">
+        {/* Tab Interface */}
+        <div className="bg-white rounded-[2.5rem] shadow-[0_32px_80px_-16px_rgba(0,0,0,0.15)] p-4 mb-12 border border-primary/5 flex flex-wrap justify-center gap-2">
           {[
-            { id: 'search', label: 'Search Library', icon: SearchIcon },
+            { id: 'search', label: 'Research Library', icon: SearchIcon },
             { id: 'dialogue', label: 'Scholarly Dialogue', icon: MessageSquare },
-            { id: 'faq', label: 'Common Questions', icon: HelpCircle }
-          ].map((tab) => (
+            { id: 'faq', label: 'Foundational FAQ', icon: HelpCircle }
+          ].map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center px-6 py-3 rounded-full font-medium transition-all shadow-md ${
+              className={`flex items-center px-8 py-4 rounded-2xl text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase transition-all ${
                 activeTab === tab.id 
-                  ? 'bg-accent text-white scale-105' 
-                  : 'bg-white text-primary/60 hover:bg-secondary-light'
+                  ? 'bg-primary text-white shadow-xl shadow-primary/20 scale-105' 
+                  : 'text-primary/40 hover:bg-secondary'
               }`}
             >
-              <tab.icon className="h-4 w-4 mr-2" />
+              <tab.icon className="h-4 w-4 mr-3" />
               {tab.label}
             </button>
           ))}
@@ -486,106 +417,115 @@ export default function StudyCenter() {
         <AnimatePresence mode="wait">
           {activeTab === 'search' && (
             <motion.div
-              key="search-tab"
-              initial={{ opacity: 0, y: 20 }}
+              key="search"
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              exit={{ opacity: 0, scale: 0.95 }}
               className="space-y-12"
             >
               <div className="max-w-3xl mx-auto">
-                <form onSubmit={handleSearch} className="relative">
-                  <SearchIcon className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-primary/30" />
+                <form onSubmit={handleSearch} className="relative group">
+                  <SearchIcon className="absolute left-8 top-1/2 -translate-y-1/2 h-6 w-6 text-primary/20 group-focus-within:text-accent transition-colors" />
                   <input
                     type="text"
-                    placeholder="Search topics..."
+                    placeholder="Search the Dispensation of Grace..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-12 pr-28 md:pl-16 md:pr-32 py-4 md:py-6 bg-white rounded-2xl md:rounded-3xl border border-primary/10 shadow-xl focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all text-lg md:text-xl text-primary"
+                    className="w-full bg-white border border-primary/5 shadow-2xl rounded-[2rem] px-20 py-8 text-xl text-primary focus:outline-none focus:border-accent/30 transition-all"
                   />
-                  <button
+                  <button 
                     type="submit"
-                    disabled={isSearching || !searchQuery.trim()}
-                    className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 px-4 md:px-6 py-2 md:py-3 bg-primary text-secondary rounded-xl md:rounded-2xl font-bold hover:bg-primary-light transition-colors disabled:opacity-50 text-sm md:text-base"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-5 bg-primary text-white rounded-2xl hover:bg-primary-light shadow-xl transition-all"
                   >
-                    {isSearching ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Search'}
+                    <ArrowRight className="h-6 w-6" />
                   </button>
                 </form>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                <div className="lg:col-span-2 space-y-8">
+                <div className="lg:col-span-2 space-y-10">
                   {isSearchAiLoading ? (
-                    <div className="bg-white p-8 rounded-3xl border border-accent/20 shadow-lg animate-pulse">
-                      <div className="flex items-center space-x-3 mb-6">
-                        <Sparkles className="h-6 w-6 text-accent" />
-                        <div className="h-6 bg-secondary-light rounded w-48"></div>
-                      </div>
+                    <div className="paper-card p-12 bg-white/50 animate-pulse">
+                      <div className="h-8 bg-primary/5 rounded w-1/3 mb-8"></div>
                       <div className="space-y-4">
-                        <div className="h-4 bg-secondary-light rounded w-3/4"></div>
-                        <div className="h-4 bg-secondary-light rounded w-full"></div>
+                        <div className="h-4 bg-primary/5 rounded w-full"></div>
+                        <div className="h-4 bg-primary/5 rounded w-5/6"></div>
+                        <div className="h-4 bg-primary/5 rounded w-4/5"></div>
                       </div>
                     </div>
-                  ) : searchAiResponse ? (
-                    <div className="bg-white p-8 rounded-3xl border border-accent/20 shadow-lg relative overflow-hidden">
-                      <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center space-x-3">
-                          <Sparkles className="h-6 w-6 text-accent" />
-                          <h2 className="text-xl font-serif font-bold text-primary">AI Library Insights</h2>
-                        </div>
-                        <SpeakButton text={searchAiResponse} size="md" />
+                  ) : searchAiResponse && (
+                    <div className="paper-card p-12 overflow-hidden relative">
+                      <div className="absolute top-0 right-0 p-8">
+                        <Sparkles className="h-8 w-8 text-accent opacity-20" />
                       </div>
-                      <div className="prose prose-primary max-w-none text-primary/80 leading-relaxed whitespace-pre-wrap">
+                      <div className="flex items-center gap-4 mb-8">
+                        <div className="p-3 bg-accent/5 rounded-xl text-accent">
+                          <Lightbulb className="h-6 w-6" />
+                        </div>
+                        <h2 className="text-2xl font-serif font-bold text-primary">Scholarly Overview</h2>
+                      </div>
+                      <div className="prose prose-primary max-w-none text-primary/70 leading-relaxed font-serif text-lg">
                         <ScriptureText text={searchAiResponse} />
                       </div>
                     </div>
-                  ) : null}
+                  )}
 
                   <div className="space-y-6">
-                    <h2 className="text-2xl font-serif font-bold text-primary flex items-center">
-                      <FileText className="mr-3 h-6 w-6 text-accent" />
-                      Direct Matches
-                    </h2>
+                    <div className="flex items-center gap-4 px-4">
+                      <div className="h-px flex-1 bg-primary/10"></div>
+                      <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-primary/30">Direct Library Matches</span>
+                      <div className="h-px flex-1 bg-primary/10"></div>
+                    </div>
+                    
                     {searchResults.length > 0 ? (
                       <div className="grid grid-cols-1 gap-4">
-                        {searchResults.map((result, idx) => (
+                        {searchResults.map((res, i) => (
                           <Link
-                            key={idx}
-                            to={result.link}
-                            className="group bg-white p-6 rounded-2xl border border-primary/5 shadow-sm hover:shadow-md hover:border-accent/30 transition-all flex items-center justify-between"
+                            key={i}
+                            to={res.link}
+                            className="paper-card p-6 flex items-center justify-between group hover:border-accent/30"
                           >
-                            <div className="flex items-center space-x-4">
-                              <div className="p-3 bg-secondary-light rounded-xl text-primary/40 group-hover:bg-accent/10 group-hover:text-accent transition-colors">
-                                {result.type === 'book' ? <Book className="h-5 w-5" /> : <FileText className="h-5 w-5" />}
+                            <div className="flex items-center gap-6">
+                              <div className="p-4 bg-secondary group-hover:bg-accent/5 rounded-xl text-primary/20 group-hover:text-accent transition-all">
+                                {res.type === 'book' ? <Book className="h-6 w-6" /> : <FileText className="h-6 w-6" />}
                               </div>
                               <div>
-                                <h3 className="font-bold text-primary group-hover:text-accent transition-colors">{result.title}</h3>
-                                <p className="text-sm text-primary/50">{result.subtitle}</p>
+                                <h4 className="font-bold text-primary group-hover:text-accent transition-colors">{res.title}</h4>
+                                <span className="text-[10px] font-bold tracking-widest uppercase text-primary/30">{res.subtitle}</span>
                               </div>
                             </div>
-                            <ChevronRight className="h-5 w-5 text-primary/20 group-hover:text-accent transition-all" />
+                            <ChevronRight className="h-5 w-5 text-primary/10 group-hover:text-accent group-hover:translate-x-1 transition-all" />
                           </Link>
                         ))}
                       </div>
-                    ) : searchQuery && !isSearching ? (
-                      <div className="text-center py-12 bg-white rounded-3xl border border-dashed border-primary/10">
-                        <p className="text-primary/40">No direct matches found for "{searchQuery}"</p>
-                      </div>
-                    ) : (
-                      <div className="text-center py-12 bg-white/50 rounded-3xl border border-dashed border-primary/10">
-                        <p className="text-primary/40 italic">Enter a query above to search the library and studies.</p>
+                    ) : searchQuery && !isSearching && (
+                      <div className="text-center py-20 bg-secondary rounded-[2rem] border border-dashed border-primary/10">
+                        <p className="text-primary/40 font-serif italic text-lg">No direct matches found in our indices.</p>
                       </div>
                     )}
                   </div>
                 </div>
 
                 <div className="space-y-8">
-                  <div className="bg-primary p-8 rounded-3xl text-secondary shadow-xl">
-                    <h3 className="text-xl font-serif font-bold mb-4">Quick Links</h3>
-                    <ul className="space-y-3 text-sm">
-                      <li><Link to="/library" className="text-secondary/70 hover:text-accent-light flex items-center"><ChevronRight className="h-4 w-4 mr-2" />Browse Library</Link></li>
-                      <li><Link to="/baptism-study" className="text-secondary/70 hover:text-accent-light flex items-center"><ChevronRight className="h-4 w-4 mr-2" />Baptism Study</Link></li>
-                      <li><Link to="/prophecy-mystery-study" className="text-secondary/70 hover:text-accent-light flex items-center"><ChevronRight className="h-4 w-4 mr-2" />Prophecy vs Mystery</Link></li>
-                    </ul>
+                  <div className="bg-primary p-10 rounded-[2.5rem] text-secondary shadow-2xl relative overflow-hidden">
+                    <div className="absolute bottom-0 right-0 p-8 opacity-10">
+                      <BookOpen className="h-32 w-32" />
+                    </div>
+                    <h3 className="text-2xl font-serif font-bold mb-8 text-accent-light">Study Tools</h3>
+                    <div className="space-y-6">
+                      <Link to="/library" className="flex items-center justify-between p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                        <span className="text-sm font-bold tracking-wide uppercase">Full Library</span>
+                        <ArrowRight className="h-4 w-4" />
+                      </Link>
+                      <Link to="/baptism-study" className="flex items-center justify-between p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                        <span className="text-sm font-bold tracking-wide uppercase">Baptism Core</span>
+                        <ArrowRight className="h-4 w-4" />
+                      </Link>
+                      <Link to="/videos" className="flex items-center justify-between p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                        <span className="text-sm font-bold tracking-wide uppercase">Video Archive</span>
+                        <ArrowRight className="h-4 w-4" />
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -594,145 +534,108 @@ export default function StudyCenter() {
 
           {activeTab === 'dialogue' && (
             <motion.div
-              key="dialogue-tab"
-              ref={dialogueSectionRef}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6"
+              key="dialogue"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="grid grid-cols-1 lg:grid-cols-4 gap-8 h-[80vh]"
             >
-              {/* History Sidebar */}
-              <div className="lg:col-span-1 space-y-4">
+              {/* Dialogue History Sidebar */}
+              <div className="lg:col-span-1 hidden lg:flex flex-col gap-4 h-full">
                 <button
-                  onClick={startNewThread}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-accent text-white rounded-xl font-bold hover:bg-accent-light transition-all shadow-lg"
+                  onClick={() => { setActiveThreadId(null); setMessages([]); }}
+                  className="w-full bg-accent text-white p-6 rounded-[1.5rem] font-bold tracking-widest uppercase text-xs shadow-xl shadow-accent/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3"
                 >
-                  <Plus className="h-4 w-4" />
-                  New Dialogue
+                  <Plus className="h-4 w-4" /> New Study Session
                 </button>
-                
-                <div className="bg-zinc-900/40 rounded-2xl border border-white/5 p-4 backdrop-blur-sm overflow-hidden flex flex-col max-h-[50vh] lg:max-h-[60vh]">
-                  <div className="flex items-center gap-2 mb-4 px-2">
+                <div className="flex-1 bg-white rounded-[2rem] border border-primary/5 shadow-xl p-6 overflow-hidden flex flex-col">
+                  <div className="flex items-center gap-2 mb-6 px-2">
                     <History className="h-4 w-4 text-accent" />
-                    <h3 className="text-secondary/60 text-sm font-serif uppercase tracking-wider">Previous Sessions</h3>
+                    <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-primary/40">History</span>
                   </div>
-                  
-                  <div className="space-y-2 overflow-y-auto pr-2 custom-scrollbar">
-                    {isThreadsLoading ? (
-                      <div className="flex justify-center p-8">
-                        <Loader2 className="h-6 w-6 text-accent animate-spin" />
-                      </div>
-                    ) : dialogueThreads.length > 0 ? (
-                      dialogueThreads.map((thread) => (
-                        <button
-                          key={thread.id}
-                          onClick={() => selectThread(thread.id)}
-                          className={`w-full text-left p-3 rounded-xl transition-all group ${
-                            activeThreadId === thread.id 
-                              ? 'bg-accent/20 border border-accent/30 text-secondary' 
-                              : 'hover:bg-white/5 border border-transparent text-secondary/40'
-                          }`}
-                        >
-                          <p className="text-sm font-medium line-clamp-1 group-hover:text-secondary transition-colors">
-                            {thread.title}
-                          </p>
-                          <p className="text-[10px] opacity-40 mt-1">
-                            {new Date(thread.lastMessageAt?.seconds * 1000 || Date.now()).toLocaleDateString()}
-                          </p>
-                        </button>
-                      ))
-                    ) : (
-                      <div className="text-center py-8 px-4 border border-dashed border-white/5 rounded-xl">
-                        <p className="text-secondary/20 text-xs italic">No previous dialogues found.</p>
-                      </div>
-                    )}
+                  <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+                    {dialogueThreads.map(thread => (
+                      <button
+                        key={thread.id}
+                        onClick={() => setActiveThreadId(thread.id)}
+                        className={`w-full text-left p-4 rounded-xl transition-all ${
+                          activeThreadId === thread.id 
+                            ? 'bg-primary text-white' 
+                            : 'hover:bg-secondary text-primary/60'
+                        }`}
+                      >
+                        <p className="text-xs font-bold truncate mb-1">{thread.title}</p>
+                        <p className={`text-[8px] font-mono tracking-widest ${activeThreadId === thread.id ? 'opacity-50' : 'text-primary/20'}`}>
+                          {new Date(thread.lastMessageAt?.seconds * 1000).toLocaleDateString()}
+                        </p>
+                      </button>
+                    ))}
                   </div>
                 </div>
-                
-                {!currentUser && (
-                  <div className="p-4 bg-accent/10 border border-accent/20 rounded-xl">
-                    <p className="text-accent text-xs text-center font-medium">Log in to save your study history permanently.</p>
-                  </div>
-                )}
               </div>
 
-              {/* Main Chat Area */}
-              <div className="lg:col-span-3">
-                <div className="bg-zinc-900/50 rounded-3xl border border-white/5 overflow-hidden flex flex-col h-[60vh] shadow-2xl relative">
-                  <div className="px-6 py-4 border-b border-white/5 bg-black/20 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <MessageSquare className="h-5 w-5 text-accent" />
-                      <h2 className="text-secondary font-serif font-bold">
-                        {activeThreadId 
-                          ? dialogueThreads.find(t => t.id === activeThreadId)?.title || 'Scholarly Dialogue'
-                          : 'New Scholarly Dialogue'
-                        }
-                      </h2>
+              {/* Chat Interface */}
+              <div className="lg:col-span-3 flex flex-col bg-white rounded-[2.5rem] shadow-2xl border border-primary/5 overflow-hidden h-full relative">
+                <div className="px-10 py-6 border-b border-primary/5 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></div>
+                    <h3 className="font-serif font-bold text-primary italic">Counselor Mode</h3>
+                  </div>
+                  {isDialogueLoading && <Loader2 className="h-4 w-4 text-accent animate-spin" />}
+                </div>
+
+                <div 
+                  className="flex-1 overflow-y-auto p-10 space-y-12 custom-scrollbar"
+                >
+                  {messages.length === 0 && (
+                    <div className="h-full flex flex-col items-center justify-center text-center px-12">
+                      <div className="ornament mb-8 text-primary/20"></div>
+                      <h4 className="text-3xl font-serif text-primary/20 italic mb-4">Awaiting Inquiry</h4>
+                      <p className="text-primary/30 text-sm font-serif max-w-sm">"Ask, and it shall be given you; seek, and ye shall find; knock, and it shall be opened unto you."</p>
                     </div>
-                  </div>
-
-                  <div 
-                    ref={chatContainerRef}
-                    className="flex-grow overflow-y-auto p-6 space-y-6"
-                  >
-                    {messages.length === 0 && (
-                      <div className="h-full flex flex-col items-center justify-center text-center px-8">
-                        <BookOpen className="h-12 w-12 text-secondary/10 mb-4" />
-                        <h3 className="text-secondary/60 font-serif text-xl mb-2">Begin Your Study</h3>
-                        <p className="text-secondary/30 text-sm max-w-xs">Ask a question about the Dispensation of Grace or the Pauline revelation.</p>
-                      </div>
-                    )}
-                    {messages.map((msg, i) => (
-                      <div key={i} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                        <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center border ${msg.role === 'user' ? 'bg-accent/10 border-accent/20 text-accent' : 'bg-zinc-800 border-white/5 text-secondary/60'}`}>
-                          {msg.role === 'user' ? <User className="h-4 w-4" /> : <BookOpen className="h-4 w-4" />}
+                  )}
+                  {messages.map((msg, i) => (
+                    <motion.div 
+                      key={i} 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div className={`max-w-[85%] group relative ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                        <div className={`inline-block px-8 py-6 rounded-[2rem] text-lg font-serif leading-relaxed ${
+                          msg.role === 'user' 
+                            ? 'bg-primary text-white rounded-tr-none' 
+                            : 'bg-secondary text-primary/80 rounded-tl-none italic'
+                        }`}>
+                          <ScriptureText text={msg.text} />
                         </div>
-                        <div 
-                          onClick={() => msg.role === 'model' && setFullScreenMessage(msg.text)}
-                          className={`max-w-[80%] p-4 rounded-2xl font-serif text-lg whitespace-pre-wrap cursor-pointer transition-all ${
-                            msg.role === 'user' 
-                              ? 'bg-accent text-white rounded-tr-none' 
-                              : 'bg-white/5 text-secondary/80 rounded-tl-none italic hover:bg-white/10'
-                          }`}
-                        >
-                          <ScriptureText 
-                            text={msg.text} 
-                            linkClassName={msg.role === 'user' ? 'text-white underline font-bold' : 'text-accent-light hover:text-white underline decoration-dotted transition-colors'}
-                          />
-                          {msg.role === 'model' && (
-                            <div className="flex items-center justify-between mt-2">
-                            <div className="text-[10px] text-secondary/20 flex items-center gap-1">
-                              <Sparkles className="h-2 w-2" /> Click to expand full screen
-                            </div>
-                            <SpeakButton text={msg.text} size="sm" className="bg-white/5 rounded-lg p-1" />
-                          </div>
-                          )}
+                        <div className={`flex items-center gap-4 mt-2 px-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                          <span className="text-[10px] font-bold tracking-widest uppercase opacity-20">{msg.role === 'user' ? 'Student' : 'Counselor'}</span>
+                          {msg.role === 'model' && <SpeakButton text={msg.text} size="sm" />}
                         </div>
                       </div>
-                    ))}
-                    <div ref={messagesEndRef} />
-                  </div>
+                    </motion.div>
+                  ))}
+                  <div ref={chatContainerRef} />
+                </div>
 
-                  <div className="p-6 bg-black/20 border-t border-white/5">
-                    <form onSubmit={handleDialogueSend} className="relative">
-                      <input
-                        type="text"
-                        value={dialogueInput}
-                        onChange={(e) => setDialogueInput(e.target.value)}
-                        placeholder="Ask about the Revelation of the Mystery..."
-                        disabled={isDialogueLoading || isInitializing}
-                        className="w-full bg-zinc-800 border border-white/10 rounded-2xl px-6 py-4 pr-16 text-secondary focus:outline-none focus:border-accent/50 transition-colors font-serif italic text-lg disabled:opacity-50"
-                      />
-                      <button
-                        type="submit"
-                        disabled={isDialogueLoading || isInitializing || !dialogueInput.trim()}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-3 bg-accent text-white rounded-xl hover:bg-accent-light transition-all disabled:opacity-50"
-                      >
-                        {isDialogueLoading || isInitializing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
-                      </button>
-                    </form>
-                    {dialogueError && <p className="mt-2 text-red-400 text-xs text-center">{dialogueError}</p>}
-                  </div>
+                <div className="p-8 bg-secondary/30 border-t border-primary/5">
+                  <form onSubmit={handleDialogueSend} className="relative">
+                    <input
+                      type="text"
+                      value={dialogueInput}
+                      onChange={(e) => setDialogueInput(e.target.value)}
+                      placeholder="Ex: 'What is the revelation of the mystery?'"
+                      className="w-full bg-white border border-primary/10 rounded-[1.5rem] px-8 py-6 pr-20 text-primary shadow-inner focus:outline-none focus:border-accent/30 transition-all font-serif italic text-lg"
+                    />
+                    <button
+                      type="submit"
+                      disabled={!dialogueInput.trim() || isDialogueLoading}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-4 text-accent hover:bg-accent/5 rounded-xl disabled:opacity-20"
+                    >
+                      <ArrowRight className="h-8 w-8" />
+                    </button>
+                  </form>
                 </div>
               </div>
             </motion.div>
@@ -740,87 +643,72 @@ export default function StudyCenter() {
 
           {activeTab === 'faq' && (
             <motion.div
-              key="faq-tab"
-              initial={{ opacity: 0, y: 20 }}
+              key="faq"
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="max-w-4xl mx-auto space-y-6"
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="max-w-4xl mx-auto space-y-8"
             >
-              {faqs.map((faq, idx) => (
-                <div key={idx} className="bg-white rounded-3xl p-8 shadow-lg border border-primary/5 hover:border-accent/30 transition-all">
-                  <div className="flex items-start space-x-4">
-                    <div className="p-3 bg-accent/10 rounded-2xl text-accent shrink-0">
-                      <HelpCircle className="h-6 w-6" />
+              {faqsList.map((faq, i) => (
+                <div key={i} className="paper-card p-12 hover:shadow-2xl transition-all group">
+                  <div className="flex gap-8">
+                    <div className="shrink-0">
+                      <div className="w-14 h-14 bg-primary/5 rounded-2xl flex items-center justify-center text-accent group-hover:bg-primary group-hover:text-white transition-all duration-500">
+                        <HelpCircle className="h-7 w-7" />
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-xl font-serif font-bold text-primary mb-4">{faq.question}</h3>
-                      <div className="flex items-start space-x-3">
-                        <MessageSquare className="h-5 w-5 text-primary/30 mt-1 shrink-0" />
-                        <div className="space-y-4">
-                          <p className="text-primary/70 leading-relaxed text-lg"><ScriptureText text={faq.answer} /></p>
-                          {faq.videoUrl && (
-                            <a href={faq.videoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-4 py-2 bg-accent text-white rounded-full text-sm font-medium hover:bg-accent-light transition-colors shadow-sm">
-                              <PlayCircle className="mr-2 h-4 w-4" />View Video
-                            </a>
-                          )}
+                    <div className="flex-1">
+                      <h3 className="text-2xl font-serif font-bold text-primary mb-6 leading-tight">{faq.question}</h3>
+                      <div className="relative p-8 bg-secondary/30 rounded-[1.5rem] border border-primary/5 italic font-serif text-lg text-primary/70 leading-relaxed overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                          <BookOpen className="h-24 w-24" />
                         </div>
+                        <ScriptureText text={faq.answer} />
+                        {faq.videoUrl && (
+                          <div className="mt-8">
+                            <a href={faq.videoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 px-6 py-3 bg-white text-primary text-[10px] font-bold tracking-[0.2em] uppercase rounded-full shadow-lg hover:text-accent transition-colors">
+                              <PlayCircle className="h-4 w-4" /> Watch Lesson
+                            </a>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
                 </div>
               ))}
-              <div className="mt-12 p-8 bg-white rounded-3xl border border-dashed border-primary/20 text-center">
-                <h3 className="text-xl font-serif text-primary mb-2">Still Seeking Answers?</h3>
-                <p className="text-primary/60 mb-6">Use the Scholarly Dialogue tab for a personalized study session.</p>
-              </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-      {/* Full Screen Dialogue Modal */}
+
+      {/* Full Screen View Modal */}
       <AnimatePresence>
         {fullScreenMessage && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/95 flex flex-col p-6 md:p-12 overflow-y-auto"
+            className="fixed inset-0 z-[100] bg-primary flex items-center justify-center p-6 md:p-24"
           >
-            <div className="max-w-4xl mx-auto w-full">
-              <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
-                <div className="flex items-center gap-3">
-                  <BookOpen className="h-8 w-8 text-accent" />
-                  <h2 className="text-2xl md:text-3xl font-serif font-bold text-secondary">Scholarly Insight</h2>
-                </div>
-                <div className="flex items-center gap-4">
-                  <SpeakButton text={fullScreenMessage} size="lg" className="bg-white/10 rounded-full" />
-                  <button 
-                    onClick={() => setFullScreenMessage(null)}
-                    className="p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
-                  >
-                    <X className="h-8 w-8" />
-                  </button>
-                </div>
-              </div>
-              <div className="prose prose-invert max-w-none">
-                <div className="text-xl md:text-2xl font-serif text-secondary/90 leading-relaxed whitespace-pre-wrap">
-                  <ScriptureText text={fullScreenMessage} />
-                </div>
-              </div>
-              <div className="mt-12 flex justify-center">
+            <div className="max-w-4xl w-full h-full flex flex-col">
+              <div className="flex justify-between items-center mb-16 border-b border-white/10 pb-8">
+                <span className="text-accent-light text-xs font-bold tracking-[0.4em] uppercase">Deep Study Mode</span>
                 <button 
                   onClick={() => setFullScreenMessage(null)}
-                  className="px-8 py-4 bg-accent text-white rounded-2xl font-bold hover:bg-accent-light transition-all shadow-xl"
+                  className="p-4 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all"
                 >
-                  Close Insight
+                  <X className="h-6 w-6" />
                 </button>
+              </div>
+              <div className="flex-1 overflow-y-auto custom-scrollbar pr-8 text-center md:text-left">
+                <div className="prose prose-invert max-w-none font-serif text-2xl md:text-4xl text-secondary/90 italic leading-[1.6]">
+                  <ScriptureText text={fullScreenMessage} />
+                </div>
               </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      <DebugPanel />
     </motion.div>
   );
 }

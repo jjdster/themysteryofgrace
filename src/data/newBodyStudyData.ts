@@ -205,5 +205,82 @@ export const newBodyStudyData: Module[] = [
         ]
       }
     ]
+  },
+  {
+    id: 'nb-m4',
+    title: "The Celestial Hope",
+    description: "Our unique heavenly position and the nature of the body suited for the heavens.",
+    lessons: [
+      {
+        id: 'nb-l6',
+        title: "The Heavenly Calling",
+        scripture: [
+          { reference: "Colossians 3:1-4", text: "If ye then be risen with Christ, seek those things which are above, where Christ sitteth on the right hand of God. Set your affection on things above, not on things on the earth. For ye are dead, and your life is hid with Christ in God. When Christ, who is our life, shall appear, then shall ye also appear with him in glory." },
+          { reference: "Ephesians 2:6", text: "And hath raised us up together, and made us sit together in heavenly places in Christ Jesus:" }
+        ],
+        sourceText: {
+          book: "A Dispensational Theology",
+          author: "Charles F. Baker",
+          excerpt: "The resurrection of the Church which is His Body is not a return to an earthly inheritance, but an appearing with Him in the 'heavenly places' where we are already positionally seated."
+        },
+        summary: "Our hope is distinct from the earthly resurrection promised to Israel. While Israel looks to a kingdom on earth, the Body of Christ has a 'heavenly calling.' We are already 'risen with Christ' positionally, and our life is 'hid with Christ in God.' When He appears, we won't just stand on the earth; we will 'appear with him in glory' in our new celestial bodies.",
+        keyIdeas: [
+          "We are positionally seated in heavenly places already.",
+          "Our life is currently hidden with Christ in God.",
+          "Our manifestation in the new body happens when Christ appears."
+        ],
+        reflectionPrompt: "What does it mean to 'set your affection on things above' in the context of your future body?",
+        questions: [
+          {
+            id: 'nb-q7',
+            question: "Where is our life currently 'hid' according to Colossians 3:3?",
+            options: [
+              "In our good works",
+              "With Christ in God",
+              "In the temple in Jerusalem",
+              "Within our physical hearts"
+            ],
+            correctAnswer: 1,
+            explanation: "Colossians 3:3 clearly states: 'For ye are dead, and your life is hid with Christ in God.'",
+            type: "multiple-choice"
+          }
+        ]
+      },
+      {
+        id: 'nb-l7',
+        title: "The Pattern: Christ's Resurrection Body",
+        scripture: [
+          { reference: "Luke 24:39-40", text: "Behold my hands and my feet, that it is I myself: handle me, and see; for a spirit hath not flesh and bones, as ye see me have. And when he had thus spoken, he shewed them his hands and his feet." },
+          { reference: "Philippians 3:21", text: "Who shall change our vile body, that it may be fashioned like unto his glorious body..." }
+        ],
+        sourceText: {
+          book: "Things That Differ",
+          author: "Cornelius R. Stam",
+          excerpt: "The resurrection body is not a vaporous spirit. Christ's body was 'flesh and bones'—real, tangible, yet transformed to pass through walls and transcend the physical limitations of this present world."
+        },
+        summary: "Christ's resurrection body is the direct pattern for our new body. It is a 'glorious body' (Phil 3:21). Crucially, it is not a 'spirit' in the sense of being non-physical; He explicitly said He had 'flesh and bones.' However, it is a body no longer subject to blood (which is the life of the flesh on earth) but animated and sustained by the Spirit, capable of heavenly travel and eternal existence.",
+        keyIdeas: [
+          "Our new body is patterned after Christ's resurrected 'flesh and bones' body.",
+          "The resurrection body is tangible and real, not a ghost.",
+          "It is a body that has transcended earthly biological limitations."
+        ],
+        reflectionPrompt: "How does knowing that Christ's body was 'tangible' (flesh and bones) help you visualize the reality of your own future resurrection?",
+        questions: [
+          {
+            id: 'nb-q8',
+            question: "In Luke 24:39, did Jesus claim to be a 'spirit' without physical form?",
+            options: [
+              "Yes, He said He was a ghost",
+              "No, He said a spirit has not flesh and bones as He has",
+              "Yes, He told them not to touch Him",
+              "He remained silent about His nature"
+            ],
+            correctAnswer: 1,
+            explanation: "Jesus said: 'for a spirit hath not flesh and bones, as ye see me have.'",
+            type: "multiple-choice"
+          }
+        ]
+      }
+    ]
   }
 ];

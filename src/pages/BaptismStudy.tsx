@@ -26,7 +26,7 @@ import {
   Menu,
   X
 } from 'lucide-react';
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { useNavigate, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { baptismStudyData, Module, Lesson, Question } from '../data/baptismStudyData';
@@ -39,7 +39,7 @@ import { useAuth } from '../lib/AuthProvider';
 import { signInWithGoogle } from '../lib/firebase';
 import { LogIn } from 'lucide-react';
 
-const RESTRICTED_AUTHORS = ['Charles F. Baker', 'Harry Bultema', 'Cornelius R. Stam', 'C.R. Stam'];
+const RESTRICTED_AUTHORS: string[] = [];
 const ALLOWED_BUILDER_EMAIL = 'jjdster@gmail.com';
 
 // --- Types ---
@@ -116,7 +116,7 @@ const AIGuide = ({
         `;
 
         chatSessionRef.current = ai.chats.create({
-          model: "gemini-3-flash-preview",
+        model: "gemini-1.5-flash",
           config: {
             systemInstruction,
           },
@@ -432,7 +432,7 @@ const Quiz = ({
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-1.5-flash",
         config: {
           responseMimeType: "application/json",
           responseSchema: {

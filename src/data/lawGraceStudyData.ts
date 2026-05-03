@@ -110,5 +110,129 @@ export const lawGraceStudyData: Module[] = [
         ]
       }
     ]
+  },
+  {
+    id: 'lg-m3',
+    title: "The Law as a Schoolmaster",
+    description: "Understanding the temporary role of the Law in leading to Christ.",
+    lessons: [
+      {
+        id: 'lg-l3',
+        title: "The Purpose and End of the Schoolmaster",
+        scripture: [
+          { reference: "Galatians 3:24-25", text: "Wherefore the law was our schoolmaster to bring us unto Christ, that we might be justified by faith. But after that faith is come, we are no longer under a schoolmaster." }
+        ],
+        sourceText: {
+          book: "Things That Differ",
+          author: "Cornelius R. Stam",
+          excerpt: "The schoolmaster (pedagogue) in ancient times was not the teacher, but the one who conducted the child to the teacher. The Law conducted the sinner to Christ, but once Christ is reached, the schoolmaster's work is finished."
+        },
+        summary: "The Law served a specific, temporary purpose in God's dealings with Israel. Like a schoolmaster who supervises a minor child until they reach maturity, the Law supervised Israel's conduct and revealed their need for a Savior. However, with the revelation of the mystery and the coming of the dispensation of grace, the believer is no longer under that supervisor. We have been brought to Christ, where justification is by faith alone.",
+        keyIdeas: [
+          "The Law was a tutor/supervisor, not the final goal.",
+          "The 'coming of faith' refers to the revelation of the path of justification apart from the Law.",
+          "Believers today are 'graduated' from the Law's supervision."
+        ],
+        reflectionPrompt: "If the Law is no longer your schoolmaster, what is now the primary guide for your life and conduct as a member of the Body of Christ?",
+        questions: [
+          {
+            id: 'lg-q5',
+            question: "According to Galatians 3:24, what was the primary goal of the Law as a 'schoolmaster'?",
+            options: [
+              "To make people permanently holy",
+              "To bring us unto Christ",
+              "To replace the need for faith",
+              "To provide a permanent social code"
+            ],
+            correctAnswer: 1,
+            explanation: "Galatians 3:24 says: 'Wherefore the law was our schoolmaster to bring us unto Christ.'",
+            type: "multiple-choice"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'lg-m4',
+    title: "Dead to the Law",
+    description: "The believer's identification with Christ in His death to the Law.",
+    lessons: [
+      {
+        id: 'lg-l4',
+        title: "Married to Another",
+        scripture: [
+          { reference: "Romans 7:4", text: "Wherefore, my brethren, ye also are become dead to the law by the body of Christ; that ye should be married to another, even to him who is raised from the dead, that we should bring forth fruit unto God." },
+          { reference: "Romans 7:6", text: "But now we are delivered from the law, that being dead wherein we were held; that we should serve in newness of spirit, and not in the oldness of the letter." }
+        ],
+        sourceText: {
+          book: "A Dispensational Theology",
+          author: "Charles F. Baker",
+          excerpt: "The believer's death with Christ has severed the legal relationship with the Law. Just as a wife is freed from the law of her husband when he dies, we are freed from the Law through Christ's death so that we might belong to Him in resurrection."
+        },
+        summary: "In Romans 7, Paul uses the analogy of marriage to show how our relationship to the Law has been severed. Through our identification with Christ in His death, we have become 'dead to the law.' This is not an license to sin, but a change of mastery. We are no longer governed by external rules (the 'oldness of the letter') but by the indwelling Spirit (the 'newness of spirit').",
+        keyIdeas: [
+          "Death terminates all legal obligations.",
+          "We are delivered from the Law to serve God in a new way.",
+          "Our union with the risen Christ is the source of spiritual fruit."
+        ],
+        reflectionPrompt: "Compare 'serving in the oldness of the letter' with 'serving in the newness of spirit.' Which one characterizes your current walk?",
+        questions: [
+          {
+            id: 'lg-q6',
+            question: "According to Romans 7:4, how do we become 'dead to the law'?",
+            options: [
+              "By ignoring its commands",
+              "By the body of Christ (our identification with His death)",
+              "By becoming perfect in behavior",
+              "By repenting of legalism"
+            ],
+            correctAnswer: 1,
+            explanation: "Romans 7:4 states we 'become dead to the law by the body of Christ.'",
+            type: "multiple-choice"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'lg-m5',
+    title: "Grace for Living",
+    description: "The practical outworking of grace in the believer's daily life.",
+    lessons: [
+      {
+        id: 'lg-l5',
+        title: "The Teaching of Grace",
+        scripture: [
+          { reference: "Titus 2:11-12", text: "For the grace of God that bringeth salvation hath appeared to all men, Teaching us that, denying ungodliness and worldly lusts, we should live soberly, righteously, and godly, in this present world;" }
+        ],
+        sourceText: {
+          book: "Things That Differ",
+          author: "Cornelius R. Stam",
+          excerpt: "Grace is not only a means of salvation; it is a teacher. It teaches us to live godly lives not because we are afraid of punishment, but because we are thankful for God's love."
+        },
+        summary: "Many mistakenly believe that without the Law, there is no restraint for sin. However, Paul teaches that Grace itself is a powerful instructor. It teaches us to deny ungodliness and worldly lusts. While the Law commanded us to do right from the outside, Grace motivates us to do right from the inside through a heart of gratitude for the finished work of Christ.",
+        keyIdeas: [
+          "Grace is an active teacher of godly living.",
+          "Grace-motivated service is based on gratitude, not fear.",
+          "The 'present world' is the sphere where grace's power is demonstrated."
+        ],
+        reflectionPrompt: "In what ways has the grace of God personally taught you to deny 'worldly lusts' this week?",
+        questions: [
+          {
+            id: 'lg-q7',
+            question: "According to Titus 2:12, what does the grace of God teach us?",
+            options: [
+              "To keep the Sabbath",
+              "To deny ungodliness and worldly lusts",
+              "That sin doesn't matter",
+              "To follow the Mosaic Law"
+            ],
+            correctAnswer: 1,
+            explanation: "Titus 2:12 explicitly states that grace teaches us to 'deny ungodliness and worldly lusts.'",
+            type: "multiple-choice"
+          }
+        ]
+      }
+    ]
   }
 ];
