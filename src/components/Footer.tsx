@@ -43,7 +43,6 @@ export default function Footer() {
               <Link to="/library" className="text-secondary/50 hover:text-white hover:translate-x-1 transition-all text-sm font-medium inline-block">Grace Library</Link>
               <Link to="/studies" className="text-secondary/50 hover:text-white hover:translate-x-1 transition-all text-sm font-medium inline-block">Bible Studies</Link>
               <Link to="/videos" className="text-secondary/50 hover:text-white hover:translate-x-1 transition-all text-sm font-medium inline-block">Video Archive</Link>
-              <Link to="/community" className="text-secondary/50 hover:text-white hover:translate-x-1 transition-all text-sm font-medium inline-block">Message Board</Link>
             </div>
           </div>
 

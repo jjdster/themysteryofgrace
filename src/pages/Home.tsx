@@ -168,7 +168,7 @@ export default function Home() {
 
             {/* Content Cards */}
             <motion.div variants={itemVariants} className="md:col-span-2">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-full">
+              <div className="grid grid-cols-1 gap-4 h-full">
                 <Link to="/videos" className="paper-card p-8 flex items-center gap-6 group">
                   <div className="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform">
                     <PlusSquare className="h-6 w-6" />
@@ -176,15 +176,6 @@ export default function Home() {
                   <div>
                     <h4 className="font-bold text-primary">Video Archives</h4>
                     <p className="text-sm text-primary/40">Watch foundational messages</p>
-                  </div>
-                </Link>
-                <Link to="/community" className="paper-card p-8 flex items-center gap-6 group">
-                  <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform">
-                    <MessageSquare className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-primary">Community Board</h4>
-                    <p className="text-sm text-primary/40">Discuss and grow with others</p>
                   </div>
                 </Link>
               </div>

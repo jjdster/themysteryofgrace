@@ -517,7 +517,7 @@ export default function ProphecyMysteryStudy() {
   const [showQuiz, setShowQuiz] = useState(false);
   const [isMastered, setIsMastered] = useState(false);
   const [isStudyComplete, setIsStudyComplete] = useState(false);
-  const [dismissedAuthPrompt, setDismissedAuthPrompt] = useState(false);
+  const [dismissedAuthPrompt, setDismissedAuthPrompt] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
 
   const hasBuilderAccess = user?.email === ALLOWED_BUILDER_EMAIL;

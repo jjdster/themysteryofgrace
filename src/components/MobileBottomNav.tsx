@@ -15,7 +15,6 @@ export default function MobileBottomNav({ onMenuClick, onSearchClick }: MobileBo
     { name: 'Gospel', path: '/gospel', icon: Heart },
     { name: 'Studies', path: '/studies', icon: BookOpen },
     { name: 'Library', path: '/library', icon: Book },
-    { name: 'Community', path: '/community', icon: MessageSquare },
   ];
 
   return (
