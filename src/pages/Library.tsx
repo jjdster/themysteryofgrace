@@ -130,6 +130,7 @@ const authorsList = [
 
 const PDF_BASE_URL = '/library'; 
 const RESTRICTED_AUTHORS: string[] = [];
+const NO_DOWNLOAD_AUTHORS = ['Charles F. Baker', 'Cornelius R. Stam', 'C.R. Stam'];
 const ALLOWED_BUILDER_EMAIL = 'jjdster@gmail.com';
 
 export default function Library() {
@@ -346,21 +347,23 @@ export default function Library() {
                     
                     <div className="mt-auto pt-8 border-t border-primary/5 flex items-center justify-between">
                       <a
-                        href={book.downloadUrl || `${PDF_BASE_URL}/${book.filename}`}
+                        href={`${book.downloadUrl || `${PDF_BASE_URL}/${book.filename}`}${NO_DOWNLOAD_AUTHORS.includes(book.author) ? '#toolbar=0' : ''}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 text-[10px] font-bold tracking-[0.2em] uppercase text-primary hover:text-accent transition-colors"
                       >
                         Read Document <ChevronLeft className="h-3 w-3 rotate-180" />
                       </a>
-                      <a
-                        href={book.downloadUrl || `${PDF_BASE_URL}/${book.filename}`}
-                        download={book.filename}
-                        className="p-2 text-primary/20 hover:text-accent transition-colors"
-                        title="Download PDF"
-                      >
-                        <Download className="h-5 w-5" />
-                      </a>
+                      {!NO_DOWNLOAD_AUTHORS.includes(book.author) && (
+                        <a
+                          href={book.downloadUrl || `${PDF_BASE_URL}/${book.filename}`}
+                          download={book.filename}
+                          className="p-2 text-primary/20 hover:text-accent transition-colors"
+                          title="Download PDF"
+                        >
+                          <Download className="h-5 w-5" />
+                        </a>
+                      )}
                     </div>
                   </motion.div>
                 ))}
