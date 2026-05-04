@@ -26,7 +26,7 @@ import {
   Menu,
   X
 } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { useNavigate, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { baptismStudyData, Module, Lesson, Question } from '../data/baptismStudyData';
@@ -116,7 +116,7 @@ const AIGuide = ({
         `;
 
         chatSessionRef.current = ai.chats.create({
-        model: "gemini-1.5-flash",
+        model: "gemini-3-flash-preview",
           config: {
             systemInstruction,
           },
@@ -432,7 +432,7 @@ const Quiz = ({
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-1.5-flash",
+        model: "gemini-3-flash-preview",
         config: {
           responseMimeType: "application/json",
           responseSchema: {

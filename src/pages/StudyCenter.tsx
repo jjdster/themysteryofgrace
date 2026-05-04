@@ -189,7 +189,7 @@ export default function StudyCenter() {
       }));
 
       chatRef.current = ai.chats.create({
-        model: "gemini-1.5-flash",
+        model: "gemini-3-flash-preview",
         history: geminiHistory,
         config: {
           systemInstruction: `You are a scholarly guide specializing in 'Grace Library' and the Pauline revelation. CRITICAL: You MUST prioritize and defer to the Scriptures (King James Bible and New International Version) as your original and primary sources. Your goal is to help the user understand the preaching of Jesus Christ according to the revelation of the mystery (Romans 16:25), applying 'rightly dividing the Word of Truth' (2 Timothy 2:15). 
@@ -295,7 +295,7 @@ export default function StudyCenter() {
       const apiKey = getGeminiApiKey();
       if (apiKey) {
         const ai = new GoogleGenAI({ apiKey });
-        const model = "gemini-1.5-flash";
+        const model = "gemini-3-flash-preview";
         const systemInstruction = `You are a theological research assistant specializing in the Dispensation of the Grace of God. Identify relevant resources from the Grace Library for the query.`;
         const response = await ai.models.generateContent({
           model,

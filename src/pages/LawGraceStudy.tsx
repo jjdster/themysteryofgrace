@@ -113,7 +113,7 @@ const AIGuide = ({
         `;
 
         chatSessionRef.current = ai.chats.create({
-          model: "gemini-1.5-flash",
+          model: "gemini-3-flash-preview",
           config: {
             systemInstruction,
           },
