@@ -342,6 +342,14 @@ export default function StudyCenter() {
           });
         }
       }
+      
+      if (!fullText) {
+          setMessages(prev => {
+            const newMessages = [...prev];
+            newMessages[newMessages.length - 1] = { role: 'model', text: "I'm sorry, I couldn't generate an answer due to an unexpected block. Could you rephrase your question?" };
+            return newMessages;
+          });
+      }
 
       setFullScreenMessage(fullText);
 

@@ -8,8 +8,10 @@ dotenv.config();
 
 const PORT = 3000;
 
+const isProduction = process.env.NODE_ENV === "production" || process.env.NODE_ENV === "production " || !process.env.NODE_ENV;
+
 // --- Vite Middleware (Development Only) ---
-if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+if (!isProduction && !process.env.VERCEL) {
   import("vite").then(async ({ createServer: createViteServer }) => {
     const vite = await createViteServer({
       server: { middlewareMode: true },
