@@ -38,8 +38,6 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
     { id: 'b2', title: 'Prophecy vs. Mystery', type: 'study', path: '/prophecy-mystery-study' },
     { id: 'b3', title: 'The New Body', type: 'study', path: '/new-body-study' },
     // Books from Library (subset)
-    { id: 'lb1', title: 'Things That Differ', type: 'book', path: '/library', description: 'C.R. Stam' },
-    { id: 'lb2', title: 'The Two-Fold Purpose of God', type: 'book', path: '/library', description: 'C.R. Stam' },
     { id: 'lb3', title: 'So Run That You May Win', type: 'book', path: '/library', description: 'Roland Wilson' },
   ];
 

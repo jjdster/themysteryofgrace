@@ -1,79 +1,34 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import Home from './pages/Home';
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './lib/AuthProvider';
+import { SearchProvider } from './lib/SearchProvider';
+import Search from './pages/Search';
+import Links from './pages/Links';
 import Mystery from './pages/Mystery';
+import ProphecyMysteryStudy from './pages/ProphecyMysteryStudy';
 import Videos from './pages/Videos';
-import Gospel from './pages/Gospel';
-import BibleStudies from './pages/BibleStudies';
 import Library from './pages/Library';
 import StudyCenter from './pages/StudyCenter';
-import AdminDashboard from './pages/AdminDashboard';
-import Contact from './pages/Contact';
-import Links from './pages/Links';
-import BaptismStudy from './pages/BaptismStudy';
-import ProphecyMysteryStudy from './pages/ProphecyMysteryStudy';
-import LawGraceStudy from './pages/LawGraceStudy';
-import SevenOnesStudy from './pages/SevenOnesStudy';
-import DualMinistryStudy from './pages/DualMinistryStudy';
-import NewBodyStudy from './pages/NewBodyStudy';
-import Search from './pages/Search';
-import { motion, AnimatePresence } from 'framer-motion';
-import ErrorBoundary from './components/ErrorBoundary';
-import ScrollToTop from './components/ScrollToTop';
-import { SearchProvider } from './lib/SearchProvider';
-import { AuthProvider } from './lib/AuthProvider';
 
-function Layout() {
-  const location = useLocation();
-  const isStudyPage = ['/baptism-study', '/prophecy-mystery-study', '/law-grace-study', '/seven-ones-study', '/dual-ministry-study', '/new-body-study'].includes(location.pathname);
-
+function App() {
   return (
-    <div className="flex flex-col min-h-screen">
-      {!isStudyPage && <Navbar />}
-      <main className="flex-grow pb-24 lg:pb-0">
-        <AnimatePresence mode="wait">
+    <BrowserRouter>
+      <SearchProvider>
+        <div className="min-h-screen bg-white">
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/gospel" element={<Gospel />} />
-            <Route path="/salvation" element={<Gospel />} />
-            <Route path="/testimony" element={<Gospel />} />
-            <Route path="/mystery" element={<Mystery />} />
-            <Route path="/videos" element={<Videos />} />
-            <Route path="/studies" element={<BibleStudies />} />
-            <Route path="/baptism-study" element={<BaptismStudy />} />
-            <Route path="/prophecy-mystery-study" element={<ProphecyMysteryStudy />} />
-            <Route path="/law-grace-study" element={<LawGraceStudy />} />
-            <Route path="/seven-ones-study" element={<SevenOnesStudy />} />
-            <Route path="/dual-ministry-study" element={<DualMinistryStudy />} />
-            <Route path="/new-body-study" element={<NewBodyStudy />} />
-            <Route path="/study-center" element={<StudyCenter />} />
-            <Route path="/asking" element={<StudyCenter />} />
+            <Route path="/" element={<div className="p-8"><h1 className="text-3xl font-bold">SGF Study Center</h1></div>} />
             <Route path="/library" element={<Library />} />
+            <Route path="/study" element={<StudyCenter />} />
+            <Route path="/videos" element={<Videos />} />
             <Route path="/search" element={<Search />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/live-study" element={<StudyCenter />} />
             <Route path="/links" element={<Links />} />
-            <Route path="/contact" element={<Contact />} />
+            <Route path="/mystery" element={<Mystery />} />
+            <Route path="/prophecy-mystery" element={<ProphecyMysteryStudy />} />
           </Routes>
-        </AnimatePresence>
-      </main>
-      {!isStudyPage && <Footer />}
-    </div>
+        </div>
+      </SearchProvider>
+    </BrowserRouter>
   );
 }
 
-export default function App() {
-  return (
-    <ErrorBoundary>
-      <AuthProvider>
-        <Router>
-          <SearchProvider>
-            <ScrollToTop />
-            <Layout />
-          </SearchProvider>
-        </Router>
-      </AuthProvider>
-    </ErrorBoundary>
-  );
-}
+export default App;

@@ -76,7 +76,7 @@ export default function Search() {
             <SearchIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
             <h2 className="text-xl font-bold text-gray-900 mb-2">No results found</h2>
             <p className="text-gray-500">
-              Try searching for something else, like "Gospel", "Mystery", or "Stam".
+              Try searching for something else, like "Gospel", "Mystery", or "Prophecy".
             </p>
           </div>
         )}
