@@ -16,7 +16,7 @@ function App() {
       <SearchProvider>
         <div className="min-h-screen bg-white">
           <Routes>
-            <Route path="/" element={<div className="p-8"><h1 className="text-3xl font-bold">SGF Study Center</h1></div>} />
+            <Route path="/" element={<Mystery />} />
             <Route path="/library" element={<Library />} />
             <Route path="/study" element={<StudyCenter />} />
             <Route path="/videos" element={<Videos />} />

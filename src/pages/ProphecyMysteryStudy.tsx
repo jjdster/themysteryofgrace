@@ -192,15 +192,15 @@ const AIGuide = ({
           status: 'completed'
         }
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("AI Error:", error);
       setMessages(prev => {
         const newMessages = [...prev];
         const lastMsg = newMessages[newMessages.length - 1];
         if (lastMsg && lastMsg.role === 'model' && lastMsg.text === '') {
-          newMessages[newMessages.length - 1] = { role: 'model', text: "I'm having trouble connecting right now. Please check your internet or try again in a moment." };
+          newMessages[newMessages.length - 1] = { role: 'model', text: `I'm having trouble connecting right now. Error: ${error.message || String(error)}` };
         } else {
-          newMessages.push({ role: 'model', text: "I encountered an error while responding. Please try again." });
+          newMessages.push({ role: 'model', text: `I encountered an error while responding. Error: ${error.message || String(error)}` });
         }
         return newMessages;
       });
