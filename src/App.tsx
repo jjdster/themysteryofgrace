@@ -15,7 +15,7 @@ function App() {
   return (
     <BrowserRouter>
       <SearchProvider>
-        <div className="min-h-screen bg-white md:pt-16 pb-16 md:pb-0">
+        <div className="min-h-screen bg-white pb-16 md:pb-0">
           <Navigation />
           <Routes>
             <Route path="/" element={<Mystery />} />

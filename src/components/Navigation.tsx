@@ -15,7 +15,7 @@ export default function Navigation() {
   return (
     <>
       {/* Desktop Navbar */}
-      <nav className="hidden md:flex fixed top-0 w-full bg-primary text-secondary z-50 px-6 py-4 justify-between items-center shadow-md">
+      <nav className="hidden md:flex sticky top-0 w-full bg-primary text-secondary z-50 px-6 py-4 justify-between items-center border-b border-primary-light/30">
         <NavLink to="/" className="text-xl font-serif font-bold tracking-wider">
           The Mystery of Grace
         </NavLink>
