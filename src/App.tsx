@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './lib/AuthProvider';
 import { SearchProvider } from './lib/SearchProvider';
+import Navigation from './components/Navigation';
 import Search from './pages/Search';
 import Links from './pages/Links';
 import Mystery from './pages/Mystery';
@@ -14,7 +15,8 @@ function App() {
   return (
     <BrowserRouter>
       <SearchProvider>
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-white md:pt-16 pb-16 md:pb-0">
+          <Navigation />
           <Routes>
             <Route path="/" element={<Mystery />} />
             <Route path="/library" element={<Library />} />
